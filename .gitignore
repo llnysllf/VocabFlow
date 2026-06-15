@@ -1,10 +1,14 @@
 # macOS
 .DS_Store
 
-# Editor
+# Editor / local tooling
 .vscode/
 .idea/
 *.swp
+.claude/
+
+# Node (only if you ever add tooling)
+node_modules/
 
 # Personal backups exported from the app
 vocabflow-backup-*.json
