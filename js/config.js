@@ -13,10 +13,12 @@
  * Data API (Project URL) and API Keys (anon public key).
  */
 window.VOCABFLOW_CONFIG = {
-  SUPABASE_URL: "",      // e.g. "https://abcdefgh.supabase.co"
-  SUPABASE_ANON_KEY: "", // e.g. "eyJhbGciOiJI..."
+  // Base project URL only — NOT the ".../rest/v1/" endpoint. The client adds paths itself.
+  SUPABASE_URL: "https://gmumbqqmlvghuwizdnut.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_fecRgCCUl6jf-yqQpO8RQQ_rSZdK7Lt",
 
-  // Optional: set to false to hide the "Continue with Google" button
-  // (only enable it if you've configured the Google provider in Supabase).
-  ENABLE_GOOGLE: true
+  // Google sign-in stays off until you configure the Google provider in
+  // Supabase (Authentication -> Providers). Email/password works without it.
+  // Flip this to true once Google is set up.
+  ENABLE_GOOGLE: false
 };
