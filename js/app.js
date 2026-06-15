@@ -40,6 +40,61 @@ function sanitize(s) {
   return s;
 }
 
+/* Union two "missed today" lists by rank, keeping the worst grade. */
+function unionWrong(a, b) {
+  var byRank = {};
+  (a || []).concat(b || []).forEach(function (it) {
+    if (!it || it.r == null) return;
+    if (!byRank[it.r]) byRank[it.r] = { r: it.r, kind: it.kind };
+    else if (it.kind === "bad") byRank[it.r].kind = "bad";
+  });
+  return Object.keys(byRank).map(function (k) { return byRank[k]; });
+}
+
+/* Merge two states without losing progress: per word keep the more-advanced
+   entry, combine same-day counters, and let the newer copy win for settings.
+   Used to reconcile concurrent edits across tabs/devices. */
+function mergeStates(a, b) {
+  a = sanitize(a); b = sanitize(b);
+  var merged = blankState();
+  var ranks = {}, r;
+  for (r in a.words) ranks[r] = 1;
+  for (r in b.words) ranks[r] = 1;
+  for (r in ranks) {
+    var wa = a.words[r], wb = b.words[r];
+    if (!wa) merged.words[r] = wb;
+    else if (!wb) merged.words[r] = wa;
+    else if (wa.seen !== wb.seen) merged.words[r] = wa.seen ? wa : wb;
+    else if (wa.lvl !== wb.lvl) merged.words[r] = (wa.lvl > wb.lvl) ? wa : wb;
+    else merged.words[r] = (wa.due >= wb.due) ? wa : wb;
+  }
+  var seen = 0; for (r in merged.words) { if (merged.words[r].seen) seen++; }
+  merged.totals.everSeen = seen;
+  var newer = (a.mtime || 0) >= (b.mtime || 0) ? a : b;
+  merged.cfg = Object.assign({}, DEFAULTS, newer.cfg);
+  if (a.day.idx === b.day.idx) {
+    merged.day = {
+      idx: a.day.idx,
+      newCount: Math.max(a.day.newCount, b.day.newCount),
+      revCount: Math.max(a.day.revCount, b.day.revCount),
+      strikes: Math.max(a.day.strikes, b.day.strikes),
+      wrongToday: unionWrong(a.day.wrongToday, b.day.wrongToday)
+    };
+  } else {
+    merged.day = newer.day;
+  }
+  merged.mtime = Math.max(a.mtime || 0, b.mtime || 0);
+  return merged;
+}
+
+/* Heuristic: does this parsed JSON look like a VocabFlow backup? */
+function looksLikeBackup(o) {
+  return o && typeof o === "object" &&
+    o.words && typeof o.words === "object" &&
+    o.day && typeof o.day === "object" &&
+    o.cfg && typeof o.cfg === "object";
+}
+
 /* ---------------- storage layer (guest localStorage + cloud sync) ---------------- */
 var S = blankState();
 
@@ -281,9 +336,61 @@ function reveal() {
   var d = BY_RANK[current];
   var typed = elAns.value.trim();
   elYour.innerHTML = typed ? ("You typed: <b>" + escapeHtml(typed) + "</b>") : "<i>(no answer typed)</i>";
-  elCn.textContent = d.c;
-  elEn.textContent = d.e ? d.e.replace(/ \/ /g, "\n") : "";
+  renderMeaning(d.c);
+  renderGloss(d.e);
   elReveal.classList.add("show");
+}
+
+function splitMeaning(text) {
+  return String(text || "").split(/\s*\/\s*/).filter(Boolean).map(function (part) {
+    var m = part.match(/^([A-Za-z][A-Za-z. -]{0,14}\.)\s*(.+)$/);
+    return m ? { label: m[1], text: m[2] } : { label: "", text: part };
+  });
+}
+
+function splitMeaningTerms(text) {
+  return String(text || "").split(/[，,;；]/).map(function (term) {
+    return term.trim();
+  }).filter(Boolean);
+}
+
+function renderMeaning(text) {
+  elCn.innerHTML = "";
+  splitMeaning(text).forEach(function (part) {
+    var termList = splitMeaningTerms(part.text);
+    var row = document.createElement("div");
+    row.className = "meaning-row" +
+      (part.label ? "" : " plain") +
+      (termList.length > 4 ? " wide" : "");
+
+    if (part.label) {
+      var label = document.createElement("span");
+      label.className = "meaning-pos";
+      label.textContent = part.label;
+      row.appendChild(label);
+    }
+
+    var terms = document.createElement("span");
+    terms.className = "meaning-terms";
+    termList.forEach(function (term) {
+      var chip = document.createElement("span");
+      chip.className = "meaning-term";
+      chip.textContent = term;
+      terms.appendChild(chip);
+    });
+    row.appendChild(terms);
+    elCn.appendChild(row);
+  });
+}
+
+function renderGloss(text) {
+  elEn.innerHTML = "";
+  String(text || "").split(/\s*\/\s*/).filter(Boolean).forEach(function (line) {
+    var item = document.createElement("div");
+    item.className = "gloss-line";
+    item.textContent = line;
+    elEn.appendChild(item);
+  });
 }
 
 function escapeHtml(s) {
