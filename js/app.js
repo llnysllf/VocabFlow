@@ -149,6 +149,7 @@ function rollDayIfNeeded() {
 var queue = [];            // ranks scheduled for this session run
 var current = null;        // current rank
 var ignoreStrikes = false; // "keep going anyway" mode
+var drillOnly = false;     // re-drilling today's misses only — don't introduce new words
 var skipped = {};          // ranks skipped this session (won't resurface until next session)
 
 function dueReviews() {
@@ -182,6 +183,7 @@ function startSession() {
   rollDayIfNeeded();
   buildQueue();
   ignoreStrikes = false;
+  drillOnly = false;
   skipped = {};
   advance();
 }
@@ -194,8 +196,8 @@ function pickNext() {
     var w = S.words[r];
     if (w && w.seen && w.lvl < MAX_LEVEL && w.due <= todayIndex()) return r;
   }
-  // 2) introduce a new word if under the daily cap
-  if (ignoreStrikes || S.day.newCount < S.cfg.newPerDay) {
+  // 2) introduce a new word if under the daily cap (never while re-drilling misses)
+  if (!drillOnly && (ignoreStrikes || S.day.newCount < S.cfg.newPerDay)) {
     var nr = nextNewRank();
     if (nr !== null) return nr;
   }
@@ -349,7 +351,8 @@ function drillWrong() {
   if (!S.day.wrongToday.length) return;
   queue = S.day.wrongToday.map(function (x) { return x.r; });
   skipped = {};
-  ignoreStrikes = true;
+  ignoreStrikes = true;   // practice past the strike limit
+  drillOnly = true;       // ...but stop after the misses, don't pull in new words
   document.getElementById("screenDone").classList.remove("active");
   var r = queue.shift();
   if (r != null) { current = r; renderCard(r); refreshStats(); }
@@ -397,6 +400,7 @@ function closeAuth() { el("authModal").classList.remove("show"); }
 function syncAuthModal() {
   el("authTitle").textContent = authMode === "in" ? "Sign in" : "Create account";
   el("btnAuthSubmit").textContent = authMode === "in" ? "Sign in" : "Create account";
+  el("authPass").setAttribute("autocomplete", authMode === "in" ? "current-password" : "new-password");
   el("authSwitchText").innerHTML = authMode === "in"
     ? 'New here? <a id="authSwitch">Create an account</a>'
     : 'Already have an account? <a id="authSwitch">Sign in</a>';
@@ -478,6 +482,7 @@ function wireEvents() {
   el("btnReviewWrong").addEventListener("click", drillWrong);
   el("btnKeepGoing").addEventListener("click", function () {
     ignoreStrikes = true;
+    drillOnly = false;   // "keep going" deliberately resumes new words
     el("screenDone").classList.remove("active");
     advance();
   });
@@ -550,10 +555,15 @@ function wireEvents() {
   el("closeAuth").addEventListener("click", closeAuth);
   el("authPass").addEventListener("keydown", function (e) { if (e.key === "Enter") submitAuth(); });
 
-  /* close modals on backdrop click */
+  /* close modals on backdrop click, or Escape */
   ["statsModal", "settingsModal", "authModal"].forEach(function (id) {
     var m = el(id);
     m.addEventListener("click", function (e) { if (e.target === m) m.classList.remove("show"); });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      ["statsModal", "settingsModal", "authModal"].forEach(function (id) { el(id).classList.remove("show"); });
+    }
   });
 
   /* flush unsynced changes when the tab is backgrounded or closed */
