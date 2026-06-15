@@ -22,7 +22,8 @@ function blankState() {
     cfg: Object.assign({}, DEFAULTS),
     words: {},          // rank -> {lvl, due, seen, lastGrade}
     day: { idx: todayIndex(), newCount: 0, revCount: 0, strikes: 0, wrongToday: [] },
-    totals: { everSeen: 0 }
+    totals: { everSeen: 0 },
+    mtime: 0            // last-modified (ms) — used to resolve local vs cloud copies
   };
 }
 
@@ -35,6 +36,7 @@ function sanitize(s) {
   if (!s.day) s.day = { idx: todayIndex(), newCount: 0, revCount: 0, strikes: 0, wrongToday: [] };
   if (!Array.isArray(s.day.wrongToday)) s.day.wrongToday = [];
   if (!s.totals) s.totals = { everSeen: 0 };
+  if (typeof s.mtime !== "number") s.mtime = 0;
   return s;
 }
 
@@ -53,37 +55,78 @@ function writeLS(key, obj) {
 }
 
 var cloudSaveTimer = null;
+var dirty = false;          // unsynced local changes pending
+var syncPaused = false;     // true when the load failed: study locally, don't clobber cloud
+
+function cloudActive() { return window.Cloud && Cloud.user && !syncPaused; }
+
 function persist() {
-  writeLS(lsKey(), S);                       // local cache: always, instant
-  if (window.Cloud && Cloud.user) {
+  S.mtime = Date.now();
+  writeLS(lsKey(), S);                        // local cache: always, instant
+  if (cloudActive()) {
+    dirty = true;
     setSynced("saving…");
     clearTimeout(cloudSaveTimer);
-    cloudSaveTimer = setTimeout(function () {
-      Cloud.saveState(S).then(function (ok) {
-        setSynced(ok ? "synced ✓" : "offline — saved locally");
-      });
-    }, 800);                                 // debounce rapid grades into one write
+    cloudSaveTimer = setTimeout(flushCloud, 800); // debounce rapid grades into one write
   }
 }
-function save() { persist(); }                // alias used throughout
+function save() { persist(); }                 // alias used throughout
+
+/* Push pending changes to the cloud now (debounce flush / tab-hide / close). */
+function flushCloud() {
+  clearTimeout(cloudSaveTimer);
+  if (!cloudActive() || !dirty) return;
+  return Cloud.saveState(S).then(function (ok) {
+    if (ok) dirty = false;
+    setSynced(ok ? "synced ✓" : "offline — saved locally");
+  });
+}
+
+/* Save immediately, then run cb (used by Reset/Import before reload). */
+function persistNowThen(cb) {
+  S.mtime = Date.now();
+  writeLS(lsKey(), S);
+  if (window.Cloud && Cloud.user && !syncPaused) {
+    setSynced("saving…");
+    Cloud.saveState(S).then(cb, cb);           // proceed even if the write fails
+  } else { cb(); }
+}
 
 /* Load the right state for whoever is signed in (or guest). */
 function loadForCurrentUser() {
+  syncPaused = false;
+  dirty = false;
   if (window.Cloud && Cloud.user) {
-    return Cloud.loadState().then(function (remote) {
-      if (remote) {
-        S = sanitize(remote);
-        writeLS(lsKey(), S);
+    return Cloud.loadState().then(function (res) {
+      var cached = readLS(lsKey());
+      if (!res.ok) {
+        // Couldn't reach the server. Work from the local cache and pause cloud
+        // writes so a partial local state never overwrites good remote data.
+        syncPaused = true;
+        S = sanitize(cached || readLS(LS_PREFIX) || blankState());
+        setSynced("offline — changes won't sync until reload");
+        return;
+      }
+      if (res.state) {
+        // If local edits are newer than the cloud (e.g. made while offline),
+        // keep them and push up; otherwise adopt the cloud copy.
+        if (cached && (cached.mtime || 0) > (res.state.mtime || 0)) {
+          S = sanitize(cached);
+          writeLS(lsKey(), S);
+          dirty = true; flushCloud();
+        } else {
+          S = sanitize(res.state);
+          writeLS(lsKey(), S);
+        }
         return;
       }
       // No cloud data yet for this account. If the guest on this browser has
       // real progress, migrate it up so nothing is lost on first sign-in.
       var guest = readLS(LS_PREFIX);
-      var cached = readLS(lsKey());
       if (!cached && guest && guest.totals && guest.totals.everSeen > 0) {
         S = sanitize(guest);
         writeLS(lsKey(), S);
-        Cloud.saveState(S);
+        dirty = true; flushCloud();
       } else {
         S = sanitize(cached || blankState());
         writeLS(lsKey(), S);
@@ -400,7 +443,7 @@ function onAuthChanged() {
   loadForCurrentUser().then(function () {
     rollDayIfNeeded();
     refreshStats();
-    setSynced(Cloud.user ? "synced ✓" : "");
+    if (!syncPaused) setSynced(Cloud.user ? "synced ✓" : "");
     startSession();
   });
 }
@@ -488,15 +531,16 @@ function wireEvents() {
     rd.onload = function () {
       try {
         S = sanitize(JSON.parse(rd.result));
-        save(); rollDayIfNeeded();
-        alert("Backup imported."); location.reload();
+        rollDayIfNeeded();
+        persistNowThen(function () { alert("Backup imported."); location.reload(); });
       } catch (err) { alert("Could not read that file."); }
     };
     rd.readAsText(f);
   });
   el("btnReset").addEventListener("click", function () {
     if (confirm("Erase ALL progress for this profile and start over from the most common word?")) {
-      S = blankState(); save(); location.reload();
+      S = blankState();
+      persistNowThen(function () { location.reload(); });
     }
   });
 
@@ -511,6 +555,10 @@ function wireEvents() {
     var m = el(id);
     m.addEventListener("click", function (e) { if (e.target === m) m.classList.remove("show"); });
   });
+
+  /* flush unsynced changes when the tab is backgrounded or closed */
+  document.addEventListener("visibilitychange", function () { if (document.hidden) flushCloud(); });
+  window.addEventListener("pagehide", flushCloud);
 }
 
 /* ---------------- boot ---------------- */
@@ -533,7 +581,7 @@ function boot() {
   }).then(function () {
     rollDayIfNeeded();
     refreshStats();
-    setSynced(window.Cloud && Cloud.user ? "synced ✓" : "");
+    if (!syncPaused) setSynced(window.Cloud && Cloud.user ? "synced ✓" : "");
     startSession();
   });
 }

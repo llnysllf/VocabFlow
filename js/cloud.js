@@ -95,18 +95,21 @@
       return client.auth.signOut().then(function () { Cloud.user = null; });
     },
 
-    /* Fetch this user's saved state, or null if they have none yet. */
+    /* Fetch this user's saved state.
+       Returns { ok, state }: ok=false means the server couldn't be reached
+       (so callers must NOT treat it as an empty account and overwrite it);
+       ok=true with state=null means the account genuinely has no data yet. */
     loadState: function () {
-      if (!client || !Cloud.user) return Promise.resolve(null);
+      if (!client || !Cloud.user) return Promise.resolve({ ok: true, state: null });
       return client.from("progress")
         .select("state")
         .eq("user_id", Cloud.user.id)
         .maybeSingle()
         .then(function (res) {
-          if (res.error || !res.data) return null;
-          return res.data.state || null;
+          if (res.error) return { ok: false, state: null };
+          return { ok: true, state: res.data ? (res.data.state || null) : null };
         })
-        .catch(function () { return null; });
+        .catch(function () { return { ok: false, state: null }; });
     },
 
     /* Upsert this user's state. Returns true on success. */
