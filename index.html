@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VocabFlow · English → Chinese Trainer</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --panel2:#1e222e; --line:#2a2f3d;
+    --txt:#e8eaf0; --muted:#9aa1b2; --faint:#6b7080;
+    --accent:#6c8cff; --accent2:#5a76e0;
+    --good:#34d399; --warn:#fbbf24; --bad:#f87171;
+    --goodbg:#0f2e24; --warnbg:#332a10; --badbg:#33161a;
+    --radius:16px; --shadow:0 10px 40px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 50% -10%, #1a1f2e 0%, var(--bg) 60%);
+    color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+    min-height:100vh; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:20px 18px 80px}
+  header.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+  .brand{font-weight:700;font-size:20px;letter-spacing:.3px;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+  .iconbtn{background:var(--panel2);border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:13px}
+  .iconbtn:hover{color:var(--txt);border-color:var(--accent)}
+
+  /* stat strip */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 10px;text-align:center}
+  .stat .num{font-size:22px;font-weight:700}
+  .stat .lbl{font-size:11px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.6px}
+  .strikes .num{color:var(--warn)}
+  .mastered .num{color:var(--good)}
+
+  /* card */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 24px;min-height:300px;position:relative}
+  .rankpill{position:absolute;top:16px;right:18px;font-size:12px;color:var(--faint);background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+  .qlabel{color:var(--muted);font-size:13px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+  .word{font-size:46px;font-weight:800;line-height:1.1;margin:6px 0 4px;word-break:break-word}
+  .prompt{color:var(--faint);font-size:14px;margin-bottom:18px}
+  textarea#answer{width:100%;min-height:70px;resize:vertical;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--txt);font-size:18px;padding:12px 14px;font-family:inherit}
+  textarea#answer:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,140,255,.18)}
+
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .btn{flex:1;min-width:120px;border:none;border-radius:12px;padding:13px 16px;font-size:15px;font-weight:600;cursor:pointer;transition:transform .05s ease}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.primary:hover{background:var(--accent2)}
+  .btn.ghost{background:var(--panel2);color:var(--muted);border:1px solid var(--line);flex:0 0 auto;min-width:auto}
+  .btn.ghost:hover{color:var(--txt)}
+
+  /* reveal */
+  .reveal{margin-top:18px;border-top:1px dashed var(--line);padding-top:16px;display:none}
+  .reveal.show{display:block;animation:fade .2s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .yourtry{font-size:14px;color:var(--muted);margin-bottom:10px}
+  .yourtry b{color:var(--txt)}
+  .ansblock{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:6px}
+  .ans-cn{font-size:24px;font-weight:700;color:var(--good);line-height:1.3}
+  .ans-en{font-size:14px;color:var(--muted);margin-top:10px;line-height:1.55;white-space:pre-line}
+  .gradehint{font-size:12px;color:var(--faint);margin:14px 0 8px}
+  .grades{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .grade{border:1px solid var(--line);border-radius:12px;padding:14px 8px;cursor:pointer;text-align:center;font-weight:600;font-size:15px;background:var(--panel2)}
+  .grade small{display:block;font-weight:400;font-size:11px;color:var(--faint);margin-top:3px}
+  .grade.g-good{color:var(--good)} .grade.g-good:hover{background:var(--goodbg);border-color:var(--good)}
+  .grade.g-part{color:var(--warn)} .grade.g-part:hover{background:var(--warnbg);border-color:var(--warn)}
+  .grade.g-bad{color:var(--bad)}   .grade.g-bad:hover{background:var(--badbg);border-color:var(--bad)}
+  .kbd{font-size:10px;color:var(--faint);border:1px solid var(--line);border-radius:5px;padding:1px 5px;margin-left:4px}
+
+  /* screens */
+  .screen{display:none}
+  .screen.active{display:block}
+  .big-msg{text-align:center;padding:30px 10px}
+  .big-msg h2{font-size:26px;margin:0 0 8px}
+  .big-msg p{color:var(--muted);margin:6px 0}
+  .focuslist{margin-top:18px;text-align:left}
+  .focusitem{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+  .focusitem .fw{font-weight:700;font-size:17px}
+  .focusitem .fc{color:var(--muted);font-size:14px;text-align:right;max-width:60%}
+  .tag{font-size:10px;padding:2px 7px;border-radius:999px;margin-left:8px;vertical-align:middle}
+  .tag.bad{background:var(--badbg);color:var(--bad)}
+  .tag.part{background:var(--warnbg);color:var(--warn)}
+
+  .progressbar{height:8px;background:var(--panel2);border-radius:999px;overflow:hidden;margin:0 0 18px;border:1px solid var(--line)}
+  .progressbar>div{height:100%;background:linear-gradient(90deg,var(--accent),#9b7cff);width:0;transition:width .3s ease}
+
+  /* modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+  .modal-bg.show{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:460px;width:100%;padding:22px}
+  .modal h3{margin:0 0 12px}
+  .modal p{color:var(--muted);font-size:14px;line-height:1.5}
+  .modal .row{margin-top:16px}
+  .footnote{color:var(--faint);font-size:12px;text-align:center;margin-top:26px;line-height:1.6}
+  a{color:var(--accent)}
+  .hidden{display:none!important}
+  select,input[type=number]{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:6px 8px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="dot"></span> VocabFlow</div>
+    <div style="display:flex;gap:8px">
+      <button class="iconbtn" id="btnStats">Progress</button>
+      <button class="iconbtn" id="btnSettings">Settings</button>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="num" id="sNew">0</div><div class="lbl">New today</div></div>
+    <div class="stat"><div class="num" id="sRev">0</div><div class="lbl">Reviews</div></div>
+    <div class="stat strikes"><div class="num" id="sStrike">0 / 7</div><div class="lbl">Strikes</div></div>
+    <div class="stat mastered"><div class="num" id="sMaster">0</div><div class="lbl">Mastered</div></div>
+  </div>
+
+  <div class="progressbar"><div id="pbar"></div></div>
+
+  <!-- TEST SCREEN -->
+  <section class="screen active" id="screenTest">
+    <div class="card">
+      <div class="rankpill" id="rankPill">#1</div>
+      <div class="qlabel" id="qlabel">What does this word mean?</div>
+      <div class="word" id="word">—</div>
+      <div class="prompt">Type the Chinese meaning, then check.</div>
+      <textarea id="answer" placeholder="输入中文意思…" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+      <div class="row">
+        <button class="btn primary" id="btnCheck">Check answer <span class="kbd">Enter</span></button>
+        <button class="btn ghost" id="btnSkip">Skip</button>
+      </div>
+
+      <div class="reveal" id="reveal">
+        <div class="yourtry" id="yourtry"></div>
+        <div class="ansblock">
+          <div class="ans-cn" id="ansCn"></div>
+          <div class="ans-en" id="ansEn"></div>
+        </div>
+        <div class="gradehint">How well did you know it? (you decide honestly)</div>
+        <div class="grades">
+          <div class="grade g-good" data-g="good">✓ Right<small>knew it · 1</small></div>
+          <div class="grade g-part" data-g="part">~ Partly<small>close · 2</small></div>
+          <div class="grade g-bad"  data-g="bad">✗ Wrong<small>didn't know · 3</small></div>
+        </div>
+      </div>
+    </div>
+    <div class="footnote">Session stops when you hit <b>7 strikes</b> (wrong = 1, partly = ½) or after 50 new words. Those words become today's focus list.</div>
+  </section>
+
+  <!-- DONE / STOP SCREEN -->
+  <section class="screen" id="screenDone">
+    <div class="card">
+      <div class="big-msg">
+        <h2 id="doneTitle">Done for today 🎉</h2>
+        <p id="doneSub"></p>
+      </div>
+      <div id="focusWrap" class="focuslist"></div>
+      <div class="row" style="margin-top:20px">
+        <button class="btn primary" id="btnReviewWrong">Drill today's words again</button>
+        <button class="btn ghost" id="btnKeepGoing">Keep going anyway</button>
+      </div>
+      <div class="footnote">Come back tomorrow — your wrong words are scheduled first, and words you got right will resurface on an expanding schedule (1 → 2 → 4 → 7 → 15 → 30 days) so they actually stick.</div>
+    </div>
+  </section>
+</div>
+
+<!-- STATS MODAL -->
+<div class="modal-bg" id="statsModal">
+  <div class="modal">
+    <h3>Your progress</h3>
+    <p id="statsBody"></p>
+    <div class="row"><button class="btn ghost" style="flex:1" id="closeStats">Close</button></div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-bg" id="settingsModal">
+  <div class="modal">
+    <h3>Settings &amp; data</h3>
+    <p>
+      Daily strike limit: <input type="number" id="setStrikes" min="1" max="30" style="width:64px"><br><br>
+      New words per day: <input type="number" id="setNew" min="0" max="300" style="width:74px"><br><br>
+      Partly-right = <select id="setPart"><option value="0.5">½ strike</option><option value="0">no strike</option><option value="1">full strike</option></select>
+    </p>
+    <div class="row">
+      <button class="btn ghost" id="btnExport">Export backup</button>
+      <button class="btn ghost" id="btnImport">Import backup</button>
+    </div>
+    <div class="row">
+      <button class="btn ghost" id="btnReset" style="color:var(--bad)">Reset all progress</button>
+      <button class="btn primary" id="closeSettings">Save &amp; close</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json" class="hidden">
+    <div class="footnote">Progress is saved in this browser only. Use Export to back it up or move to another device.</div>
+  </div>
+</div>
+
+<script src="words.js"></script>
+<script>
+(function(){
+"use strict";
+
+/* ---------------- config / state ---------------- */
+var LS_KEY = "vocabflow_v1";
+var INTERVALS = {0:1, 1:2, 2:4, 3:7, 4:15, 5:30}; // days until next review by resulting level
+var MAX_LEVEL = 6; // level 6 = mastered
+
+var DEFAULTS = { strikeLimit:7, newPerDay:50, partWeight:0.5 };
+
+var DATA = window.VOCAB || [];
+// index by rank for quick lookup
+var BY_RANK = {};
+for (var i=0;i<DATA.length;i++){ BY_RANK[DATA[i].r] = DATA[i]; }
+
+function todayIndex(){
+  var now = new Date();
+  return Math.floor((now.getTime() - now.getTimezoneOffset()*60000)/86400000);
+}
+
+function blankState(){
+  return {
+    cfg: Object.assign({}, DEFAULTS),
+    words: {},          // rank -> {lvl, due, seen, lastGrade}
+    day: { idx: todayIndex(), newCount:0, revCount:0, strikes:0, wrongToday:[] },
+    totals: { everSeen:0 }
+  };
+}
+
+var S = load();
+
+function load(){
+  try{
+    var raw = localStorage.getItem(LS_KEY);
+    if(!raw) return blankState();
+    var s = JSON.parse(raw);
+    if(!s.cfg) s.cfg = Object.assign({}, DEFAULTS);
+    if(!s.words) s.words = {};
+    if(!s.day) s.day = { idx: todayIndex(), newCount:0, revCount:0, strikes:0, wrongToday:[] };
+    if(!s.totals) s.totals = { everSeen:0 };
+    return s;
+  }catch(e){ return blankState(); }
+}
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(S)); }catch(e){} }
+
+function rollDayIfNeeded(){
+  var t = todayIndex();
+  if(S.day.idx !== t){
+    S.day = { idx:t, newCount:0, revCount:0, strikes:0, wrongToday:[] };
+    save();
+  }
+}
+
+/* ---------------- queue building ---------------- */
+var queue = [];      // array of ranks for this session run
+var current = null;  // current rank
+var ignoreStrikes = false; // "keep going anyway" mode
+
+function dueReviews(){
+  var t = todayIndex();
+  var out = [];
+  for(var rank in S.words){
+    var w = S.words[rank];
+    if(w.seen && w.lvl < MAX_LEVEL && w.due <= t){
+      out.push(parseInt(rank,10));
+    }
+  }
+  // most overdue first, then most common (lowest rank)
+  out.sort(function(a,b){
+    var da=S.words[a].due, db=S.words[b].due;
+    if(da!==db) return da-db;
+    return a-b;
+  });
+  return out;
+}
+
+function nextNewRank(){
+  // walk DATA in rank order, return first not-yet-seen
+  for(var i=0;i<DATA.length;i++){
+    var r = DATA[i].r;
+    if(!S.words[r] || !S.words[r].seen){ return r; }
+  }
+  return null;
+}
+
+function buildQueue(){
+  queue = dueReviews();
+}
+
+/* ---------------- session flow ---------------- */
+function startSession(){
+  rollDayIfNeeded();
+  buildQueue();
+  ignoreStrikes = false;
+  advance();
+}
+
+function pickNext(){
+  // 1) any queued review still pending?
+  while(queue.length){
+    var r = queue.shift();
+    var w = S.words[r];
+    if(w && w.seen && w.lvl < MAX_LEVEL && w.due <= todayIndex()) return r;
+  }
+  // 2) introduce a new word if under daily cap
+  if(ignoreStrikes || S.day.newCount < S.cfg.newPerDay){
+    var nr = nextNewRank();
+    if(nr!==null) return nr;
+  }
+  return null;
+}
+
+function advance(){
+  rollDayIfNeeded();
+  // stop condition: strikes
+  if(!ignoreStrikes && S.day.strikes >= S.cfg.strikeLimit){
+    return showDone("stopped");
+  }
+  var r = pickNext();
+  if(r===null){ return showDone("complete"); }
+  current = r;
+  renderCard(r);
+  refreshStats();
+}
+
+/* ---------------- grading ---------------- */
+function isNew(rank){ return !S.words[rank] || !S.words[rank].seen; }
+
+function ensure(rank){
+  if(!S.words[rank]) S.words[rank] = { lvl:0, due:todayIndex(), seen:false, lastGrade:null };
+  return S.words[rank];
+}
+
+function grade(g){ // 'good' | 'part' | 'bad'
+  rollDayIfNeeded();
+  var w = ensure(current);
+  var wasNew = !w.seen;
+  var t = todayIndex();
+
+  if(wasNew){ S.day.newCount++; S.totals.everSeen++; }
+  else { S.day.revCount++; }
+  w.seen = true;
+  w.lastGrade = g;
+
+  if(g==='good'){
+    w.lvl = Math.min(MAX_LEVEL, (wasNew? 1 : w.lvl+1));
+  } else if(g==='part'){
+    w.lvl = Math.max(0, w.lvl-1);
+    addStrike(S.cfg.partWeight);
+    recordWrong('part');
+  } else { // bad
+    w.lvl = 0;
+    addStrike(1);
+    recordWrong('bad');
+  }
+
+  // schedule next review
+  if(w.lvl >= MAX_LEVEL){ w.due = t + 999999; } // mastered, effectively never
+  else { w.due = t + (INTERVALS[w.lvl] || 1); }
+
+  save();
+  advance();
+}
+
+function addStrike(n){ S.day.strikes += n; }
+
+function recordWrong(kind){
+  // avoid duplicate entries for same word in a day; keep worst kind
+  var existing = null;
+  for(var i=0;i<S.day.wrongToday.length;i++){ if(S.day.wrongToday[i].r===current){ existing=S.day.wrongToday[i]; break; } }
+  if(existing){ if(kind==='bad') existing.kind='bad'; }
+  else { S.day.wrongToday.push({ r:current, kind:kind }); }
+}
+
+/* ---------------- rendering ---------------- */
+var elWord = document.getElementById('word');
+var elRank = document.getElementById('rankPill');
+var elQ = document.getElementById('qlabel');
+var elAns = document.getElementById('answer');
+var elReveal = document.getElementById('reveal');
+var elYour = document.getElementById('yourtry');
+var elCn = document.getElementById('ansCn');
+var elEn = document.getElementById('ansEn');
+
+function renderCard(rank){
+  var d = BY_RANK[rank];
+  document.getElementById('screenDone').classList.remove('active');
+  document.getElementById('screenTest').classList.add('active');
+  elReveal.classList.remove('show');
+  elAns.value = "";
+  elWord.textContent = d.w;
+  elRank.textContent = "#" + d.r;
+  elQ.textContent = isNew(rank) ? "NEW WORD — what does it mean?" : "REVIEW — what does it mean?";
+  setTimeout(function(){ elAns.focus(); }, 30);
+}
+
+function reveal(){
+  var d = BY_RANK[current];
+  var typed = elAns.value.trim();
+  elYour.innerHTML = typed ? ("You typed: <b>"+escapeHtml(typed)+"</b>") : "<i>(no answer typed)</i>";
+  elCn.textContent = d.c;
+  elEn.textContent = d.e ? d.e.replace(/ \/ /g, "\n") : "";
+  elReveal.classList.add('show');
+}
+
+function escapeHtml(s){ return s.replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+
+/* progress bar = strikes toward limit (or new-word progress when no strikes) */
+function refreshStats(){
+  document.getElementById('sNew').textContent = S.day.newCount;
+  document.getElementById('sRev').textContent = S.day.revCount;
+  document.getElementById('sStrike').textContent = round1(S.day.strikes) + " / " + S.cfg.strikeLimit;
+  document.getElementById('sMaster').textContent = countMastered();
+  var pct = Math.min(100, (S.day.strikes / S.cfg.strikeLimit)*100);
+  document.getElementById('pbar').style.width = pct + "%";
+}
+function round1(n){ return Math.round(n*10)/10; }
+function countMastered(){ var c=0; for(var r in S.words){ if(S.words[r].lvl>=MAX_LEVEL) c++; } return c; }
+function countSeen(){ var c=0; for(var r in S.words){ if(S.words[r].seen) c++; } return c; }
+function countDue(){ return dueReviews().length; }
+
+/* ---------------- done screen ---------------- */
+function showDone(reason){
+  document.getElementById('screenTest').classList.remove('active');
+  var sc = document.getElementById('screenDone');
+  sc.classList.add('active');
+  var title = document.getElementById('doneTitle');
+  var sub = document.getElementById('doneSub');
+  var wrap = document.getElementById('focusWrap');
+
+  var wrong = S.day.wrongToday;
+  if(reason==='stopped'){
+    title.textContent = "Time to lock these in 🔒";
+    sub.textContent = "You hit " + round1(S.day.strikes) + " strikes. These " + wrong.length + " word(s) are your job to remember today.";
+  } else {
+    if(wrong.length){
+      title.textContent = "Nice work today ✓";
+      sub.textContent = "No more words due. Here are the " + wrong.length + " you stumbled on — give them a look.";
+    } else {
+      title.textContent = "All clear — great session! 🎉";
+      sub.textContent = "You got everything right and there's nothing left due today.";
+    }
+  }
+
+  wrap.innerHTML = "";
+  if(wrong.length){
+    wrong.forEach(function(item){
+      var d = BY_RANK[item.r];
+      var div = document.createElement('div');
+      div.className = 'focusitem';
+      div.innerHTML = '<div><span class="fw">'+escapeHtml(d.w)+'</span>'+
+        '<span class="tag '+(item.kind==='bad'?'bad':'part')+'">'+(item.kind==='bad'?'wrong':'partly')+'</span></div>'+
+        '<div class="fc">'+escapeHtml(d.c)+'</div>';
+      wrap.appendChild(div);
+    });
+    document.getElementById('btnReviewWrong').style.display='';
+  } else {
+    document.getElementById('btnReviewWrong').style.display='none';
+  }
+  refreshStats();
+}
+
+/* drill today's wrong words again immediately (does not change strikes) */
+function drillWrong(){
+  if(!S.day.wrongToday.length) return;
+  queue = S.day.wrongToday.map(function(x){return x.r;});
+  ignoreStrikes = true; // allow practice past the limit
+  document.getElementById('screenDone').classList.remove('active');
+  var r = queue.shift();
+  if(r!=null){ current=r; renderCard(r); refreshStats(); }
+}
+
+/* ---------------- events ---------------- */
+document.getElementById('btnCheck').addEventListener('click', reveal);
+document.getElementById('btnSkip').addEventListener('click', function(){
+  // skip = postpone, no grade; just go to next without marking seen
+  advance();
+});
+elAns.addEventListener('keydown', function(e){
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); if(!elReveal.classList.contains('show')) reveal(); }
+});
+document.querySelectorAll('.grade').forEach(function(g){
+  g.addEventListener('click', function(){ grade(g.getAttribute('data-g')); });
+});
+document.addEventListener('keydown', function(e){
+  if(elReveal.classList.contains('show') && document.getElementById('screenTest').classList.contains('active')){
+    if(e.key==='1'){ grade('good'); }
+    else if(e.key==='2'){ grade('part'); }
+    else if(e.key==='3'){ grade('bad'); }
+  }
+});
+document.getElementById('btnReviewWrong').addEventListener('click', drillWrong);
+document.getElementById('btnKeepGoing').addEventListener('click', function(){
+  ignoreStrikes = true;
+  document.getElementById('screenDone').classList.remove('active');
+  advance();
+});
+
+/* stats modal */
+document.getElementById('btnStats').addEventListener('click', function(){
+  rollDayIfNeeded();
+  var seen=countSeen(), mastered=countMastered(), due=countDue();
+  var learning = seen - mastered;
+  document.getElementById('statsBody').innerHTML =
+    "<b>"+seen.toLocaleString()+"</b> of "+DATA.length.toLocaleString()+" words started<br>"+
+    "<b>"+mastered.toLocaleString()+"</b> mastered (level "+MAX_LEVEL+")<br>"+
+    "<b>"+learning.toLocaleString()+"</b> still in rotation<br>"+
+    "<b>"+due.toLocaleString()+"</b> due for review right now<br><br>"+
+    "Today: "+S.day.newCount+" new · "+S.day.revCount+" reviews · "+round1(S.day.strikes)+" strikes";
+  document.getElementById('statsModal').classList.add('show');
+});
+document.getElementById('closeStats').addEventListener('click', function(){ document.getElementById('statsModal').classList.remove('show'); });
+
+/* settings modal */
+function openSettings(){
+  document.getElementById('setStrikes').value = S.cfg.strikeLimit;
+  document.getElementById('setNew').value = S.cfg.newPerDay;
+  document.getElementById('setPart').value = String(S.cfg.partWeight);
+  document.getElementById('settingsModal').classList.add('show');
+}
+document.getElementById('btnSettings').addEventListener('click', openSettings);
+document.getElementById('closeSettings').addEventListener('click', function(){
+  var st = parseInt(document.getElementById('setStrikes').value,10);
+  var nw = parseInt(document.getElementById('setNew').value,10);
+  var pw = parseFloat(document.getElementById('setPart').value);
+  if(st>0) S.cfg.strikeLimit = st;
+  if(nw>=0) S.cfg.newPerDay = nw;
+  if(!isNaN(pw)) S.cfg.partWeight = pw;
+  save();
+  document.getElementById('settingsModal').classList.remove('show');
+  refreshStats();
+});
+
+/* export / import / reset */
+document.getElementById('btnExport').addEventListener('click', function(){
+  var blob = new Blob([JSON.stringify(S)], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'vocabflow-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+});
+document.getElementById('btnImport').addEventListener('click', function(){ document.getElementById('importFile').click(); });
+document.getElementById('importFile').addEventListener('change', function(e){
+  var f = e.target.files[0]; if(!f) return;
+  var rd = new FileReader();
+  rd.onload = function(){
+    try{ var obj = JSON.parse(rd.result); S = obj; if(!S.cfg) S.cfg=Object.assign({},DEFAULTS); save(); rollDayIfNeeded(); alert('Backup imported.'); location.reload(); }
+    catch(err){ alert('Could not read that file.'); }
+  };
+  rd.readAsText(f);
+});
+document.getElementById('btnReset').addEventListener('click', function(){
+  if(confirm('Erase ALL progress and start over from the most common word?')){
+    S = blankState(); save(); location.reload();
+  }
+});
+
+/* close modals on backdrop click */
+[ 'statsModal','settingsModal' ].forEach(function(id){
+  var m = document.getElementById(id);
+  m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('show'); });
+});
+
+/* ---------------- boot ---------------- */
+if(!DATA.length){
+  document.getElementById('word').textContent = "⚠ words.js not found";
+  document.getElementById('qlabel').textContent = "Keep index.html and words.js in the same folder.";
+} else {
+  rollDayIfNeeded();
+  refreshStats();
+  startSession();
+}
+
+})();
+</script>
+</body>
+</html>
