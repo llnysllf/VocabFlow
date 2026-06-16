@@ -367,12 +367,12 @@ function reveal() {
    (n, v, a, s, r) and dictionary abbreviations (n., adj., prep., v. i. ...).
    Normalise either form to one readable label. */
 var POS_LABEL = {
-  n: "noun", v: "verb", vt: "verb", vi: "verb",
+  n: "n.", v: "v.", vt: "v.", vi: "v.",
   a: "adj.", s: "adj.", adj: "adj.",
   ad: "adv.", adv: "adv.", r: "adv.",
-  prep: "prep.", conj: "conj.", pron: "pron.", art: "article",
+  prep: "prep.", conj: "conj.", pron: "pron.", art: "art.",
   num: "num.", int: "interj.", interj: "interj.", aux: "aux.",
-  pl: "plural", imp: "past tense", p: "participle", abbr: "abbr."
+  pl: "pl.", imp: "pt.", p: "pp.", abbr: "abbr."
 };
 function posLabel(token) {
   var key = String(token).toLowerCase().replace(/[.\s&]/g, "");
@@ -440,7 +440,7 @@ function parseGloss(line) {
     if (label) {
       var rest = m[2];
       // absorb Webster transitivity sub-markers: "v. i." / "v. t." / "v. n."
-      if (label === "verb") rest = rest.replace(/^(?:i|t|n)\.\s+/i, "");
+      if (label === "v.") rest = rest.replace(/^(?:i|t|n)\.\s+/i, "");
       return { pos: label, text: rest };
     }
   }
