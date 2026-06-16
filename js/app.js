@@ -363,10 +363,33 @@ function reveal() {
   elReveal.classList.add("show");
 }
 
+/* Part-of-speech codes appear two ways in the data: WordNet single letters
+   (n, v, a, s, r) and dictionary abbreviations (n., adj., prep., v. i. ...).
+   Normalise either form to one readable label. */
+var POS_LABEL = {
+  n: "noun", v: "verb", vt: "verb", vi: "verb",
+  a: "adj.", s: "adj.", adj: "adj.",
+  ad: "adv.", adv: "adv.", r: "adv.",
+  prep: "prep.", conj: "conj.", pron: "pron.", art: "article",
+  num: "num.", int: "interj.", interj: "interj.", aux: "aux.",
+  pl: "plural", imp: "past tense", p: "participle", abbr: "abbr."
+};
+function posLabel(token) {
+  var key = String(token).toLowerCase().replace(/[.\s&]/g, "");
+  return POS_LABEL[key] || null;
+}
+// One-to-three leading abbreviations like "prep. ", "v. i. ", "n. & a. "
+var POS_TOKENS = "n|vt|vi|v|adj|adv|ad|a|s|r|prep|conj|pron|art|num|interj|int|aux|pl|abbr|imp|p";
+var POS_LEAD_RE = new RegExp("^((?:(?:" + POS_TOKENS + ")\\.\\s*&?\\s*){1,3})(.+)$", "i");
+
 function splitMeaning(text) {
   return String(text || "").split(/\s*\/\s*/).filter(Boolean).map(function (part) {
-    var m = part.match(/^([A-Za-z][A-Za-z. -]{0,14}\.)\s*(.+)$/);
-    return m ? { label: m[1], text: m[2] } : { label: "", text: part };
+    var m = part.match(POS_LEAD_RE);
+    if (m) {
+      var label = posLabel(m[1].split(/\s+/)[0]); // normalise just the first token
+      if (label) return { label: label, text: m[2] };
+    }
+    return { label: "", text: part };
   });
 }
 
@@ -405,12 +428,41 @@ function renderMeaning(text) {
   });
 }
 
+/* Pull a leading part-of-speech code off an English gloss and make it readable.
+   Handles WordNet single letters ("v have...") and abbreviations ("v. i. ..."). */
+function parseGloss(line) {
+  line = line.trim();
+  var m = line.match(/^([nvasr])\s+(.+)$/);          // WordNet: letter + space
+  if (m) return { pos: posLabel(m[1]), text: m[2] };
+  m = line.match(POS_LEAD_RE);                         // abbreviations: "n.", "v. i."
+  if (m) {
+    var label = posLabel(m[1].split(/\s+/)[0]);
+    if (label) {
+      var rest = m[2];
+      // absorb Webster transitivity sub-markers: "v. i." / "v. t." / "v. n."
+      if (label === "verb") rest = rest.replace(/^(?:i|t|n)\.\s+/i, "");
+      return { pos: label, text: rest };
+    }
+  }
+  return { pos: "", text: line };
+}
+
 function renderGloss(text) {
   elEn.innerHTML = "";
-  String(text || "").split(/\s*\/\s*/).filter(Boolean).forEach(function (line) {
+  String(text || "").split(/\s*\/\s*/).filter(Boolean).forEach(function (raw) {
+    var g = parseGloss(raw);
     var item = document.createElement("div");
-    item.className = "gloss-line";
-    item.textContent = line;
+    item.className = "gloss-line" + (g.pos ? " has-pos" : "");
+    if (g.pos) {
+      var pos = document.createElement("span");
+      pos.className = "gloss-pos";
+      pos.textContent = g.pos;
+      item.appendChild(pos);
+    }
+    var txt = document.createElement("span");
+    txt.className = "gloss-text";
+    txt.textContent = g.text;
+    item.appendChild(txt);
     elEn.appendChild(item);
   });
 }

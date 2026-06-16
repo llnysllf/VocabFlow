@@ -316,6 +316,19 @@ textarea#answer:focus{border-color:rgba(124,140,255,.7);box-shadow:0 0 0 3px rgb
   background:var(--accent);
   box-shadow:0 0 10px rgba(124,140,255,.5);
 }
+.gloss-line.has-pos::before{display:none}
+.gloss-pos{
+  flex:0 0 auto;
+  margin-top:1px;
+  padding:3px 7px;
+  border-radius:999px;
+  background:rgba(124,140,255,.14);
+  border:1px solid rgba(124,140,255,.30);
+  color:#9db0ff;
+  font-size:10px;font-weight:800;letter-spacing:.5px;
+  line-height:1.3;text-transform:uppercase;white-space:nowrap;
+}
+.gloss-text{min-width:0;overflow-wrap:anywhere}
 .gradehint{color:#8891a4}
 .grade{
   background:rgba(255,255,255,.04);
