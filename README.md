@@ -141,9 +141,11 @@ supabase/schema.sql   Database table + row-level-security policies
 
 ## Data sources
 
-Word, idiom, and phrasal-verb meanings come from [**ECDICT**](https://github.com/skywind3000/ECDICT)
-(an open English→Chinese dictionary), with the most common idioms and phrasal verbs curated
-by hand at the top of each deck.
+- **Vocabulary** and **Phrasal Verbs** meanings come from [**ECDICT**](https://github.com/skywind3000/ECDICT),
+  an open English→Chinese dictionary.
+- **Idioms** come from [**IdiomKB**](https://github.com/lishuang-w/IdiomKB), a verified idiom
+  knowledge base (each idiom with a Chinese and English meaning).
+- The most common entries in each deck are hand-curated at the top.
 
 ## Contributing
 
