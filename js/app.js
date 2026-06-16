@@ -455,9 +455,30 @@ function isCrossRef(text) {
          /^Alt\.\s+of\s+/i.test(t);
 }
 
+/* The data uses " / " both to separate senses AND to mark mid-sentence line
+   wraps from the original dictionary. Rejoin wrapped continuation lines (a
+   lowercase start that isn't a new sense, following an unfinished line) so a
+   single definition stays in one box. */
+var POS_SENSE_START = new RegExp("^(?:[nvasr]\\s|(?:" + POS_TOKENS + ")\\.\\s)", "i");
+function joinGlossLines(text) {
+  var segs = String(text || "").split(/\s*\/\s*/).filter(Boolean);
+  var out = [];
+  segs.forEach(function (seg) {
+    if (out.length) {
+      var prev = out[out.length - 1];
+      if (/^[a-z]/.test(seg) && !POS_SENSE_START.test(seg) && !/[.;:!?]["'’)\]]*$/.test(prev)) {
+        out[out.length - 1] = prev + " " + seg;
+        return;
+      }
+    }
+    out.push(seg);
+  });
+  return out;
+}
+
 function renderGloss(text) {
   elEn.innerHTML = "";
-  String(text || "").split(/\s*\/\s*/).filter(Boolean).forEach(function (raw) {
+  joinGlossLines(text).forEach(function (raw) {
     var g = parseGloss(raw);
     if (isCrossRef(g.text)) return;                 // skip useless cross-references
     var item = document.createElement("div");
