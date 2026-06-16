@@ -447,10 +447,19 @@ function parseGloss(line) {
   return { pos: "", text: line };
 }
 
+/* Old Webster cross-references carry no meaning on their own ("See Thee.",
+   "Alt. of foo") — drop them so the card shows only real definitions. */
+function isCrossRef(text) {
+  var t = String(text || "").trim();
+  return /^See\s+[A-Z][A-Za-z'’\- ]{0,18}\.?$/.test(t) ||
+         /^Alt\.\s+of\s+/i.test(t);
+}
+
 function renderGloss(text) {
   elEn.innerHTML = "";
   String(text || "").split(/\s*\/\s*/).filter(Boolean).forEach(function (raw) {
     var g = parseGloss(raw);
+    if (isCrossRef(g.text)) return;                 // skip useless cross-references
     var item = document.createElement("div");
     item.className = "gloss-line" + (g.pos ? " has-pos" : "");
     if (g.pos) {
