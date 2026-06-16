@@ -21,8 +21,7 @@ repetition** engine schedules each word for the right day so it actually moves i
 long-term memory.
 
 It has **three decks you switch between with tabs** — **Vocabulary** (15,000 words),
-**Idioms** (~90 common idioms), and **Phrasal Verbs** (~100 common ones) — each with its
-own independent progress.
+**Idioms** (1,000), and **Phrasal Verbs** (1,000) — each with its own independent progress.
 
 It's a single static site — no framework, no build step. Open it and study. Optionally
 **sign in** (powered by Supabase) so your progress syncs across all your devices; without
@@ -126,8 +125,8 @@ js/config.js          Your Supabase URL + anon key (public-safe)
 js/cloud.js           Supabase auth + cloud sync, with offline fallback
 js/app.js             The trainer: scheduling, grading, UI
 words.js              15,000-word data set (window.VOCAB)
-idioms.js             ~90 common idioms (window.IDIOMS)
-phrasal.js            ~100 common phrasal verbs (window.PHRASAL)
+idioms.js             1,000 idioms (window.IDIOMS)
+phrasal.js            1,000 phrasal verbs (window.PHRASAL)
 supabase/schema.sql   Database table + row-level-security policies
 ```
 
@@ -139,6 +138,12 @@ supabase/schema.sql   Database table + row-level-security policies
 - **Signed in:** progress is stored in your Supabase project and synced across devices.
 - **Guest:** progress is saved in that browser's `localStorage` only.
 - **Export / Import** (in Settings) lets you back up or move progress as JSON anytime.
+
+## Data sources
+
+Word, idiom, and phrasal-verb meanings come from [**ECDICT**](https://github.com/skywind3000/ECDICT)
+(an open English→Chinese dictionary), with the most common idioms and phrasal verbs curated
+by hand at the top of each deck.
 
 ## Contributing
 
