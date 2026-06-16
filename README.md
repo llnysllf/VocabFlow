@@ -20,12 +20,17 @@ type the Chinese meaning, grade yourself honestly, and a **Leitner / SM-2-style 
 repetition** engine schedules each word for the right day so it actually moves into
 long-term memory.
 
+It has **three decks you switch between with tabs** — **Vocabulary** (15,000 words),
+**Idioms** (~90 common idioms), and **Phrasal Verbs** (~100 common ones) — each with its
+own independent progress.
+
 It's a single static site — no framework, no build step. Open it and study. Optionally
 **sign in** (powered by Supabase) so your progress syncs across all your devices; without
 sign-in it works fully offline as a guest, saving progress in your browser.
 
 ## Features
 
+- 🗂️ **Three decks, tabbed** — Vocabulary, Idioms, and Phrasal Verbs, each tracked separately.
 - 🧠 **Spaced repetition** — expanding review intervals (1 → 2 → 4 → 7 → 15 → 30 days → mastered).
 - 📊 **Frequency-ordered** — learn the highest-value words first, 15,000 in total.
 - ✍️ **Active recall** — you type the meaning, then self-grade Right / Partly / Wrong.
@@ -121,6 +126,8 @@ js/config.js          Your Supabase URL + anon key (public-safe)
 js/cloud.js           Supabase auth + cloud sync, with offline fallback
 js/app.js             The trainer: scheduling, grading, UI
 words.js              15,000-word data set (window.VOCAB)
+idioms.js             ~90 common idioms (window.IDIOMS)
+phrasal.js            ~100 common phrasal verbs (window.PHRASAL)
 supabase/schema.sql   Database table + row-level-security policies
 ```
 

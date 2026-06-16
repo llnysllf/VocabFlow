@@ -8,36 +8,83 @@ var MAX_LEVEL = 6;                           // level 6 = mastered
 
 var DEFAULTS = { strikeLimit: 7, newPerDay: 50, partWeight: 0.5 };
 
-var DATA = window.VOCAB || [];
-var BY_RANK = {};
-for (var i = 0; i < DATA.length; i++) { BY_RANK[DATA[i].r] = DATA[i]; }
+/* Three independent decks, each with its own data set and progress. */
+var DECKS = {
+  vocab:   window.VOCAB || [],
+  idioms:  window.IDIOMS || [],
+  phrasal: window.PHRASAL || []
+};
+var DECK_IDS = ["vocab", "idioms", "phrasal"];
+var DECK_LABELS = { vocab: "Vocabulary", idioms: "Idioms", phrasal: "Phrasal Verbs" };
+var DECK_NOUN = { vocab: "words", idioms: "idioms", phrasal: "phrasal verbs" };
+var DECK_ITEM = { vocab: "word", idioms: "idiom", phrasal: "phrasal verb" };
+
+var BY_RANK = {};   // BY_RANK[deckId][rank] -> entry
+DECK_IDS.forEach(function (id) {
+  BY_RANK[id] = {};
+  DECKS[id].forEach(function (o) { BY_RANK[id][o.r] = o; });
+});
+
+function curData() { return DECKS[S.active] || []; }     // active deck's word list
+function curIndex() { return BY_RANK[S.active] || {}; }  // active deck's rank->entry
+function D() { return S.decks[S.active]; }               // active deck's progress
 
 function todayIndex() {
   var now = new Date();
   return Math.floor((now.getTime() - now.getTimezoneOffset() * 60000) / 86400000);
 }
 
-function blankState() {
+function blankDay() {
+  return { idx: todayIndex(), newCount: 0, revCount: 0, strikes: 0, wrongToday: [] };
+}
+function blankDeck() {
+  return { words: {}, day: blankDay(), totals: { everSeen: 0 } }; // words: rank -> {lvl,due,seen,lastGrade}
+}
+function blankStore() {
   return {
+    schema: 2,
     cfg: Object.assign({}, DEFAULTS),
-    words: {},          // rank -> {lvl, due, seen, lastGrade}
-    day: { idx: todayIndex(), newCount: 0, revCount: 0, strikes: 0, wrongToday: [] },
-    totals: { everSeen: 0 },
+    active: "vocab",
+    decks: { vocab: blankDeck(), idioms: blankDeck(), phrasal: blankDeck() },
     mtime: 0            // last-modified (ms) — used to resolve local vs cloud copies
   };
 }
 
-/* Make any loaded object safe to use even if a key is missing/corrupt. */
-function sanitize(s) {
-  if (!s || typeof s !== "object") return blankState();
-  if (!s.cfg) s.cfg = Object.assign({}, DEFAULTS);
-  else s.cfg = Object.assign({}, DEFAULTS, s.cfg);
-  if (!s.words || typeof s.words !== "object") s.words = {};
-  if (!s.day) s.day = { idx: todayIndex(), newCount: 0, revCount: 0, strikes: 0, wrongToday: [] };
-  if (!Array.isArray(s.day.wrongToday)) s.day.wrongToday = [];
-  if (!s.totals) s.totals = { everSeen: 0 };
-  if (typeof s.mtime !== "number") s.mtime = 0;
-  return s;
+function sanitizeDeck(d) {
+  var out = blankDeck();
+  if (d && typeof d === "object") {
+    if (d.words && typeof d.words === "object") out.words = d.words;
+    if (d.day && typeof d.day === "object") {
+      out.day = {
+        idx: typeof d.day.idx === "number" ? d.day.idx : todayIndex(),
+        newCount: d.day.newCount || 0, revCount: d.day.revCount || 0,
+        strikes: d.day.strikes || 0,
+        wrongToday: Array.isArray(d.day.wrongToday) ? d.day.wrongToday : []
+      };
+    }
+    if (d.totals && typeof d.totals === "object") out.totals = { everSeen: d.totals.everSeen || 0 };
+  }
+  return out;
+}
+
+/* Make any loaded object safe, and migrate the old single-deck (v1) shape. */
+function sanitizeStore(s) {
+  if (!s || typeof s !== "object") return blankStore();
+  var out = blankStore();
+  if (s.cfg) out.cfg = Object.assign({}, DEFAULTS, s.cfg);
+  if (typeof s.mtime === "number") out.mtime = s.mtime;
+  if (s.decks && typeof s.decks === "object") {           // v2
+    DECK_IDS.forEach(function (id) { out.decks[id] = sanitizeDeck(s.decks[id]); });
+    if (DECK_IDS.indexOf(s.active) >= 0) out.active = s.active;
+  } else if (s.words && typeof s.words === "object") {    // v1 -> migrate into vocab
+    out.decks.vocab = sanitizeDeck({ words: s.words, day: s.day, totals: s.totals });
+  }
+  return out;
+}
+
+function hasProgress(s) {
+  s = sanitizeStore(s);
+  return DECK_IDS.some(function (id) { return s.decks[id].totals.everSeen > 0; });
 }
 
 /* Union two "missed today" lists by rank, keeping the worst grade. */
@@ -51,17 +98,16 @@ function unionWrong(a, b) {
   return Object.keys(byRank).map(function (k) { return byRank[k]; });
 }
 
-/* Merge two states without losing progress: per word keep the more-advanced
-   entry, combine same-day counters, and let the newer copy win for settings.
-   Used to reconcile concurrent edits across tabs/devices. */
-function mergeStates(a, b) {
-  a = sanitize(a); b = sanitize(b);
-  var merged = blankState();
+/* Merge one deck without losing progress: per word keep the more-advanced
+   entry, combine same-day counters. newerIsA decides a stale-day tiebreak. */
+function mergeDeck(da, db, newerIsA) {
+  da = sanitizeDeck(da); db = sanitizeDeck(db);
+  var merged = blankDeck();
   var ranks = {}, r;
-  for (r in a.words) ranks[r] = 1;
-  for (r in b.words) ranks[r] = 1;
+  for (r in da.words) ranks[r] = 1;
+  for (r in db.words) ranks[r] = 1;
   for (r in ranks) {
-    var wa = a.words[r], wb = b.words[r];
+    var wa = da.words[r], wb = db.words[r];
     if (!wa) merged.words[r] = wb;
     else if (!wb) merged.words[r] = wa;
     else if (wa.seen !== wb.seen) merged.words[r] = wa.seen ? wa : wb;
@@ -70,33 +116,44 @@ function mergeStates(a, b) {
   }
   var seen = 0; for (r in merged.words) { if (merged.words[r].seen) seen++; }
   merged.totals.everSeen = seen;
-  var newer = (a.mtime || 0) >= (b.mtime || 0) ? a : b;
-  merged.cfg = Object.assign({}, DEFAULTS, newer.cfg);
-  if (a.day.idx === b.day.idx) {
+  if (da.day.idx === db.day.idx) {
     merged.day = {
-      idx: a.day.idx,
-      newCount: Math.max(a.day.newCount, b.day.newCount),
-      revCount: Math.max(a.day.revCount, b.day.revCount),
-      strikes: Math.max(a.day.strikes, b.day.strikes),
-      wrongToday: unionWrong(a.day.wrongToday, b.day.wrongToday)
+      idx: da.day.idx,
+      newCount: Math.max(da.day.newCount, db.day.newCount),
+      revCount: Math.max(da.day.revCount, db.day.revCount),
+      strikes: Math.max(da.day.strikes, db.day.strikes),
+      wrongToday: unionWrong(da.day.wrongToday, db.day.wrongToday)
     };
   } else {
-    merged.day = newer.day;
+    merged.day = newerIsA ? da.day : db.day;
   }
-  merged.mtime = Math.max(a.mtime || 0, b.mtime || 0);
   return merged;
 }
 
-/* Heuristic: does this parsed JSON look like a VocabFlow backup? */
+/* Merge two stores (all decks). Newer copy wins for settings + active tab. */
+function mergeStates(a, b) {
+  a = sanitizeStore(a); b = sanitizeStore(b);
+  var newerIsA = (a.mtime || 0) >= (b.mtime || 0);
+  var newer = newerIsA ? a : b;
+  var merged = blankStore();
+  merged.cfg = Object.assign({}, DEFAULTS, newer.cfg);
+  merged.active = newer.active;
+  merged.mtime = Math.max(a.mtime || 0, b.mtime || 0);
+  DECK_IDS.forEach(function (id) {
+    merged.decks[id] = mergeDeck(a.decks[id], b.decks[id], newerIsA);
+  });
+  return merged;
+}
+
+/* Heuristic: does this parsed JSON look like a VocabFlow backup (v1 or v2)? */
 function looksLikeBackup(o) {
-  return o && typeof o === "object" &&
-    o.words && typeof o.words === "object" &&
-    o.day && typeof o.day === "object" &&
-    o.cfg && typeof o.cfg === "object";
+  if (!o || typeof o !== "object" || !o.cfg || typeof o.cfg !== "object") return false;
+  return (o.decks && typeof o.decks === "object") ||
+         (o.words && typeof o.words === "object" && o.day);
 }
 
 /* ---------------- storage layer (guest localStorage + cloud sync) ---------------- */
-var S = blankState();
+var S = blankStore();
 
 function lsKey() {
   return (window.Cloud && Cloud.user) ? LS_PREFIX + "_" + Cloud.user.id : LS_PREFIX;
@@ -178,7 +235,7 @@ function loadForCurrentUser() {
         // writes so a partial local state never overwrites good remote data.
         syncPaused = true;
         baseMtime = 0;
-        S = sanitize(cached || readLS(LS_PREFIX) || blankState());
+        S = sanitizeStore(cached || readLS(LS_PREFIX) || blankStore());
         setSynced("offline — changes won't sync until reload");
         return;
       }
@@ -187,11 +244,11 @@ function loadForCurrentUser() {
         // If local edits are newer than the cloud (e.g. made while offline),
         // keep them and push up; otherwise adopt the cloud copy.
         if (cached && (cached.mtime || 0) > (res.state.mtime || 0)) {
-          S = sanitize(cached);
+          S = sanitizeStore(cached);
           writeLS(lsKey(), S);
           dirty = true; flushCloud();
         } else {
-          S = sanitize(res.state);
+          S = sanitizeStore(res.state);
           writeLS(lsKey(), S);
         }
         return;
@@ -200,24 +257,24 @@ function loadForCurrentUser() {
       // real progress, migrate it up so nothing is lost on first sign-in.
       baseMtime = 0;
       var guest = readLS(LS_PREFIX);
-      if (!cached && guest && guest.totals && guest.totals.everSeen > 0) {
-        S = sanitize(guest);
+      if (!cached && guest && hasProgress(guest)) {
+        S = sanitizeStore(guest);
         writeLS(lsKey(), S);
         dirty = true; flushCloud();
       } else {
-        S = sanitize(cached || blankState());
+        S = sanitizeStore(cached || blankStore());
         writeLS(lsKey(), S);
       }
     });
   }
-  S = sanitize(readLS(lsKey()) || blankState());
+  S = sanitizeStore(readLS(lsKey()) || blankStore());
   return Promise.resolve();
 }
 
 function rollDayIfNeeded() {
   var t = todayIndex();
-  if (S.day.idx !== t) {
-    S.day = { idx: t, newCount: 0, revCount: 0, strikes: 0, wrongToday: [] };
+  if (D().day.idx !== t) {
+    D().day = { idx: t, newCount: 0, revCount: 0, strikes: 0, wrongToday: [] };
     save();
   }
 }
@@ -232,12 +289,12 @@ var skipped = {};          // ranks skipped this session (won't resurface until 
 function dueReviews() {
   var t = todayIndex();
   var out = [];
-  for (var rank in S.words) {
-    var w = S.words[rank];
+  for (var rank in D().words) {
+    var w = D().words[rank];
     if (w.seen && w.lvl < MAX_LEVEL && w.due <= t) out.push(parseInt(rank, 10));
   }
   out.sort(function (a, b) {                  // most overdue first, then most common
-    var da = S.words[a].due, db = S.words[b].due;
+    var da = D().words[a].due, db = D().words[b].due;
     if (da !== db) return da - db;
     return a - b;
   });
@@ -245,10 +302,11 @@ function dueReviews() {
 }
 
 function nextNewRank() {
-  for (var i = 0; i < DATA.length; i++) {
-    var r = DATA[i].r;
+  var data = curData();
+  for (var i = 0; i < data.length; i++) {
+    var r = data[i].r;
     if (skipped[r]) continue;
-    if (!S.words[r] || !S.words[r].seen) return r;
+    if (!D().words[r] || !D().words[r].seen) return r;
   }
   return null;
 }
@@ -270,11 +328,11 @@ function pickNext() {
   while (queue.length) {
     var r = queue.shift();
     if (skipped[r]) continue;
-    var w = S.words[r];
+    var w = D().words[r];
     if (w && w.seen && w.lvl < MAX_LEVEL && w.due <= todayIndex()) return r;
   }
   // 2) introduce a new word if under the daily cap (never while re-drilling misses)
-  if (!drillOnly && (ignoreStrikes || S.day.newCount < S.cfg.newPerDay)) {
+  if (!drillOnly && (ignoreStrikes || D().day.newCount < S.cfg.newPerDay)) {
     var nr = nextNewRank();
     if (nr !== null) return nr;
   }
@@ -283,7 +341,7 @@ function pickNext() {
 
 function advance() {
   rollDayIfNeeded();
-  if (!ignoreStrikes && S.day.strikes >= S.cfg.strikeLimit) return showDone("stopped");
+  if (!ignoreStrikes && D().day.strikes >= S.cfg.strikeLimit) return showDone("stopped");
   var r = pickNext();
   if (r === null) return showDone("complete");
   current = r;
@@ -292,11 +350,11 @@ function advance() {
 }
 
 /* ---------------- grading ---------------- */
-function isNew(rank) { return !S.words[rank] || !S.words[rank].seen; }
+function isNew(rank) { return !D().words[rank] || !D().words[rank].seen; }
 
 function ensure(rank) {
-  if (!S.words[rank]) S.words[rank] = { lvl: 0, due: todayIndex(), seen: false, lastGrade: null };
-  return S.words[rank];
+  if (!D().words[rank]) D().words[rank] = { lvl: 0, due: todayIndex(), seen: false, lastGrade: null };
+  return D().words[rank];
 }
 
 function grade(g) { // 'good' | 'part' | 'bad'
@@ -305,8 +363,8 @@ function grade(g) { // 'good' | 'part' | 'bad'
   var wasNew = !w.seen;
   var t = todayIndex();
 
-  if (wasNew) { S.day.newCount++; S.totals.everSeen++; }
-  else { S.day.revCount++; }
+  if (wasNew) { D().day.newCount++; D().totals.everSeen++; }
+  else { D().day.revCount++; }
   w.seen = true;
   w.lastGrade = g;
 
@@ -328,34 +386,34 @@ function grade(g) { // 'good' | 'part' | 'bad'
   advance();
 }
 
-function addStrike(n) { S.day.strikes += n; }
+function addStrike(n) { D().day.strikes += n; }
 
 function recordWrong(kind) {
   var existing = null;
-  for (var i = 0; i < S.day.wrongToday.length; i++) {
-    if (S.day.wrongToday[i].r === current) { existing = S.day.wrongToday[i]; break; }
+  for (var i = 0; i < D().day.wrongToday.length; i++) {
+    if (D().day.wrongToday[i].r === current) { existing = D().day.wrongToday[i]; break; }
   }
   if (existing) { if (kind === "bad") existing.kind = "bad"; }
-  else { S.day.wrongToday.push({ r: current, kind: kind }); }
+  else { D().day.wrongToday.push({ r: current, kind: kind }); }
 }
 
 /* ---------------- rendering ---------------- */
 var elWord, elRank, elQ, elAns, elReveal, elYour, elCn, elEn;
 
 function renderCard(rank) {
-  var d = BY_RANK[rank];
+  var d = curIndex()[rank];
   document.getElementById("screenDone").classList.remove("active");
   document.getElementById("screenTest").classList.add("active");
   elReveal.classList.remove("show");
   elAns.value = "";
   elWord.textContent = d.w;
   elRank.textContent = "#" + d.r;
-  elQ.textContent = isNew(rank) ? "NEW WORD — what does it mean?" : "REVIEW — what does it mean?";
+  elQ.textContent = (isNew(rank) ? "NEW " + DECK_ITEM[S.active].toUpperCase() : "REVIEW") + " — what does it mean?";
   setTimeout(function () { elAns.focus(); }, 30);
 }
 
 function reveal() {
-  var d = BY_RANK[current];
+  var d = curIndex()[current];
   var typed = elAns.value.trim();
   elYour.innerHTML = typed ? ("You typed: <b>" + escapeHtml(typed) + "</b>") : "<i>(no answer typed)</i>";
   renderMeaning(d.c);
@@ -504,16 +562,16 @@ function escapeHtml(s) {
 }
 
 function refreshStats() {
-  document.getElementById("sNew").textContent = S.day.newCount;
-  document.getElementById("sRev").textContent = S.day.revCount;
-  document.getElementById("sStrike").textContent = round1(S.day.strikes) + " / " + S.cfg.strikeLimit;
+  document.getElementById("sNew").textContent = D().day.newCount;
+  document.getElementById("sRev").textContent = D().day.revCount;
+  document.getElementById("sStrike").textContent = round1(D().day.strikes) + " / " + S.cfg.strikeLimit;
   document.getElementById("sMaster").textContent = countMastered();
-  var pct = Math.min(100, (S.day.strikes / S.cfg.strikeLimit) * 100);
+  var pct = Math.min(100, (D().day.strikes / S.cfg.strikeLimit) * 100);
   document.getElementById("pbar").style.width = pct + "%";
 }
 function round1(n) { return Math.round(n * 10) / 10; }
-function countMastered() { var c = 0; for (var r in S.words) { if (S.words[r].lvl >= MAX_LEVEL) c++; } return c; }
-function countSeen() { var c = 0; for (var r in S.words) { if (S.words[r].seen) c++; } return c; }
+function countMastered() { var c = 0; for (var r in D().words) { if (D().words[r].lvl >= MAX_LEVEL) c++; } return c; }
+function countSeen() { var c = 0; for (var r in D().words) { if (D().words[r].seen) c++; } return c; }
 function countDue() { return dueReviews().length; }
 
 /* ---------------- done screen ---------------- */
@@ -525,10 +583,10 @@ function showDone(reason) {
   var sub = document.getElementById("doneSub");
   var wrap = document.getElementById("focusWrap");
 
-  var wrong = S.day.wrongToday;
+  var wrong = D().day.wrongToday;
   if (reason === "stopped") {
     title.textContent = "Time to lock these in 🔒";
-    sub.textContent = "You hit " + round1(S.day.strikes) + " strikes. These " + wrong.length + " word(s) are your job to remember today.";
+    sub.textContent = "You hit " + round1(D().day.strikes) + " strikes. These " + wrong.length + " word(s) are your job to remember today.";
   } else {
     if (wrong.length) {
       title.textContent = "Nice work today ✓";
@@ -542,7 +600,7 @@ function showDone(reason) {
   wrap.innerHTML = "";
   if (wrong.length) {
     wrong.forEach(function (item) {
-      var d = BY_RANK[item.r];
+      var d = curIndex()[item.r];
       var div = document.createElement("div");
       div.className = "focusitem";
       div.innerHTML = '<div><span class="fw">' + escapeHtml(d.w) + "</span>" +
@@ -559,8 +617,8 @@ function showDone(reason) {
 
 /* drill today's wrong words again immediately (does not change strikes) */
 function drillWrong() {
-  if (!S.day.wrongToday.length) return;
-  queue = S.day.wrongToday.map(function (x) { return x.r; });
+  if (!D().day.wrongToday.length) return;
+  queue = D().day.wrongToday.map(function (x) { return x.r; });
   skipped = {};
   ignoreStrikes = true;   // practice past the strike limit
   drillOnly = true;       // ...but stop after the misses, don't pull in new words
@@ -574,6 +632,29 @@ var authMode = "in"; // 'in' | 'up'
 
 function el(id) { return document.getElementById(id); }
 function setSynced(text) { var n = el("syncedNote"); if (n) n.textContent = text; }
+
+/* ---------------- deck tabs ---------------- */
+function renderTabs() {
+  var nav = el("tabs");
+  if (!nav) return;
+  nav.innerHTML = "";
+  DECK_IDS.forEach(function (id) {
+    var b = document.createElement("button");
+    b.className = "tab" + (id === S.active ? " active" : "");
+    b.innerHTML = '<span class="tabname">' + DECK_LABELS[id] + "</span>" +
+      '<span class="tabcount">' + DECKS[id].length + "</span>";
+    b.addEventListener("click", function () { switchDeck(id); });
+    nav.appendChild(b);
+  });
+}
+
+function switchDeck(id) {
+  if (id === S.active || !DECKS[id]) return;
+  S.active = id;
+  persist();             // saves the whole store (all decks) + queues a cloud sync
+  renderTabs();
+  startSession();        // builds today's session for the newly active deck
+}
 
 function renderAuthBar() {
   var box = el("authBox");
@@ -657,6 +738,7 @@ function onAuthChanged() {
   renderAuthBar();
   loadForCurrentUser().then(function () {
     rollDayIfNeeded();
+    renderTabs();
     refreshStats();
     if (!syncPaused) setSynced(Cloud.user ? "synced ✓" : "");
     startSession();
@@ -704,11 +786,12 @@ function wireEvents() {
     var seen = countSeen(), mastered = countMastered(), due = countDue();
     var learning = seen - mastered;
     el("statsBody").innerHTML =
-      "<b>" + seen.toLocaleString() + "</b> of " + DATA.length.toLocaleString() + " words started<br>" +
+      "<b>" + DECK_LABELS[S.active] + "</b><br>" +
+      "<b>" + seen.toLocaleString() + "</b> of " + curData().length.toLocaleString() + " " + DECK_NOUN[S.active] + " started<br>" +
       "<b>" + mastered.toLocaleString() + "</b> mastered (level " + MAX_LEVEL + ")<br>" +
       "<b>" + learning.toLocaleString() + "</b> still in rotation<br>" +
       "<b>" + due.toLocaleString() + "</b> due for review right now<br><br>" +
-      "Today: " + S.day.newCount + " new · " + S.day.revCount + " reviews · " + round1(S.day.strikes) + " strikes";
+      "Today: " + D().day.newCount + " new · " + D().day.revCount + " reviews · " + round1(D().day.strikes) + " strikes";
     el("statsModal").classList.add("show");
   });
   el("closeStats").addEventListener("click", function () { el("statsModal").classList.remove("show"); });
@@ -752,7 +835,7 @@ function wireEvents() {
         alert("That doesn't look like a VocabFlow backup, so nothing was changed.");
         return;
       }
-      S = sanitize(obj);
+      S = sanitizeStore(obj);
       rollDayIfNeeded();
       persistNowThen(function () { alert("Backup imported."); location.reload(); });
     };
@@ -760,7 +843,7 @@ function wireEvents() {
   });
   el("btnReset").addEventListener("click", function () {
     if (confirm("Erase ALL progress for this profile and start over from the most common word?")) {
-      S = blankState();
+      S = blankStore();
       persistNowThen(function () { location.reload(); });
     }
   });
@@ -801,7 +884,7 @@ function wireEvents() {
 function boot() {
   wireEvents();
 
-  if (!DATA.length) {
+  if (!DECKS.vocab.length) {
     el("word").textContent = "⚠ words.js not found";
     el("qlabel").textContent = "Keep index.html and words.js together.";
     return;
@@ -816,6 +899,7 @@ function boot() {
     return loadForCurrentUser();
   }).then(function () {
     rollDayIfNeeded();
+    renderTabs();
     refreshStats();
     if (!syncPaused) setSynced(window.Cloud && Cloud.user ? "synced ✓" : "");
     startSession();
