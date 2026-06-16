@@ -112,6 +112,8 @@ function writeLS(key, obj) {
 var cloudSaveTimer = null;
 var dirty = false;          // unsynced local changes pending
 var syncPaused = false;     // true when the load failed: study locally, don't clobber cloud
+var baseMtime = 0;          // mtime of the cloud copy we last loaded/saved
+var flushing = false;       // a cloud flush is currently in flight
 
 function cloudActive() { return window.Cloud && Cloud.user && !syncPaused; }
 
@@ -127,13 +129,29 @@ function persist() {
 }
 function save() { persist(); }                 // alias used throughout
 
-/* Push pending changes to the cloud now (debounce flush / tab-hide / close). */
+/* Push pending changes to the cloud now (debounce flush / tab-hide / close).
+   Conflict-aware: if another device wrote since we last synced, merge first so
+   neither side's progress is lost, then write the combined result. */
 function flushCloud() {
   clearTimeout(cloudSaveTimer);
-  if (!cloudActive() || !dirty) return;
-  return Cloud.saveState(S).then(function (ok) {
-    if (ok) dirty = false;
+  if (!cloudActive() || !dirty || flushing) return;
+  flushing = true;
+  return Cloud.loadState().then(function (res) {
+    if (res.ok && res.state && (res.state.mtime || 0) > baseMtime) {
+      S = mergeStates(S, res.state);
+      refreshStats();
+    }
+    S.mtime = Date.now();
+    writeLS(lsKey(), S);
+    return Cloud.saveState(S);
+  }).then(function (ok) {
+    if (ok) { dirty = false; baseMtime = S.mtime; }
     setSynced(ok ? "synced ✓" : "offline — saved locally");
+  }, function () {
+    setSynced("offline — saved locally");
+  }).then(function () {
+    flushing = false;
+    if (dirty && cloudActive()) cloudSaveTimer = setTimeout(flushCloud, 800);
   });
 }
 
@@ -143,7 +161,8 @@ function persistNowThen(cb) {
   writeLS(lsKey(), S);
   if (window.Cloud && Cloud.user && !syncPaused) {
     setSynced("saving…");
-    Cloud.saveState(S).then(cb, cb);           // proceed even if the write fails
+    // Intentional overwrite (reset / import) — skip the merge.
+    Cloud.saveState(S).then(function () { baseMtime = S.mtime; cb(); }, cb);
   } else { cb(); }
 }
 
@@ -158,11 +177,13 @@ function loadForCurrentUser() {
         // Couldn't reach the server. Work from the local cache and pause cloud
         // writes so a partial local state never overwrites good remote data.
         syncPaused = true;
+        baseMtime = 0;
         S = sanitize(cached || readLS(LS_PREFIX) || blankState());
         setSynced("offline — changes won't sync until reload");
         return;
       }
       if (res.state) {
+        baseMtime = res.state.mtime || 0;
         // If local edits are newer than the cloud (e.g. made while offline),
         // keep them and push up; otherwise adopt the cloud copy.
         if (cached && (cached.mtime || 0) > (res.state.mtime || 0)) {
@@ -177,6 +198,7 @@ function loadForCurrentUser() {
       }
       // No cloud data yet for this account. If the guest on this browser has
       // real progress, migrate it up so nothing is lost on first sign-in.
+      baseMtime = 0;
       var guest = readLS(LS_PREFIX);
       if (!cached && guest && guest.totals && guest.totals.everSeen > 0) {
         S = sanitize(guest);
@@ -641,11 +663,16 @@ function wireEvents() {
     var f = e.target.files[0]; if (!f) return;
     var rd = new FileReader();
     rd.onload = function () {
-      try {
-        S = sanitize(JSON.parse(rd.result));
-        rollDayIfNeeded();
-        persistNowThen(function () { alert("Backup imported."); location.reload(); });
-      } catch (err) { alert("Could not read that file."); }
+      var obj;
+      try { obj = JSON.parse(rd.result); }
+      catch (err) { alert("Could not read that file — it isn't valid JSON."); return; }
+      if (!looksLikeBackup(obj)) {
+        alert("That doesn't look like a VocabFlow backup, so nothing was changed.");
+        return;
+      }
+      S = sanitize(obj);
+      rollDayIfNeeded();
+      persistNowThen(function () { alert("Backup imported."); location.reload(); });
     };
     rd.readAsText(f);
   });
@@ -676,6 +703,16 @@ function wireEvents() {
   /* flush unsynced changes when the tab is backgrounded or closed */
   document.addEventListener("visibilitychange", function () { if (document.hidden) flushCloud(); });
   window.addEventListener("pagehide", flushCloud);
+
+  /* keep other tabs of the same browser in sync: when another tab writes this
+     profile's data, merge it in so neither tab's progress is lost */
+  window.addEventListener("storage", function (e) {
+    if (!e.key || e.key !== lsKey() || !e.newValue) return;
+    try {
+      S = mergeStates(S, JSON.parse(e.newValue));
+      refreshStats();
+    } catch (err) {}
+  });
 }
 
 /* ---------------- boot ---------------- */
