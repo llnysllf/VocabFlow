@@ -37,14 +37,17 @@ function gradeStrike(g) {
 
 /* Three independent decks, each with its own data set and progress. */
 var DECKS = {
-  vocab:   window.VOCAB || [],
-  idioms:  window.IDIOMS || [],
-  phrasal: window.PHRASAL || []
+  vocab:    window.VOCAB || [],
+  idioms:   window.IDIOMS || [],
+  phrasal:  window.PHRASAL || [],
+  slang:    window.SLANG || [],
+  proverbs: window.PROVERBS || [],
+  sayings:  window.SAYINGS || []
 };
-var DECK_IDS = ["vocab", "idioms", "phrasal"];
-var DECK_LABELS = { vocab: "Vocabulary", idioms: "Idioms", phrasal: "Phrasal Verbs" };
-var DECK_NOUN = { vocab: "words", idioms: "idioms", phrasal: "phrasal verbs" };
-var DECK_ITEM = { vocab: "word", idioms: "idiom", phrasal: "phrasal verb" };
+var DECK_IDS = ["vocab", "idioms", "phrasal", "slang", "proverbs", "sayings"];
+var DECK_LABELS = { vocab: "Vocabulary", idioms: "Idioms", phrasal: "Phrasal Verbs", slang: "Slang", proverbs: "Proverbs", sayings: "Sayings" };
+var DECK_NOUN = { vocab: "words", idioms: "idioms", phrasal: "phrasal verbs", slang: "slang terms", proverbs: "proverbs", sayings: "sayings" };
+var DECK_ITEM = { vocab: "word", idioms: "idiom", phrasal: "phrasal verb", slang: "slang term", proverbs: "proverb", sayings: "saying" };
 
 var BY_RANK = {};   // BY_RANK[deckId][rank] -> entry
 DECK_IDS.forEach(function (id) {
@@ -72,7 +75,7 @@ function blankStore() {
     schema: 3,
     cfg: Object.assign({}, DEFAULTS),
     active: "vocab",
-    decks: { vocab: blankDeck(), idioms: blankDeck(), phrasal: blankDeck() },
+    decks: { vocab: blankDeck(), idioms: blankDeck(), phrasal: blankDeck(), slang: blankDeck(), proverbs: blankDeck(), sayings: blankDeck() },
     mtime: 0            // last-modified (ms) — used to resolve local vs cloud copies
   };
 }
