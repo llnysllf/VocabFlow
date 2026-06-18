@@ -20,8 +20,9 @@ type the Chinese meaning, grade yourself honestly, and a **Leitner / SM-2-style 
 repetition** engine schedules each word for the right day so it actually moves into
 long-term memory.
 
-It has **three decks you switch between with tabs** — **Vocabulary** (15,000 words),
-**Idioms** (1,000), and **Phrasal Verbs** (1,000) — each with its own independent progress.
+It has **six decks you switch between with tabs** — **Vocabulary** (15,000 words),
+**Idioms** (1,000), **Phrasal Verbs** (1,000), **Slang**, **Proverbs**, and **Sayings** —
+each with its own independent progress.
 
 It's a single static site — no framework, no build step. Open it and study. Optionally
 **sign in** (powered by Supabase) so your progress syncs across all your devices; without
@@ -29,7 +30,7 @@ sign-in it works fully offline as a guest, saving progress in your browser.
 
 ## Features
 
-- 🗂️ **Three decks, tabbed** — Vocabulary, Idioms, and Phrasal Verbs, each tracked separately.
+- 🗂️ **Six decks, tabbed** — Vocabulary, Idioms, Phrasal Verbs, Slang, Proverbs, Sayings, each tracked separately.
 - 🔎 **Browse view** — search the whole deck and see each entry's status (new / learning / due / mastered).
 - 🧠 **Spaced repetition** — expanding review intervals (1 → 2 → 4 → 7 → 15 → 30 days → mastered).
 - 📊 **Frequency-ordered** — learn the highest-value words first, 15,000 in total.
@@ -128,6 +129,9 @@ js/app.js             The trainer: scheduling, grading, UI
 words.js              15,000-word data set (window.VOCAB)
 idioms.js             1,000 idioms (window.IDIOMS)
 phrasal.js            1,000 phrasal verbs (window.PHRASAL)
+slang.js              slang & colloquialisms (window.SLANG)
+proverbs.js           proverbs (window.PROVERBS)
+sayings.js            sayings & expressions (window.SAYINGS)
 supabase/schema.sql   Database table + row-level-security policies
 ```
 
@@ -144,8 +148,11 @@ supabase/schema.sql   Database table + row-level-security policies
 
 - **Vocabulary** and **Phrasal Verbs** meanings come from [**ECDICT**](https://github.com/skywind3000/ECDICT),
   an open English→Chinese dictionary.
-- **Idioms** come from [**IdiomKB**](https://github.com/lishuang-w/IdiomKB), a verified idiom
-  knowledge base (each idiom with a Chinese and English meaning).
+- **Idioms** and **Sayings** come from [**IdiomKB**](https://github.com/lishuang-w/IdiomKB),
+  a verified idiom knowledge base (each entry with a Chinese and English meaning).
+- **Proverbs** come from [**LLMProverbMT**](https://github.com/yuriak/LLMProverbMT) (human-verified
+  English→Chinese proverbs) plus IdiomKB.
+- **Slang** is drawn from ECDICT's register-tagged (俚/口) slang and colloquial entries.
 - The most common entries in each deck are hand-curated at the top.
 
 ## Contributing
