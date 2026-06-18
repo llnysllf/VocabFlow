@@ -30,6 +30,7 @@ sign-in it works fully offline as a guest, saving progress in your browser.
 ## Features
 
 - 🗂️ **Three decks, tabbed** — Vocabulary, Idioms, and Phrasal Verbs, each tracked separately.
+- 🔎 **Browse view** — search the whole deck and see each entry's status (new / learning / due / mastered).
 - 🧠 **Spaced repetition** — expanding review intervals (1 → 2 → 4 → 7 → 15 → 30 days → mastered).
 - 📊 **Frequency-ordered** — learn the highest-value words first, 15,000 in total.
 - ✍️ **Active recall** — you type the meaning, then self-grade Right / Partly / Wrong.
