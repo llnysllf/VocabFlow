@@ -709,9 +709,21 @@ function joinGlossLines(text) {
 
 function renderGloss(text) {
   elEn.innerHTML = "";
+  var lines = [];
   joinGlossLines(text).forEach(function (raw) {
     var g = parseGloss(raw);
     if (isCrossRef(g.text)) return;                 // skip useless cross-references
+    lines.push(g);
+  });
+  if (!lines.length) return;
+  var details = document.createElement("details");
+  details.className = "gloss-details";
+  var summary = document.createElement("summary");
+  summary.textContent = "English hints";
+  details.appendChild(summary);
+  var grid = document.createElement("div");
+  grid.className = "gloss-grid";
+  lines.forEach(function (g) {
     var item = document.createElement("div");
     item.className = "gloss-line" + (g.pos ? " has-pos" : "");
     if (g.pos) {
@@ -724,8 +736,10 @@ function renderGloss(text) {
     txt.className = "gloss-text";
     txt.textContent = g.text;
     item.appendChild(txt);
-    elEn.appendChild(item);
+    grid.appendChild(item);
   });
+  details.appendChild(grid);
+  elEn.appendChild(details);
 }
 
 function escapeHtml(s) {
