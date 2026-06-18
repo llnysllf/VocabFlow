@@ -6,7 +6,7 @@
 <title>VocabFlow · English → Chinese Trainer</title>
 <meta name="description" content="A free, open-source spaced-repetition trainer for the 15,000 most common English words, with Chinese meanings.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f1117'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%236c8cff'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/styles.css?v=5">
+<link rel="stylesheet" href="css/styles.css?v=9">
 </head>
 <body>
 <div class="wrap">
@@ -26,7 +26,7 @@
     <div class="stat"><div class="num" id="sNew">0</div><div class="lbl">New today</div></div>
     <div class="stat"><div class="num" id="sRev">0</div><div class="lbl">Reviews</div></div>
     <div class="stat strikes"><div class="num" id="sStrike">0 / 7</div><div class="lbl">Strikes</div></div>
-    <div class="stat mastered"><div class="num" id="sMaster">0</div><div class="lbl">Mastered</div></div>
+    <div class="stat mastered"><div class="num" id="sMaster">0</div><div class="lbl">Strong</div></div>
   </div>
 
   <div class="progressbar"><div id="pbar"></div></div>
@@ -50,16 +50,19 @@
           <div class="ans-cn" id="ansCn"></div>
           <div class="ans-en" id="ansEn"></div>
         </div>
-        <div class="gradehint">How well did you know it? (you decide honestly)</div>
+        <div class="gradehint">How strong is this one for you?</div>
         <div class="grades">
-          <div class="grade g-good" data-g="good">✓ Right<small>knew it · 1</small></div>
-          <div class="grade g-part" data-g="part">~ Partly<small>close · 2</small></div>
-          <div class="grade g-bad"  data-g="bad">✗ Wrong<small>didn't know · 3</small></div>
+          <button class="grade g-again" data-g="again" type="button">Again<small>missed it · 1</small></button>
+          <button class="grade g-hard" data-g="hard" type="button">Hard<small>slow / unsure · 2</small></button>
+          <button class="grade g-shaky" data-g="shaky" type="button">Shaky<small>not stable · 3</small></button>
+          <button class="grade g-good" data-g="good" type="button">Good<small>knew it · 4</small></button>
+          <button class="grade g-easy" data-g="easy" type="button">Easy<small>very familiar · 5</small></button>
+          <button class="grade g-retire" data-g="retire" type="button">Too easy<small>retire · 6</small></button>
         </div>
       </div>
       <div class="synced" id="syncedNote"></div>
     </div>
-    <div class="footnote">Session stops when you hit <b>7 strikes</b> (wrong = 1, partly = ½) or after 50 new words. Those words become today's focus list.</div>
+    <div class="footnote">Session pauses at <b>7 strikes</b> or after 50 new items. Again, Hard, and Shaky answers become today's focus list.</div>
   </section>
 
   <!-- DONE / STOP SCREEN -->
@@ -71,10 +74,10 @@
       </div>
       <div id="focusWrap" class="focuslist"></div>
       <div class="row" style="margin-top:20px">
-        <button class="btn primary" id="btnReviewWrong">Drill today's words again</button>
+        <button class="btn primary" id="btnReviewWrong">Drill today's focus words</button>
         <button class="btn ghost" id="btnKeepGoing">Keep going anyway</button>
       </div>
-      <div class="footnote">Come back tomorrow — your wrong words are scheduled first, and words you got right will resurface on an expanding schedule (1 → 2 → 4 → 7 → 15 → 30 days) so they actually stick.</div>
+      <div class="footnote">Come back tomorrow — focus words are scheduled first, and strong words resurface rarely so they stay alive.</div>
     </div>
   </section>
 
@@ -84,6 +87,13 @@
       <div class="browsehead">
         <input type="text" id="browseSearch" placeholder="Search this deck…" autocomplete="off" autocorrect="off" spellcheck="false">
         <button class="btn ghost" id="btnBrowseBack">Back to studying</button>
+      </div>
+      <div class="browseviews" id="browseViews">
+        <button class="browseview active" data-view="today" type="button">Today</button>
+        <button class="browseview" data-view="answered" type="button">Answered</button>
+        <button class="browseview" data-view="upcoming" type="button">Upcoming</button>
+        <button class="browseview" data-view="retired" type="button">Too Easy</button>
+        <button class="browseview" data-view="all" type="button">All</button>
       </div>
       <div class="browsecount" id="browseCount"></div>
       <div class="browselist" id="browseList"></div>
@@ -107,7 +117,7 @@
     <p>
       Daily strike limit: <input type="number" id="setStrikes" min="1" max="30" style="width:64px"><br><br>
       New words per day: <input type="number" id="setNew" min="0" max="300" style="width:74px"><br><br>
-      Partly-right = <select id="setPart"><option value="0.5">½ strike</option><option value="0">no strike</option><option value="1">full strike</option></select>
+      Hard grade = <select id="setPart"><option value="0.5">½ strike</option><option value="0">no strike</option><option value="1">full strike</option></select>
     </p>
     <div class="row">
       <button class="btn ghost" id="btnExport">Export backup</button>
@@ -154,6 +164,6 @@
 <script src="js/config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/cloud.js"></script>
-<script src="js/app.js?v=8"></script>
+<script src="js/app.js?v=9"></script>
 </body>
 </html>
