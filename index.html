@@ -14,6 +14,7 @@
     <div class="brand"><span class="dot"></span> VocabFlow</div>
     <div class="authbox">
       <span id="authBox"></span>
+      <button class="iconbtn" id="btnBrowse">Browse</button>
       <button class="iconbtn" id="btnStats">Progress</button>
       <button class="iconbtn" id="btnSettings">Settings</button>
     </div>
@@ -74,6 +75,18 @@
         <button class="btn ghost" id="btnKeepGoing">Keep going anyway</button>
       </div>
       <div class="footnote">Come back tomorrow — your wrong words are scheduled first, and words you got right will resurface on an expanding schedule (1 → 2 → 4 → 7 → 15 → 30 days) so they actually stick.</div>
+    </div>
+  </section>
+
+  <!-- BROWSE SCREEN -->
+  <section class="screen" id="screenBrowse">
+    <div class="card">
+      <div class="browsehead">
+        <input type="text" id="browseSearch" placeholder="Search this deck…" autocomplete="off" autocorrect="off" spellcheck="false">
+        <button class="btn ghost" id="btnBrowseBack">Back to studying</button>
+      </div>
+      <div class="browsecount" id="browseCount"></div>
+      <div class="browselist" id="browseList"></div>
     </div>
   </section>
 </div>
@@ -141,6 +154,6 @@
 <script src="js/config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/cloud.js"></script>
-<script src="js/app.js?v=7"></script>
+<script src="js/app.js?v=8"></script>
 </body>
 </html>

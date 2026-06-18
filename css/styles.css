@@ -97,6 +97,28 @@ textarea#answer:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3
 .progressbar{height:8px;background:var(--panel2);border-radius:999px;overflow:hidden;margin:0 0 18px;border:1px solid var(--line)}
 .progressbar>div{height:100%;background:linear-gradient(90deg,var(--accent),#9b7cff);width:0;transition:width .3s ease}
 
+/* browse / list view */
+.browsehead{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+#browseSearch{flex:1;min-width:160px;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px 12px;font-size:15px;font-family:inherit}
+#browseSearch:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,140,255,.18)}
+.browsehead .btn{flex:0 0 auto;min-width:auto}
+.browsecount{font-size:12px;color:var(--faint);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.browselist{max-height:62vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px}
+.browseitem{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.browseitem .bw{font-weight:700;font-size:15px;flex:0 0 38%;word-break:break-word}
+.browseitem .bc{color:var(--muted);font-size:13px;flex:1;line-height:1.4}
+.browseitem .bstat{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 7px;border-radius:999px;white-space:nowrap;flex:0 0 auto}
+.bstat.new{background:var(--panel);color:var(--faint);border:1px solid var(--line)}
+.bstat.learning{background:var(--warnbg);color:var(--warn)}
+.bstat.due{background:rgba(108,140,255,.16);color:var(--accent)}
+.bstat.mastered{background:var(--goodbg);color:var(--good)}
+.browseempty{color:var(--faint);text-align:center;padding:30px 10px;font-size:14px}
+@media (max-width:700px){
+  .browseitem{flex-wrap:wrap}
+  .browseitem .bw{flex-basis:100%}
+  .browseitem .bc{flex-basis:70%;text-align:left}
+}
+
 /* modal */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
 .modal-bg.show{display:flex}

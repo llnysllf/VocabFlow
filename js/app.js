@@ -654,6 +654,58 @@ function switchDeck(id) {
   persist();             // saves the whole store (all decks) + queues a cloud sync
   renderTabs();
   startSession();        // builds today's session for the newly active deck
+  if (browseActive) openBrowse();   // stay in browse, now showing the new deck
+}
+
+/* ---------------- browse / list view ---------------- */
+var browseActive = false;
+var browseTimer = null;
+
+function itemStatus(rank) {
+  var w = D().words[rank];
+  if (!w || !w.seen) return "new";
+  if (w.lvl >= MAX_LEVEL) return "mastered";
+  if (w.due <= todayIndex()) return "due";
+  return "learning";
+}
+
+function renderBrowse() {
+  var q = (el("browseSearch").value || "").trim().toLowerCase();
+  var data = curData();
+  var parts = [], matches = 0;
+  var CAP = 2000;   // safety cap so the huge vocab deck stays responsive
+  for (var i = 0; i < data.length; i++) {
+    var d = data[i];
+    if (q && d.w.toLowerCase().indexOf(q) === -1 &&
+        String(d.c || "").toLowerCase().indexOf(q) === -1) continue;
+    matches++;
+    if (matches > CAP) continue;
+    var st = itemStatus(d.r);
+    parts.push('<div class="browseitem"><span class="bw">' + escapeHtml(d.w) + "</span>" +
+      '<span class="bc">' + escapeHtml(String(d.c || "").replace(/\n/g, " / ")) + "</span>" +
+      '<span class="bstat ' + st + '">' + st + "</span></div>");
+  }
+  el("browseList").innerHTML = parts.length ? parts.join("") :
+    '<div class="browseempty">No matches.</div>';
+  var label;
+  if (q) label = matches.toLocaleString() + " match" + (matches === 1 ? "" : "es");
+  else label = data.length.toLocaleString() + " " + DECK_NOUN[S.active];
+  if (matches > CAP) label += " · showing first " + CAP.toLocaleString() + ", search to narrow";
+  el("browseCount").textContent = label;
+}
+
+function openBrowse() {
+  browseActive = true;
+  el("screenTest").classList.remove("active");
+  el("screenDone").classList.remove("active");
+  el("screenBrowse").classList.add("active");
+  renderBrowse();
+}
+
+function closeBrowse() {
+  browseActive = false;
+  el("screenBrowse").classList.remove("active");
+  el("screenTest").classList.add("active");
 }
 
 function renderAuthBar() {
@@ -755,6 +807,14 @@ function wireEvents() {
   el("btnSkip").addEventListener("click", function () {
     if (current != null) skipped[current] = true; // fixes: Skip now shows a *different* word
     advance();
+  });
+
+  /* browse / list view */
+  el("btnBrowse").addEventListener("click", function () { browseActive ? closeBrowse() : openBrowse(); });
+  el("btnBrowseBack").addEventListener("click", closeBrowse);
+  el("browseSearch").addEventListener("input", function () {
+    clearTimeout(browseTimer);
+    browseTimer = setTimeout(renderBrowse, 120);   // debounce while typing
   });
   elAns.addEventListener("keydown", function (e) {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -862,6 +922,7 @@ function wireEvents() {
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
       ["statsModal", "settingsModal", "authModal"].forEach(function (id) { el(id).classList.remove("show"); });
+      if (browseActive) closeBrowse();
     }
   });
 
