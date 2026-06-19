@@ -17,18 +17,26 @@
   --goodbg:#0f2b24;
   --warnbg:#302611;
   --badbg:#341820;
-  --radius:8px;
-  --shadow:0 22px 56px rgba(0,0,0,.34);
+  --radius:12px;
+  --radius-lg:18px;
+  --radius-sm:10px;
+  --shadow:0 24px 60px -24px rgba(0,0,0,.55);
 }
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
   min-height:100vh;
-  background:linear-gradient(180deg,#0d121b 0%,var(--bg) 100%);
+  background:
+    radial-gradient(1100px 620px at 18% -8%, rgba(69,214,163,.07), transparent 60%),
+    radial-gradient(1000px 600px at 100% 0%, rgba(123,140,255,.06), transparent 55%),
+    linear-gradient(180deg,#0d121b 0%,var(--bg) 60%);
+  background-attachment:fixed;
   color:var(--txt);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-feature-settings:"cv02","cv03","cv04","cv11";
   -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
 }
 button,input,textarea,select{font:inherit}
 button{cursor:pointer}
@@ -1003,6 +1011,23 @@ button:focus-visible{
 .tab.active{box-shadow:0 8px 22px -10px rgba(69,214,163,.45)}
 .appnav-item{transition:background .16s ease,border-color .16s ease,color .16s ease,transform .12s ease}
 .appnav-item:hover{transform:translateX(1px)}
+
+/* ===== design refresh ===== */
+/* friendlier rounding on the big surfaces */
+.card{border-radius:var(--radius-lg)}
+.rail-card{border-radius:16px}
+.appnav-item{border-radius:11px;font-weight:650;letter-spacing:.1px}
+.appnav-item.active{box-shadow:inset 0 0 0 1px rgba(69,214,163,.12),0 10px 22px -14px rgba(69,214,163,.6)}
+.nav-icon{border-radius:8px}
+/* inputs / pills / controls */
+textarea#answer{border-radius:13px;background:rgba(8,12,18,.55)}
+.tab{border-radius:11px}
+.grade{border-radius:12px}
+.rankpill,.tabcount{font-weight:750}
+/* crisp tabular figures wherever numbers carry meaning */
+.stat .num,.metric>span,.tabcount,.rankpill,.scaleline b{font-variant-numeric:tabular-nums}
+/* the prompt word: clean, weighty, with a soft halo */
+.word{font-weight:850;letter-spacing:-.5px}
 
 @media (max-width:1180px){
   .app-shell{grid-template-columns:220px minmax(0,1fr)}
