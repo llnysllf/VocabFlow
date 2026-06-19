@@ -376,6 +376,8 @@ var current = null;        // current rank
 var ignoreStrikes = false; // "keep going anyway" mode
 var drillOnly = false;     // re-drilling today's misses only — don't introduce new words
 var skipped = {};          // ranks skipped this session (won't resurface until next session)
+var appView = "practice";
+var practiceDone = false;
 
 function dueReviews() {
   var t = todayIndex();
@@ -578,8 +580,8 @@ var elWord, elRank, elQ, elAns, elReveal, elYour, elCn, elEn;
 
 function renderCard(rank) {
   var d = curIndex()[rank];
-  document.getElementById("screenDone").classList.remove("active");
-  document.getElementById("screenTest").classList.add("active");
+  practiceDone = false;
+  if (appView === "practice") showScreen("screenTest");
   elReveal.classList.remove("show");
   elAns.value = "";
   elWord.textContent = d.w;
@@ -595,6 +597,10 @@ function reveal() {
   renderMeaning(d.c);
   renderGloss(d.e);
   elReveal.classList.add("show");
+  requestAnimationFrame(function () {
+    var grades = document.querySelector(".grades");
+    if (grades && grades.scrollIntoView) grades.scrollIntoView({ block: "nearest", inline: "nearest" });
+  });
 }
 
 /* Part-of-speech codes appear two ways in the data: WordNet single letters
@@ -752,18 +758,62 @@ function escapeHtml(s) {
 }
 
 function refreshStats() {
-  document.getElementById("sNew").textContent = D().day.newCount;
-  document.getElementById("sRev").textContent = D().day.revCount;
-  document.getElementById("sStrike").textContent = round1(D().day.strikes) + " / " + S.cfg.strikeLimit;
-  document.getElementById("sMaster").textContent = countMastered();
+  if (el("sNew")) el("sNew").textContent = D().day.newCount;
+  if (el("sRev")) el("sRev").textContent = D().day.revCount;
+  if (el("sStrike")) el("sStrike").textContent = round1(D().day.strikes) + " / " + S.cfg.strikeLimit;
+  if (el("sMaster")) el("sMaster").textContent = countMastered();
   var pct = Math.min(100, (D().day.strikes / S.cfg.strikeLimit) * 100);
-  document.getElementById("pbar").style.width = pct + "%";
+  if (el("pbar")) el("pbar").style.width = pct + "%";
+  renderSideRail();
+  if (appView === "stats") renderStatsScreen();
 }
 function round1(n) { return Math.round(n * 10) / 10; }
 function countMastered() { var c = 0; for (var r in D().words) { if (D().words[r].seen && !D().words[r].retired && D().words[r].lvl >= 5) c++; } return c; }
 function countRetired() { var c = 0; for (var r in D().words) { if (D().words[r].retired) c++; } return c; }
 function countSeen() { var c = 0; for (var r in D().words) { if (D().words[r].seen) c++; } return c; }
 function countDue() { return dueReviews().length; }
+
+function renderStatsScreen() {
+  if (!el("statsSeen")) return;
+  var seen = countSeen();
+  var mastered = countMastered();
+  var retired = countRetired();
+  var due = countDue();
+  var learning = Math.max(0, seen - mastered - retired);
+  el("statsDeckName").textContent = DECK_LABELS[S.active] + " · " + curData().length.toLocaleString() + " " + DECK_NOUN[S.active];
+  el("statsSeen").textContent = seen.toLocaleString();
+  el("statsStrong").textContent = mastered.toLocaleString();
+  el("statsRetired").textContent = retired.toLocaleString();
+  el("statsLearning").textContent = learning.toLocaleString();
+  el("statsDue").textContent = due.toLocaleString();
+  el("statsToday").textContent = (D().day.newCount + D().day.revCount).toLocaleString();
+  el("statsTodayLine").textContent = "Today: " + D().day.newCount + " new, " +
+    D().day.revCount + " reviews, " + round1(D().day.strikes) + " strikes.";
+}
+
+function railItemHtml(rank, note) {
+  var d = rankEntry(rank);
+  if (!d) return "";
+  return '<div class="rail-item"><span>' + escapeHtml(d.w) + "</span><small>" + escapeHtml(note) + "</small></div>";
+}
+
+function renderSideRail() {
+  if (!el("railGoalText")) return;
+  el("railGoalText").textContent = dailyGoalText();
+
+  var due = uniqueRanks(dueReviews()).slice(0, 5);
+  var rows = due.map(function (rank) { return railItemHtml(rank, "review"); }).filter(Boolean);
+  if (!rows.length) {
+    var nextRank = nextUnseenRank();
+    if (nextRank !== null) rows.push(railItemHtml(nextRank, "new"));
+  }
+  el("railQueueList").innerHTML = rows.length ? rows.join("") : '<div class="rail-empty">Nothing is queued right now.</div>';
+
+  var focus = sanitizeFocus(D().day.wrongToday).slice(0, 5);
+  var focusRows = focus.map(function (it) { return railItemHtml(it.r, focusLabel(it.kind)); }).filter(Boolean);
+  el("railFocusList").innerHTML = focusRows.length ? focusRows.join("") : '<div class="rail-empty">No focus words yet.</div>';
+  if (el("btnRailReviewWrong")) el("btnRailReviewWrong").disabled = !focusRows.length;
+}
 
 function focusLabel(kind) {
   kind = normalizeGrade(kind) || kind;
@@ -795,9 +845,11 @@ function dueLabel(day) {
 
 /* ---------------- done screen ---------------- */
 function showDone(reason) {
-  document.getElementById("screenTest").classList.remove("active");
-  var sc = document.getElementById("screenDone");
-  sc.classList.add("active");
+  practiceDone = true;
+  appView = "practice";
+  browseActive = false;
+  syncAppChrome("practice");
+  showScreen("screenDone");
   var title = document.getElementById("doneTitle");
   var sub = document.getElementById("doneSub");
   var wrap = document.getElementById("focusWrap");
@@ -844,7 +896,10 @@ function drillWrong() {
   skipped = {};
   ignoreStrikes = true;   // practice past the strike limit
   drillOnly = true;       // ...but stop after the misses, don't pull in new words
-  document.getElementById("screenDone").classList.remove("active");
+  appView = "practice";
+  browseActive = false;
+  syncAppChrome("practice");
+  practiceDone = false;
   var r = queue.shift();
   if (r != null) { current = r; renderCard(r); refreshStats(); }
 }
@@ -854,6 +909,86 @@ var authMode = "in"; // 'in' | 'up'
 
 function el(id) { return document.getElementById(id); }
 function setSynced(text) { var n = el("syncedNote"); if (n) n.textContent = text; }
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(function (screen) {
+    screen.classList.toggle("active", screen.id === id);
+  });
+}
+
+function appViewForBrowse(view) {
+  if (view === "today" || view === "answered" || view === "upcoming") return "today";
+  if (view === "retired") return "tooEasy";
+  return "library";
+}
+
+function viewCopy(view) {
+  if (view === "today") return {
+    title: "Today",
+    sub: "Focus words, due reviews, and the next new items for this deck."
+  };
+  if (view === "library") return {
+    title: "Library",
+    sub: "Search the deck and adjust mastery for items you have already answered."
+  };
+  if (view === "tooEasy") return {
+    title: "Too Easy",
+    sub: "Words you retired because they are already automatic."
+  };
+  if (view === "stats") return {
+    title: "Statistics",
+    sub: "A clean read on this deck's progress and due work."
+  };
+  if (view === "settings") return {
+    title: "Goal & Data",
+    sub: "Daily limits, grade weight, and backup controls."
+  };
+  return {
+    title: "Practice",
+    sub: "Answer the current card, then set how strong it feels."
+  };
+}
+
+function syncAppChrome(view) {
+  var copy = viewCopy(view);
+  var title = el("viewTitle"), sub = el("viewSub");
+  if (title) title.textContent = copy.title;
+  if (sub) sub.textContent = copy.sub;
+  document.querySelectorAll(".appnav-item").forEach(function (b) {
+    b.classList.toggle("active", b.getAttribute("data-appview") === view);
+  });
+}
+
+function showPractice() {
+  appView = "practice";
+  browseActive = false;
+  syncAppChrome("practice");
+  showScreen(practiceDone ? "screenDone" : "screenTest");
+  setTimeout(function () { if (elAns && !practiceDone) elAns.focus(); }, 30);
+}
+
+function syncSettingsFields() {
+  if (!el("setStrikes")) return;
+  el("setStrikes").value = S.cfg.strikeLimit;
+  el("setNew").value = S.cfg.newPerDay;
+  el("setPart").value = String(S.cfg.partWeight);
+}
+
+function showStatsView() {
+  appView = "stats";
+  browseActive = false;
+  syncAppChrome("stats");
+  renderStatsScreen();
+  showScreen("screenStats");
+}
+
+function showSettingsView() {
+  appView = "settings";
+  browseActive = false;
+  syncAppChrome("settings");
+  syncSettingsFields();
+  showScreen("screenSettings");
+}
 
 /* ---------------- deck tabs ---------------- */
 function renderTabs() {
@@ -872,11 +1007,13 @@ function renderTabs() {
 
 function switchDeck(id) {
   if (id === S.active || !DECKS[id]) return;
+  var wasBrowsing = browseActive;
+  var previousBrowseView = browseView;
   S.active = id;
   persist();             // saves the whole store (all decks) + queues a cloud sync
   renderTabs();
   startSession();        // builds today's session for the newly active deck
-  if (browseActive) openBrowse();   // stay in browse, now showing the new deck
+  if (wasBrowsing) openBrowse(previousBrowseView);   // stay in browse, now showing the new deck
 }
 
 /* ---------------- browse / list view ---------------- */
@@ -1028,24 +1165,27 @@ function renderBrowse() {
 
 function setBrowseView(view) {
   browseView = view || "today";
+  if (browseActive) {
+    appView = appViewForBrowse(browseView);
+    syncAppChrome(appView);
+  }
   document.querySelectorAll(".browseview").forEach(function (b) {
     b.classList.toggle("active", b.getAttribute("data-view") === browseView);
   });
   renderBrowse();
 }
 
-function openBrowse() {
+function openBrowse(view) {
+  if (view) browseView = view;
   browseActive = true;
-  el("screenTest").classList.remove("active");
-  el("screenDone").classList.remove("active");
-  el("screenBrowse").classList.add("active");
+  appView = appViewForBrowse(browseView);
+  syncAppChrome(appView);
+  showScreen("screenBrowse");
   setBrowseView(browseView || "today");
 }
 
 function closeBrowse() {
-  browseActive = false;
-  el("screenBrowse").classList.remove("active");
-  el("screenTest").classList.add("active");
+  showPractice();
 }
 
 function restoreWord(rank) {
@@ -1162,8 +1302,20 @@ function wireEvents() {
     advance();
   });
 
+  /* app sections */
+  el("btnPractice").addEventListener("click", showPractice);
+  el("btnToday").addEventListener("click", function () { openBrowse("today"); });
+  el("btnBrowse").addEventListener("click", function () { openBrowse("all"); });
+  el("btnTooEasy").addEventListener("click", function () { openBrowse("retired"); });
+  el("btnStats").addEventListener("click", showStatsView);
+  el("btnSettings").addEventListener("click", showSettingsView);
+  el("railOpenToday").addEventListener("click", function () { openBrowse("today"); });
+  el("btnRailReviewWrong").addEventListener("click", function () {
+    showPractice();
+    drillWrong();
+  });
+
   /* browse / list view */
-  el("btnBrowse").addEventListener("click", function () { browseActive ? closeBrowse() : openBrowse(); });
   el("btnBrowseBack").addEventListener("click", closeBrowse);
   document.querySelectorAll(".browseview").forEach(function (b) {
     b.addEventListener("click", function () { setBrowseView(b.getAttribute("data-view")); });
@@ -1211,34 +1363,11 @@ function wireEvents() {
   el("btnKeepGoing").addEventListener("click", function () {
     ignoreStrikes = true;
     drillOnly = false;   // "keep going" deliberately resumes new words
-    el("screenDone").classList.remove("active");
+    practiceDone = false;
     advance();
   });
 
-  /* stats modal */
-  el("btnStats").addEventListener("click", function () {
-    rollDayIfNeeded();
-    var seen = countSeen(), mastered = countMastered(), due = countDue(), retired = countRetired();
-    var learning = seen - mastered - retired;
-    el("statsBody").innerHTML =
-      "<b>" + DECK_LABELS[S.active] + "</b><br>" +
-      "<b>" + seen.toLocaleString() + "</b> of " + curData().length.toLocaleString() + " " + DECK_NOUN[S.active] + " started<br>" +
-      "<b>" + mastered.toLocaleString() + "</b> strong / easy<br>" +
-      "<b>" + retired.toLocaleString() + "</b> retired as too easy<br>" +
-      "<b>" + learning.toLocaleString() + "</b> still in rotation<br>" +
-      "<b>" + due.toLocaleString() + "</b> due for review right now<br><br>" +
-      "Today: " + D().day.newCount + " new · " + D().day.revCount + " reviews · " + round1(D().day.strikes) + " strikes";
-    el("statsModal").classList.add("show");
-  });
-  el("closeStats").addEventListener("click", function () { el("statsModal").classList.remove("show"); });
-
-  /* settings modal */
-  el("btnSettings").addEventListener("click", function () {
-    el("setStrikes").value = S.cfg.strikeLimit;
-    el("setNew").value = S.cfg.newPerDay;
-    el("setPart").value = String(S.cfg.partWeight);
-    el("settingsModal").classList.add("show");
-  });
+  /* settings */
   el("closeSettings").addEventListener("click", function () {
     var st = parseInt(el("setStrikes").value, 10);
     var nw = parseInt(el("setNew").value, 10);
@@ -1247,8 +1376,8 @@ function wireEvents() {
     if (nw >= 0) S.cfg.newPerDay = nw;
     if (!isNaN(pw)) S.cfg.partWeight = pw;
     save();
-    el("settingsModal").classList.remove("show");
     refreshStats();
+    el("settingsSaved").textContent = "Saved. Your new goal will be used for this deck from now on.";
   });
 
   /* export / import / reset */
@@ -1290,14 +1419,14 @@ function wireEvents() {
   el("closeAuth").addEventListener("click", closeAuth);
   el("authPass").addEventListener("keydown", function (e) { if (e.key === "Enter") submitAuth(); });
 
-  /* close modals on backdrop click, or Escape */
-  ["statsModal", "settingsModal", "authModal"].forEach(function (id) {
+  /* close modal on backdrop click, or Escape */
+  ["authModal"].forEach(function (id) {
     var m = el(id);
     m.addEventListener("click", function (e) { if (e.target === m) m.classList.remove("show"); });
   });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
-      ["statsModal", "settingsModal", "authModal"].forEach(function (id) { el(id).classList.remove("show"); });
+      ["authModal"].forEach(function (id) { el(id).classList.remove("show"); });
       if (browseActive) closeBrowse();
     }
   });

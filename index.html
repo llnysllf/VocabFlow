@@ -6,130 +6,185 @@
 <title>VocabFlow · English → Chinese Trainer</title>
 <meta name="description" content="A free, open-source spaced-repetition trainer for the 15,000 most common English words, with Chinese meanings.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f1117'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%236c8cff'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/styles.css?v=11">
+<link rel="stylesheet" href="css/styles.css?v=16">
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <div class="brand"><span class="dot"></span> VocabFlow</div>
-    <div class="authbox">
-      <span id="authBox"></span>
-      <button class="iconbtn" id="btnBrowse">Browse</button>
-      <button class="iconbtn" id="btnStats">Progress</button>
-      <button class="iconbtn" id="btnSettings">Settings</button>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark"></span><span>VocabFlow</span></div>
+    <nav class="appnav" aria-label="App sections">
+      <button class="appnav-item active" id="btnPractice" data-appview="practice" type="button"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 10-13h-7l1-7Z"/></svg></span><span>Practice</span></button>
+      <button class="appnav-item" id="btnToday" data-appview="today" type="button"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3v4M17 3v4M4 9h16M5 5h14v16H5z"/></svg></span><span>Today</span></button>
+      <button class="appnav-item" id="btnBrowse" data-appview="library" type="button"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4Zm3 0v13a3 3 0 0 0 3 3"/></svg></span><span>Library</span></button>
+      <button class="appnav-item" id="btnTooEasy" data-appview="tooEasy" type="button"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6-5.4-2.8-5.4 2.8 1-6-4.4-4.3 6.1-.9L12 3Z"/></svg></span><span>Too Easy</span></button>
+      <button class="appnav-item" id="btnStats" data-appview="stats" type="button"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 20V9M12 20V4M19 20v-7"/></svg></span><span>Statistics</span></button>
+      <button class="appnav-item" id="btnSettings" data-appview="settings" type="button"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M4.2 7.5l2.6 1.5M17.2 15l2.6 1.5M19.8 7.5 17.2 9M6.8 15l-2.6 1.5M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg></span><span>Goal &amp; Data</span></button>
+    </nav>
+    <div class="sidebar-foot">
+      <div id="authBox"></div>
     </div>
-  </header>
+  </aside>
 
-  <nav class="tabs" id="tabs"></nav>
+  <main class="workspace">
+    <header class="workspace-top">
+      <div class="workspace-heading">
+        <div class="eyeline">English to Chinese</div>
+        <h1 id="viewTitle">Practice</h1>
+        <p id="viewSub">Answer the current card, then set how strong it feels.</p>
+      </div>
+      <nav class="tabs" id="tabs" aria-label="Decks"></nav>
+    </header>
 
-  <div class="stats">
-    <div class="stat"><div class="num" id="sNew">0</div><div class="lbl">New today</div></div>
-    <div class="stat"><div class="num" id="sRev">0</div><div class="lbl">Reviews</div></div>
-    <div class="stat strikes"><div class="num" id="sStrike">0 / 7</div><div class="lbl">Strikes</div></div>
-    <div class="stat mastered"><div class="num" id="sMaster">0</div><div class="lbl">Strong</div></div>
-  </div>
+    <div class="content-grid">
+      <div class="content-main">
+        <!-- TEST SCREEN -->
+        <section class="screen active" id="screenTest">
+          <div class="card practice-card">
+            <div class="rankpill" id="rankPill">#1</div>
+            <div class="qlabel" id="qlabel">What does this word mean?</div>
+            <div class="word" id="word">-</div>
+            <label class="answer-label" for="answer">Your answer in Chinese</label>
+            <textarea id="answer" placeholder="输入中文意思..." autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+            <div class="row action-row">
+              <button class="btn primary" id="btnCheck">Check answer <span class="kbd">Enter</span></button>
+              <button class="btn ghost" id="btnSkip">Skip</button>
+            </div>
 
-  <div class="progressbar"><div id="pbar"></div></div>
+            <div class="reveal" id="reveal">
+              <div class="yourtry" id="yourtry"></div>
+              <div class="ansblock">
+                <div class="ans-cn" id="ansCn"></div>
+              </div>
+              <div class="gradehint">How strong is this one for you?</div>
+              <div class="grades">
+                <button class="grade g-again" data-g="again" type="button">Again<small>missed it · 1</small></button>
+                <button class="grade g-hard" data-g="hard" type="button">Hard<small>slow / unsure · 2</small></button>
+                <button class="grade g-shaky" data-g="shaky" type="button">Shaky<small>not stable · 3</small></button>
+                <button class="grade g-good" data-g="good" type="button">Good<small>knew it · 4</small></button>
+                <button class="grade g-easy" data-g="easy" type="button">Easy<small>very familiar · 5</small></button>
+                <button class="grade g-retire" data-g="retire" type="button">Too easy<small>retire · 6</small></button>
+              </div>
+              <div class="ans-en" id="ansEn"></div>
+            </div>
+            <div class="synced" id="syncedNote"></div>
+          </div>
+        </section>
 
-  <!-- TEST SCREEN -->
-  <section class="screen active" id="screenTest">
-    <div class="card">
-      <div class="rankpill" id="rankPill">#1</div>
-      <div class="qlabel" id="qlabel">What does this word mean?</div>
-      <div class="word" id="word">—</div>
-      <div class="prompt">Type the Chinese meaning, then check.</div>
-      <textarea id="answer" placeholder="输入中文意思…" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
-      <div class="row">
-        <button class="btn primary" id="btnCheck">Check answer <span class="kbd">Enter</span></button>
-        <button class="btn ghost" id="btnSkip">Skip</button>
+        <!-- DONE / STOP SCREEN -->
+        <section class="screen" id="screenDone">
+          <div class="card done-card">
+            <div class="big-msg">
+              <h2 id="doneTitle">Done for today</h2>
+              <p id="doneSub"></p>
+            </div>
+            <div id="focusWrap" class="focuslist"></div>
+            <div class="row">
+              <button class="btn primary" id="btnReviewWrong">Drill today's focus words</button>
+              <button class="btn ghost" id="btnKeepGoing">Keep going anyway</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- TODAY / LIBRARY / TOO EASY SCREEN -->
+        <section class="screen" id="screenBrowse">
+          <div class="card list-card">
+            <div class="browsehead">
+              <input type="text" id="browseSearch" placeholder="Search this deck..." autocomplete="off" autocorrect="off" spellcheck="false">
+              <button class="btn ghost" id="btnBrowseBack">Back to practice</button>
+            </div>
+            <div class="browseviews" id="browseViews">
+              <button class="browseview active" data-view="today" type="button">Today</button>
+              <button class="browseview" data-view="answered" type="button">Answered</button>
+              <button class="browseview" data-view="upcoming" type="button">Upcoming</button>
+              <button class="browseview" data-view="retired" type="button">Too Easy</button>
+              <button class="browseview" data-view="all" type="button">All</button>
+            </div>
+            <div class="browsecount" id="browseCount"></div>
+            <div class="browselist" id="browseList"></div>
+          </div>
+        </section>
+
+        <!-- STATISTICS SCREEN -->
+        <section class="screen" id="screenStats">
+          <div class="card stats-card">
+            <div class="section-head">
+              <h2>Statistics</h2>
+              <p id="statsDeckName">Current deck</p>
+            </div>
+            <div class="metric-grid">
+              <div class="metric"><span id="statsSeen">0</span><small>Started</small></div>
+              <div class="metric"><span id="statsStrong">0</span><small>Strong / easy</small></div>
+              <div class="metric"><span id="statsRetired">0</span><small>Too easy</small></div>
+              <div class="metric"><span id="statsLearning">0</span><small>In rotation</small></div>
+              <div class="metric"><span id="statsDue">0</span><small>Due now</small></div>
+              <div class="metric"><span id="statsToday">0</span><small>Today</small></div>
+            </div>
+            <p class="screen-note" id="statsTodayLine"></p>
+          </div>
+        </section>
+
+        <!-- SETTINGS SCREEN -->
+        <section class="screen" id="screenSettings">
+          <div class="card settings-card">
+            <div class="section-head">
+              <h2>Goal &amp; Data</h2>
+              <p>Adjust the daily limits and backup your progress.</p>
+            </div>
+            <div class="settings-grid">
+              <label class="setting-field" for="setStrikes">
+                <span>Daily strike limit</span>
+                <input type="number" id="setStrikes" min="1" max="30">
+              </label>
+              <label class="setting-field" for="setNew">
+                <span>New words per day</span>
+                <input type="number" id="setNew" min="0" max="300">
+              </label>
+              <label class="setting-field" for="setPart">
+                <span>Hard grade weight</span>
+                <select id="setPart"><option value="0.5">half strike</option><option value="0">no strike</option><option value="1">full strike</option></select>
+              </label>
+            </div>
+            <div class="row">
+              <button class="btn ghost" id="btnExport">Export backup</button>
+              <button class="btn ghost" id="btnImport">Import backup</button>
+            </div>
+            <div class="row">
+              <button class="btn ghost danger" id="btnReset">Reset all progress</button>
+              <button class="btn primary" id="closeSettings">Save settings</button>
+            </div>
+            <input type="file" id="importFile" accept="application/json" class="hidden">
+            <p class="screen-note" id="settingsSaved">When signed in, progress syncs to your account. As a guest it is saved in this browser only.</p>
+          </div>
+        </section>
       </div>
 
-      <div class="reveal" id="reveal">
-        <div class="yourtry" id="yourtry"></div>
-        <div class="ansblock">
-          <div class="ans-cn" id="ansCn"></div>
-        </div>
-        <div class="gradehint">How strong is this one for you?</div>
-        <div class="grades">
-          <button class="grade g-again" data-g="again" type="button">Again<small>missed it · 1</small></button>
-          <button class="grade g-hard" data-g="hard" type="button">Hard<small>slow / unsure · 2</small></button>
-          <button class="grade g-shaky" data-g="shaky" type="button">Shaky<small>not stable · 3</small></button>
-          <button class="grade g-good" data-g="good" type="button">Good<small>knew it · 4</small></button>
-          <button class="grade g-easy" data-g="easy" type="button">Easy<small>very familiar · 5</small></button>
-          <button class="grade g-retire" data-g="retire" type="button">Too easy<small>retire · 6</small></button>
-        </div>
-        <div class="ans-en" id="ansEn"></div>
-      </div>
-      <div class="synced" id="syncedNote"></div>
-    </div>
-    <div class="footnote">Session pauses at <b>7 strikes</b> or after 50 new items. Again, Hard, and Shaky answers become today's focus list.</div>
-  </section>
+      <aside class="study-rail" id="studyRail">
+        <section class="rail-card">
+          <div class="rail-title">Today</div>
+          <div class="stats">
+            <div class="stat"><div class="num" id="sNew">0</div><div class="lbl">New</div></div>
+            <div class="stat"><div class="num" id="sRev">0</div><div class="lbl">Reviews</div></div>
+            <div class="stat strikes"><div class="num" id="sStrike">0 / 7</div><div class="lbl">Strikes</div></div>
+            <div class="stat mastered"><div class="num" id="sMaster">0</div><div class="lbl">Strong</div></div>
+          </div>
+          <div class="progressbar"><div id="pbar"></div></div>
+          <p class="rail-copy" id="railGoalText"></p>
+          <button class="text-link" id="railOpenToday" type="button">Open today's list</button>
+        </section>
 
-  <!-- DONE / STOP SCREEN -->
-  <section class="screen" id="screenDone">
-    <div class="card">
-      <div class="big-msg">
-        <h2 id="doneTitle">Done for today 🎉</h2>
-        <p id="doneSub"></p>
-      </div>
-      <div id="focusWrap" class="focuslist"></div>
-      <div class="row" style="margin-top:20px">
-        <button class="btn primary" id="btnReviewWrong">Drill today's focus words</button>
-        <button class="btn ghost" id="btnKeepGoing">Keep going anyway</button>
-      </div>
-      <div class="footnote">Come back tomorrow — focus words are scheduled first, and strong words resurface rarely so they stay alive.</div>
-    </div>
-  </section>
+        <section class="rail-card">
+          <div class="rail-title">Up next</div>
+          <div class="rail-list" id="railQueueList"></div>
+        </section>
 
-  <!-- BROWSE SCREEN -->
-  <section class="screen" id="screenBrowse">
-    <div class="card">
-      <div class="browsehead">
-        <input type="text" id="browseSearch" placeholder="Search this deck…" autocomplete="off" autocorrect="off" spellcheck="false">
-        <button class="btn ghost" id="btnBrowseBack">Back to studying</button>
-      </div>
-      <div class="browseviews" id="browseViews">
-        <button class="browseview active" data-view="today" type="button">Today</button>
-        <button class="browseview" data-view="answered" type="button">Answered</button>
-        <button class="browseview" data-view="upcoming" type="button">Upcoming</button>
-        <button class="browseview" data-view="retired" type="button">Too Easy</button>
-        <button class="browseview" data-view="all" type="button">All</button>
-      </div>
-      <div class="browsecount" id="browseCount"></div>
-      <div class="browselist" id="browseList"></div>
+        <section class="rail-card">
+          <div class="rail-title">Focus</div>
+          <div class="rail-list" id="railFocusList"></div>
+          <button class="text-link" id="btnRailReviewWrong" type="button">Drill focus words</button>
+        </section>
+      </aside>
     </div>
-  </section>
-</div>
-
-<!-- STATS MODAL -->
-<div class="modal-bg" id="statsModal">
-  <div class="modal">
-    <h3>Your progress</h3>
-    <p id="statsBody"></p>
-    <div class="row"><button class="btn ghost" style="flex:1" id="closeStats">Close</button></div>
-  </div>
-</div>
-
-<!-- SETTINGS MODAL -->
-<div class="modal-bg" id="settingsModal">
-  <div class="modal">
-    <h3>Settings &amp; data</h3>
-    <p>
-      Daily strike limit: <input type="number" id="setStrikes" min="1" max="30" style="width:64px"><br><br>
-      New words per day: <input type="number" id="setNew" min="0" max="300" style="width:74px"><br><br>
-      Hard grade = <select id="setPart"><option value="0.5">½ strike</option><option value="0">no strike</option><option value="1">full strike</option></select>
-    </p>
-    <div class="row">
-      <button class="btn ghost" id="btnExport">Export backup</button>
-      <button class="btn ghost" id="btnImport">Import backup</button>
-    </div>
-    <div class="row">
-      <button class="btn ghost" id="btnReset" style="color:var(--bad)">Reset all progress</button>
-      <button class="btn primary" id="closeSettings">Save &amp; close</button>
-    </div>
-    <input type="file" id="importFile" accept="application/json" class="hidden">
-    <div class="footnote">When signed in, progress syncs to your account. As a guest it's saved in this browser only — use Export to back it up.</div>
-  </div>
+  </main>
 </div>
 
 <!-- AUTH MODAL -->
@@ -138,7 +193,7 @@
     <h3 id="authTitle">Sign in</h3>
     <p>Sign in to save your progress and pick up on any device.</p>
     <div id="googleRow">
-      <div class="row" style="margin-top:6px">
+      <div class="row">
         <button class="btn google" id="btnAuthGoogle">
           <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
           Continue with Google
@@ -167,6 +222,6 @@
 <script src="js/config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/cloud.js"></script>
-<script src="js/app.js?v=12"></script>
+<script src="js/app.js?v=16"></script>
 </body>
 </html>
