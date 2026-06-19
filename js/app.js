@@ -954,8 +954,10 @@ function syncAppChrome(view) {
   var title = el("viewTitle"), sub = el("viewSub");
   if (title) title.textContent = copy.title;
   if (sub) sub.textContent = copy.sub;
+  // "Too Easy" is reached through the Library now, so keep Library lit for it
+  var navView = (view === "tooEasy") ? "library" : view;
   document.querySelectorAll(".appnav-item").forEach(function (b) {
-    b.classList.toggle("active", b.getAttribute("data-appview") === view);
+    b.classList.toggle("active", b.getAttribute("data-appview") === navView);
   });
 }
 
@@ -1306,7 +1308,6 @@ function wireEvents() {
   el("btnPractice").addEventListener("click", showPractice);
   el("btnToday").addEventListener("click", function () { openBrowse("today"); });
   el("btnBrowse").addEventListener("click", function () { openBrowse("all"); });
-  el("btnTooEasy").addEventListener("click", function () { openBrowse("retired"); });
   el("btnStats").addEventListener("click", showStatsView);
   el("btnSettings").addEventListener("click", showSettingsView);
   el("railOpenToday").addEventListener("click", function () { openBrowse("today"); });
