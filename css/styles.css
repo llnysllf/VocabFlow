@@ -1042,13 +1042,19 @@ textarea#answer{border-radius:13px;background:rgba(8,12,18,.55)}
   .sidebar{
     position:static;
     height:auto;
-    gap:14px;
-    padding:14px;
+    padding:12px 14px;
     border-right:0;
     border-bottom:1px solid var(--line);
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    grid-template-areas:"brand account" "nav nav";
+    align-items:center;
+    column-gap:12px;
+    row-gap:12px;
   }
-  .brand{font-size:20px;padding:0}
+  .brand{grid-area:brand;font-size:20px;padding:0}
   .appnav{
+    grid-area:nav;
     display:flex;
     gap:8px;
     overflow-x:auto;
@@ -1061,7 +1067,17 @@ textarea#answer{border-radius:13px;background:rgba(8,12,18,.55)}
     padding:9px 10px;
   }
   .nav-icon{display:none}
-  .sidebar-foot{display:none}
+  .sidebar-foot{
+    grid-area:account;
+    display:flex;
+    justify-content:flex-end;
+    min-width:0;
+    margin-top:0;
+  }
+  .sidebar-foot #authBox{min-width:0;display:flex;justify-content:flex-end}
+  .sidebar-foot .authpill{min-width:0;max-width:100%}
+  .sidebar-foot .authpill .who{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sidebar-foot .authpill .iconbtn{flex:0 0 auto;white-space:nowrap}
   .workspace{padding:16px 12px 52px}
   .workspace h1{font-size:25px}
   .tabs{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start}
