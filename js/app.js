@@ -943,6 +943,10 @@ function viewCopy(view) {
     title: "Goal & Data",
     sub: "Daily limits, grade weight, and backup controls."
   };
+  if (view === "sentences") return {
+    title: "Sentences",
+    sub: "Translate the Chinese sentence into English — several phrasings are accepted."
+  };
   return {
     title: "Practice",
     sub: "Answer the current card, then set how strong it feels."
@@ -959,6 +963,8 @@ function syncAppChrome(view) {
   document.querySelectorAll(".appnav-item").forEach(function (b) {
     b.classList.toggle("active", b.getAttribute("data-appview") === navView);
   });
+  // sentence mode hides the deck tabs + study rail (word-deck specific)
+  document.body.classList.toggle("sentences-mode", view === "sentences");
 }
 
 function showPractice() {
@@ -990,6 +996,103 @@ function showSettingsView() {
   syncAppChrome("settings");
   syncSettingsFields();
   showScreen("screenSettings");
+}
+
+/* ---------------- sentence translation mode ---------------- */
+var SENTENCES = window.SENTENCES || [];
+var sIdx = 0;
+var sChecked = false;
+
+/* normalise an English answer for matching (lowercase, expand contractions,
+   drop punctuation, collapse spaces). */
+function normEn(s) {
+  s = " " + String(s || "").toLowerCase().replace(/[’]/g, "'") + " ";
+  s = s.replace(/n't\b/g, " not").replace(/'re\b/g, " are").replace(/'ve\b/g, " have")
+       .replace(/'ll\b/g, " will").replace(/'m\b/g, " am").replace(/'d\b/g, " would");
+  s = s.replace(/[.,!?;:"“”()]/g, " ");
+  return s.replace(/\s+/g, " ").trim();
+}
+function hasTok(norm, token) {
+  token = normEn(token);
+  if (!token) return false;
+  if (token.indexOf(" ") >= 0) return norm.indexOf(token) >= 0;          // phrase
+  return (" " + norm + " ").indexOf(" " + token + " ") >= 0;             // whole word
+}
+/* Accept several phrasings; otherwise diagnose each tested point. */
+function gradeSentence(sent, answer) {
+  var n = normEn(answer);
+  if (!n) return { empty: true };
+  var exact = sent.en.map(normEn).indexOf(n) >= 0;
+  var points = (sent.points || []).map(function (p) {
+    var ok = (p.need || []).some(function (t) { return hasTok(n, t); });
+    var wrong = !ok && (p.wrong || []).some(function (t) { return hasTok(n, t); });
+    return { p: p, status: ok ? "ok" : (wrong ? "wrong" : "missing") };
+  });
+  var failed = points.filter(function (x) { return x.status !== "ok"; });
+  return { correct: exact || failed.length === 0, exact: exact, points: points, failed: failed };
+}
+
+function showSentencesView() {
+  appView = "sentences";
+  browseActive = false;
+  syncAppChrome("sentences");
+  if (!sChecked) renderSentence();
+  showScreen("screenSentences");
+  setTimeout(function () { var t = el("sAnswer"); if (t) t.focus(); }, 30);
+}
+
+function renderSentence() {
+  sChecked = false;
+  var sent = SENTENCES[sIdx];
+  if (!el("sZh")) return;
+  if (!sent) { el("sZh").textContent = "—"; return; }
+  el("sZh").textContent = sent.zh;
+  el("sProgress").textContent = (sIdx + 1) + " / " + SENTENCES.length;
+  el("sPointTags").innerHTML = (sent.points || []).map(function (p) {
+    return '<span class="spoint">' + escapeHtml(p.reason) + "</span>";
+  }).join("");
+  el("sAnswer").value = "";
+  el("sFeedback").innerHTML = "";
+  el("sFeedback").className = "s-feedback";
+  el("sCheck").classList.remove("hidden");
+  el("sNext").classList.add("hidden");
+}
+
+function checkSentence() {
+  if (sChecked) return;
+  var sent = SENTENCES[sIdx];
+  if (!sent) return;
+  var res = gradeSentence(sent, el("sAnswer").value);
+  var fb = el("sFeedback");
+  if (res.empty) { fb.className = "s-feedback"; fb.innerHTML = '<div class="s-head">Type a translation first.</div>'; return; }
+  sChecked = true;
+  var html = "";
+  if (res.correct) {
+    fb.className = "s-feedback ok";
+    html += '<div class="s-head">✓ ' + (res.exact ? "Correct!" : "Looks right!") + "</div>";
+  } else {
+    fb.className = "s-feedback bad";
+    html += '<div class="s-head">✗ Not quite — likely issue' + (res.failed.length > 1 ? "s" : "") + ":</div>";
+    html += '<ul class="s-issues">';
+    res.failed.forEach(function (x) {
+      html += "<li><b>" + escapeHtml(x.p.reason) + "</b> — " + escapeHtml(x.p.label) +
+        ' <span class="s-why">(' + (x.status === "wrong" ? "wrong form" : "missing") + ")</span></li>";
+    });
+    html += "</ul>";
+  }
+  html += '<div class="s-ref"><span>Sample answer</span>' + escapeHtml(sent.en[0]) + "</div>";
+  if (sent.en.length > 1) {
+    html += '<div class="s-alts">also accepted: ' + sent.en.slice(1).map(escapeHtml).join(" · ") + "</div>";
+  }
+  fb.innerHTML = html;
+  el("sCheck").classList.add("hidden");
+  el("sNext").classList.remove("hidden");
+}
+
+function nextSentence() {
+  sIdx = (sIdx + 1) % SENTENCES.length;
+  renderSentence();
+  setTimeout(function () { var t = el("sAnswer"); if (t) t.focus(); }, 30);
 }
 
 /* ---------------- deck tabs ---------------- */
@@ -1310,6 +1413,15 @@ function wireEvents() {
   el("btnBrowse").addEventListener("click", function () { openBrowse("all"); });
   el("btnStats").addEventListener("click", showStatsView);
   el("btnSettings").addEventListener("click", showSettingsView);
+  if (el("btnSentences")) el("btnSentences").addEventListener("click", showSentencesView);
+  if (el("sCheck")) el("sCheck").addEventListener("click", checkSentence);
+  if (el("sNext")) el("sNext").addEventListener("click", nextSentence);
+  if (el("sAnswer")) el("sAnswer").addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sChecked ? nextSentence() : checkSentence();
+    }
+  });
   el("railOpenToday").addEventListener("click", function () { openBrowse("today"); });
   el("btnRailReviewWrong").addEventListener("click", function () {
     showPractice();
