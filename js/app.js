@@ -1018,14 +1018,14 @@ function normEn(s) {
   s = s.replace(/[.,!?;:"“”()]/g, " ");
   return s.replace(/\s+/g, " ").trim();
 }
-function hasTok(norm, token) {
+function hasTok(norm, token, fuzzy) {
   token = normEn(token);
   if (!token) return false;
   if (token.indexOf(" ") >= 0) return norm.indexOf(token) >= 0;          // phrase
   var pad = " " + norm + " ";
-  return pad.indexOf(" " + token + " ") >= 0 ||                          // whole word
-         pad.indexOf(" " + token + "s ") >= 0 ||                         // simple plural
-         pad.indexOf(" " + token + "es ") >= 0;
+  if (pad.indexOf(" " + token + " ") >= 0) return true;                  // whole word
+  // simple-plural tolerance, only for the "needed" words (not the wrong-form list)
+  return !!fuzzy && (pad.indexOf(" " + token + "s ") >= 0 || pad.indexOf(" " + token + "es ") >= 0);
 }
 /* Accept several phrasings; otherwise diagnose each tested point. */
 function gradeSentence(sent, answer) {
@@ -1033,8 +1033,8 @@ function gradeSentence(sent, answer) {
   if (!n) return { empty: true };
   var exact = sent.en.map(normEn).indexOf(n) >= 0;
   var points = (sent.points || []).map(function (p) {
-    var ok = (p.need || []).some(function (t) { return hasTok(n, t); });
-    var wrong = !ok && (p.wrong || []).some(function (t) { return hasTok(n, t); });
+    var ok = (p.need || []).some(function (t) { return hasTok(n, t, true); });
+    var wrong = !ok && (p.wrong || []).some(function (t) { return hasTok(n, t, false); });
     return { p: p, status: ok ? "ok" : (wrong ? "wrong" : "missing") };
   });
   var failed = points.filter(function (x) { return x.status !== "ok"; });

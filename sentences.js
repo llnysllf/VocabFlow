@@ -435,5 +435,163 @@ window.SENTENCES = [
     { "id": "yet", "label": "adverb “yet / still”", "reason": "adverb (yet)", "need": ["yet", "still"], "wrong": ["already", "ever"] },
     { "id": "v-dinner", "label": "the word “dinner”", "reason": "vocabulary", "need": ["dinner"] }
   ]
+},
+{
+  "r": 49, "zh": "这是一个很有趣的故事。",
+  "en": ["This is an interesting story.", "This is a very interesting story.", "It is an interesting story."],
+  "points": [
+    { "id": "article", "label": "article “an” before a vowel sound", "reason": "article", "need": ["an interesting", "a very interesting"], "wrong": ["a interesting", "an very interesting", "the interesting story"] },
+    { "id": "v-story", "label": "the word “story”", "reason": "vocabulary", "need": ["story"] },
+    { "id": "v-int", "label": "the word “interesting”", "reason": "vocabulary", "need": ["interesting"] }
+  ]
+},
+{
+  "r": 50, "zh": "她有一只又大又白的狗。",
+  "en": ["She has a big white dog.", "She has a large white dog."],
+  "points": [
+    { "id": "adjorder", "label": "adjective order (size before colour)", "reason": "adjective order", "need": ["big white dog", "large white dog"], "wrong": ["white big dog", "white large dog", "big and white dog"] },
+    { "id": "agree", "label": "agreement (she has)", "reason": "agreement", "need": ["she has"], "wrong": ["she have"] },
+    { "id": "v-dog", "label": "the word “dog”", "reason": "vocabulary", "need": ["dog"] }
+  ]
+},
+{
+  "r": 51, "zh": "我和我朋友一样高。",
+  "en": ["I am as tall as my friend.", "I'm as tall as my friend.", "I am as tall as my friend is."],
+  "points": [
+    { "id": "asas", "label": "comparison of equality (as … as)", "reason": "comparison", "need": ["as tall as"], "wrong": ["as tall than", "so tall as", "tall as my", "as taller as"] },
+    { "id": "v-tall", "label": "the word “tall”", "reason": "vocabulary", "need": ["tall"] },
+    { "id": "v-friend", "label": "the word “friend”", "reason": "vocabulary", "need": ["friend"] }
+  ]
+},
+{
+  "r": 52, "zh": "这部电影比那部更有意思。",
+  "en": ["This movie is more interesting than that one.", "This film is more interesting than that one.", "This movie is more interesting than that movie."],
+  "points": [
+    { "id": "comp", "label": "comparative (more … than)", "reason": "comparative", "need": ["more interesting than"], "wrong": ["interestinger", "more interesting then", "most interesting than", "interesting than"] },
+    { "id": "v-movie", "label": "the word “movie / film”", "reason": "vocabulary", "need": ["movie", "film"] }
+  ]
+},
+{
+  "r": 53, "zh": "我下周要见我的医生。",
+  "en": ["I am seeing my doctor next week.", "I'm seeing my doctor next week.", "I am going to see my doctor next week.", "I will see my doctor next week."],
+  "points": [
+    { "id": "future", "label": "future arrangement (am seeing / going to / will)", "reason": "tense", "need": ["am seeing", "going to see", "will see"], "wrong": ["saw my doctor", "am see", "seed my doctor", "see my doctor next"] },
+    { "id": "t-next", "label": "time phrase “next week”", "reason": "time phrase", "need": ["next week"] },
+    { "id": "v-doctor", "label": "the word “doctor”", "reason": "vocabulary", "need": ["doctor"] }
+  ]
+},
+{
+  "r": 54, "zh": "我明天可能会去。",
+  "en": ["I might go tomorrow.", "I may go tomorrow.", "Maybe I will go tomorrow.", "I might come tomorrow."],
+  "points": [
+    { "id": "might", "label": "modal of possibility (might / may)", "reason": "modal", "need": ["might go", "may go", "might come", "maybe i will", "might", "may "], "wrong": ["can go tomorrow", "must go", "will definitely go"] },
+    { "id": "t-tomorrow", "label": "time word “tomorrow”", "reason": "time word", "need": ["tomorrow"] }
+  ]
+},
+{
+  "r": 55, "zh": "你本应该早点告诉我。",
+  "en": ["You should have told me earlier.", "You should have told me sooner.", "You ought to have told me earlier.", "You should've told me earlier."],
+  "points": [
+    { "id": "shouldhave", "label": "modal perfect (should have + done)", "reason": "modal", "need": ["should have told", "ought to have told", "should have", "should've told"], "wrong": ["should told", "should have tell", "should had told", "must have told"] },
+    { "id": "v-earlier", "label": "“earlier / sooner”", "reason": "vocabulary", "need": ["earlier", "sooner"] }
+  ]
+},
+{
+  "r": 56, "zh": "这就是我出生的医院。",
+  "en": ["This is the hospital where I was born.", "This is the hospital I was born in.", "This is the hospital that I was born in.", "This is the hospital in which I was born."],
+  "points": [
+    { "id": "rel", "label": "relative clause (where / in which)", "reason": "relative clause", "need": ["where i was born", "born in", "in which i was born"], "wrong": ["which i was born", "that i born", "where i born"] },
+    { "id": "born", "label": "passive “was born”", "reason": "tense", "need": ["was born"], "wrong": ["born ", "is born", "were born", "am born"] },
+    { "id": "v-hospital", "label": "the word “hospital”", "reason": "vocabulary", "need": ["hospital"] }
+  ]
+},
+{
+  "r": 57, "zh": "房子里所有的窗户都开着。",
+  "en": ["All the windows in the house are open.", "All of the windows in the house are open.", "All the windows in the house were open."],
+  "points": [
+    { "id": "all", "label": "quantifier “all the”", "reason": "quantifier", "need": ["all the windows", "all of the windows"], "wrong": ["every windows", "all the window ", "all window"] },
+    { "id": "plural", "label": "plural “windows”", "reason": "plural", "need": ["windows"], "wrong": ["all the window are", "window are open"] },
+    { "id": "v-window", "label": "the word “window”", "reason": "vocabulary", "need": ["window"] }
+  ]
+},
+{
+  "r": 58, "zh": "别忘了关灯。",
+  "en": ["Don't forget to turn off the lights.", "Don't forget to turn off the light.", "Remember to turn off the lights.", "Don't forget to switch off the lights."],
+  "points": [
+    { "id": "imperative", "label": "negative imperative (Don't …)", "reason": "imperative", "need": ["don't forget", "do not forget", "remember to"], "wrong": ["not forget", "you don't forget", "forget not"] },
+    { "id": "phrasal", "label": "phrasal verb “turn off”", "reason": "phrasal verb", "need": ["turn off", "switch off", "shut off"], "wrong": ["turn out the light", "close the light", "open off"] },
+    { "id": "v-light", "label": "the word “light”", "reason": "vocabulary", "need": ["light"] }
+  ]
+},
+{
+  "r": 59, "zh": "自从2010年，我就一直在学英语。",
+  "en": ["I have been learning English since 2010.", "I have studied English since 2010.", "I've been learning English since 2010.", "I have been studying English since 2010."],
+  "points": [
+    { "id": "perfect", "label": "present perfect (continuous)", "reason": "tense", "need": ["have been learning", "have been studying", "have studied", "have learned"], "wrong": ["am learning english since", "learned english since", "study english since"] },
+    { "id": "since", "label": "preposition “since 2010”", "reason": "preposition", "need": ["since 2010"], "wrong": ["for 2010", "from 2010"] },
+    { "id": "v-english", "label": "the word “English”", "reason": "vocabulary", "need": ["english"] }
+  ]
+},
+{
+  "r": 60, "zh": "钥匙在桌子上还是在抽屉里？",
+  "en": ["Are the keys on the table or in the drawer?", "Is the key on the table or in the drawer?"],
+  "points": [
+    { "id": "qform", "label": "question form (be + subject)", "reason": "question form", "need": ["are the keys", "is the key"], "wrong": ["the keys are", "the key is on", "where the keys"] },
+    { "id": "prep", "label": "prepositions “on the table / in the drawer”", "reason": "preposition", "need": ["on the table", "in the drawer"], "wrong": ["in the table", "on the drawer", "at the drawer"] },
+    { "id": "v-key", "label": "the word “key”", "reason": "vocabulary", "need": ["key"] }
+  ]
+},
+{
+  "r": 61, "zh": "他跑得比我快。",
+  "en": ["He runs faster than me.", "He runs faster than I do.", "He runs more quickly than me."],
+  "points": [
+    { "id": "compadv", "label": "comparative adverb (faster than)", "reason": "comparative", "need": ["faster than", "more quickly than"], "wrong": ["more fast than", "faster then", "quicklier", "more faster"] },
+    { "id": "agree", "label": "agreement (he runs)", "reason": "agreement", "need": ["he runs"], "wrong": ["he run "] },
+    { "id": "v-run", "label": "the word “run”", "reason": "vocabulary", "need": ["run"] }
+  ]
+},
+{
+  "r": 62, "zh": "我没有足够的钱买那个。",
+  "en": ["I don't have enough money to buy that.", "I do not have enough money to buy it.", "I haven't got enough money to buy that."],
+  "points": [
+    { "id": "enough", "label": "quantifier “enough” (before noun)", "reason": "quantifier", "need": ["enough money"], "wrong": ["money enough", "enough of money", "too much money to buy"] },
+    { "id": "neg", "label": "negation (don't have / haven't got)", "reason": "negation", "need": ["don't have", "do not have", "haven't got"], "wrong": ["not have enough", "no have"] },
+    { "id": "v-money", "label": "the word “money”", "reason": "vocabulary", "need": ["money"] }
+  ]
+},
+{
+  "r": 63, "zh": "那本书是我的，不是你的。",
+  "en": ["That book is mine, not yours.", "That book is mine, not yours."],
+  "points": [
+    { "id": "possessive", "label": "possessive pronouns (mine / yours)", "reason": "possessive pronoun", "need": ["mine", "yours"], "wrong": ["is my book", "is your book", "mine's"] },
+    { "id": "neg", "label": "negation (not)", "reason": "negation", "need": ["not"] },
+    { "id": "v-book", "label": "the word “book”", "reason": "vocabulary", "need": ["book"] }
+  ]
+},
+{
+  "r": 64, "zh": "我每天步行去上班。",
+  "en": ["I walk to work every day.", "I go to work on foot every day.", "Every day I walk to work.", "I walk to work everyday."],
+  "points": [
+    { "id": "habit", "label": "present simple (daily habit)", "reason": "tense", "need": ["walk to work", "go to work", "i walk"], "wrong": ["walked to work", "am walking to work", "walking to work every"] },
+    { "id": "prep", "label": "preposition “to work / on foot”", "reason": "preposition", "need": ["to work", "on foot"], "wrong": ["at work every", "into work"] },
+    { "id": "t-everyday", "label": "“every day”", "reason": "time phrase", "need": ["every day", "everyday"] }
+  ]
+},
+{
+  "r": 65, "zh": "他们结婚十年了。",
+  "en": ["They have been married for ten years.", "They have been married for 10 years.", "They got married ten years ago.", "They have been married for ten years now."],
+  "points": [
+    { "id": "perfect", "label": "present perfect / state duration", "reason": "tense", "need": ["have been married", "got married ten years ago", "got married 10 years ago"], "wrong": ["are married for", "were married for ten", "have married for"] },
+    { "id": "forago", "label": "“for ten years” / “… ago”", "reason": "preposition", "need": ["for ten years", "for 10 years", "ten years ago", "10 years ago"], "wrong": ["since ten years", "before ten years"] },
+    { "id": "v-married", "label": "the word “married”", "reason": "vocabulary", "need": ["married", "marry"] }
+  ]
+},
+{
+  "r": 66, "zh": "请安静一点。",
+  "en": ["Please be quiet.", "Please be quieter.", "Could you be quiet, please?", "Be quiet, please."],
+  "points": [
+    { "id": "imperative", "label": "imperative / polite request (Be …)", "reason": "imperative", "need": ["be quiet", "be quieter", "could you be quiet"], "wrong": ["you are quiet", "you quiet", "are quiet please"] },
+    { "id": "v-quiet", "label": "the word “quiet”", "reason": "vocabulary", "need": ["quiet"] }
+  ]
 }
 ];
