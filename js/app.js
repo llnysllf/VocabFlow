@@ -76,6 +76,7 @@ function blankStore() {
     cfg: Object.assign({}, DEFAULTS),
     active: "vocab",
     decks: { vocab: blankDeck(), idioms: blankDeck(), phrasal: blankDeck(), slang: blankDeck(), proverbs: blankDeck(), sayings: blankDeck() },
+    sentences: blankDeck(),  // spaced-repetition progress for the sentence-translation mode
     mtime: 0            // last-modified (ms) — used to resolve local vs cloud copies
   };
 }
@@ -156,6 +157,7 @@ function sanitizeStore(s) {
   if (typeof s.mtime === "number") out.mtime = s.mtime;
   if (s.decks && typeof s.decks === "object") {           // v2
     DECK_IDS.forEach(function (id) { out.decks[id] = sanitizeDeck(s.decks[id]); });
+    out.sentences = sanitizeDeck(s.sentences);
     if (DECK_IDS.indexOf(s.active) >= 0) out.active = s.active;
   } else if (s.words && typeof s.words === "object") {    // v1 -> migrate into vocab
     out.decks.vocab = sanitizeDeck({ words: s.words, day: s.day, totals: s.totals });
@@ -165,7 +167,8 @@ function sanitizeStore(s) {
 
 function hasProgress(s) {
   s = sanitizeStore(s);
-  return DECK_IDS.some(function (id) { return s.decks[id].totals.everSeen > 0; });
+  return (s.sentences.totals.everSeen > 0) ||
+         DECK_IDS.some(function (id) { return s.decks[id].totals.everSeen > 0; });
 }
 
 /* Union two "missed today" lists by rank, keeping the worst grade. */
@@ -233,6 +236,7 @@ function mergeStates(a, b) {
   DECK_IDS.forEach(function (id) {
     merged.decks[id] = mergeDeck(a.decks[id], b.decks[id], newerIsA);
   });
+  merged.sentences = mergeDeck(a.sentences, b.sentences, newerIsA);
   return merged;
 }
 
@@ -1000,7 +1004,9 @@ function showSettingsView() {
 
 /* ---------------- sentence translation mode ---------------- */
 var SENTENCES = window.SENTENCES || [];
-var sIdx = 0;
+var SENT_BY_RANK = {};
+SENTENCES.forEach(function (s) { SENT_BY_RANK[s.r] = s; });
+var sCurrent = null;     // current sentence object
 var sChecked = false;
 
 /* normalise an English answer for matching (lowercase, expand contractions,
@@ -1032,22 +1038,82 @@ function gradeSentence(sent, answer) {
   return { correct: exact || failed.length === 0, exact: exact, points: points, failed: failed };
 }
 
+function sProg() { return S.sentences; }
+function sWord(rank) {
+  var p = sProg();
+  if (!p.words[rank]) p.words[rank] = sanitizeWord(null);
+  return p.words[rank];
+}
+function sStatus(rank) {
+  var w = sProg().words[rank];
+  if (!w || !w.seen) return "new";
+  if (w.retired || w.lvl >= MAX_LEVEL) return "strong";
+  if (w.due <= todayIndex()) return "due";
+  return "learning";
+}
+
+/* spaced-repetition pick: due reviews first, then new, then earliest-due. */
+function pickSentence() {
+  var t = todayIndex(), prog = sProg().words, due = [], i, s;
+  for (i = 0; i < SENTENCES.length; i++) {
+    s = SENTENCES[i]; var w = prog[s.r];
+    if (w && w.seen && !w.retired && w.due <= t) due.push(s);
+  }
+  due.sort(function (a, b) { return (prog[a.r].due - prog[b.r].due) || (a.r - b.r); });
+  var notSame = function (x) { return !sCurrent || x.r !== sCurrent.r; };
+  var dueOther = due.filter(notSame);
+  if (dueOther.length) return dueOther[0];
+  for (i = 0; i < SENTENCES.length; i++) { s = SENTENCES[i]; if (!prog[s.r] || !prog[s.r].seen) return s; }
+  if (due.length) return due[0];
+  var all = SENTENCES.slice().sort(function (a, b) {
+    return ((prog[a.r] && prog[a.r].due) || 0) - ((prog[b.r] && prog[b.r].due) || 0);
+  });
+  return all.filter(notSame)[0] || all[0] || null;
+}
+
+function recordSentenceResult(sent, correct) {
+  var w = sWord(sent.r), t = todayIndex(), wasNew = !w.seen;
+  w.seen = true; w.lastSeen = t;
+  if (correct) {
+    w.lvl = Math.min(MAX_LEVEL, wasNew ? 1 : w.lvl + 1);
+    w.right = (w.right || 0) + 1; w.streak = (w.streak || 0) + 1; w.lastGrade = "good";
+    w.due = t + (INTERVALS[w.lvl] != null ? INTERVALS[w.lvl] : 1);
+  } else {
+    w.lvl = 0; w.wrong = (w.wrong || 0) + 1; w.streak = 0;
+    w.lapses = (w.lapses || 0) + 1; w.lastGrade = "again";
+    w.due = t + (INTERVALS[0] != null ? INTERVALS[0] : 0);
+  }
+  if (wasNew) sProg().totals.everSeen = (sProg().totals.everSeen || 0) + 1;
+  persist();
+}
+
+function renderSentenceProgress() {
+  if (!el("sStat")) return;
+  var dueN = 0, strong = 0, newN = 0;
+  SENTENCES.forEach(function (s) {
+    var st = sStatus(s.r);
+    if (st === "strong") strong++; else if (st === "new") newN++; else if (st === "due") dueN++;
+  });
+  el("sStat").textContent = "Due " + dueN + " · New " + newN + " · Strong " + strong + " / " + SENTENCES.length;
+}
+
 function showSentencesView() {
   appView = "sentences";
   browseActive = false;
   syncAppChrome("sentences");
-  if (!sChecked) renderSentence();
+  if (!sChecked) { sCurrent = pickSentence(); renderSentence(); }
   showScreen("screenSentences");
   setTimeout(function () { var t = el("sAnswer"); if (t) t.focus(); }, 30);
 }
 
 function renderSentence() {
   sChecked = false;
-  var sent = SENTENCES[sIdx];
   if (!el("sZh")) return;
-  if (!sent) { el("sZh").textContent = "—"; return; }
+  renderSentenceProgress();
+  var sent = sCurrent;
+  if (!sent) { el("sZh").textContent = "—"; el("sPointTags").innerHTML = ""; return; }
   el("sZh").textContent = sent.zh;
-  el("sProgress").textContent = (sIdx + 1) + " / " + SENTENCES.length;
+  el("sProgress").textContent = sStatus(sent.r);
   el("sPointTags").innerHTML = (sent.points || []).map(function (p) {
     return '<span class="spoint">' + escapeHtml(p.reason) + "</span>";
   }).join("");
@@ -1060,12 +1126,14 @@ function renderSentence() {
 
 function checkSentence() {
   if (sChecked) return;
-  var sent = SENTENCES[sIdx];
+  var sent = sCurrent;
   if (!sent) return;
   var res = gradeSentence(sent, el("sAnswer").value);
   var fb = el("sFeedback");
   if (res.empty) { fb.className = "s-feedback"; fb.innerHTML = '<div class="s-head">Type a translation first.</div>'; return; }
   sChecked = true;
+  recordSentenceResult(sent, res.correct);
+  renderSentenceProgress();
   var html = "";
   if (res.correct) {
     fb.className = "s-feedback ok";
@@ -1090,10 +1158,12 @@ function checkSentence() {
 }
 
 function nextSentence() {
-  sIdx = (sIdx + 1) % SENTENCES.length;
+  sCurrent = pickSentence();
   renderSentence();
   setTimeout(function () { var t = el("sAnswer"); if (t) t.focus(); }, 30);
 }
+
+function skipSentence() { nextSentence(); }   // move on without recording a result
 
 /* ---------------- deck tabs ---------------- */
 function renderTabs() {
@@ -1416,6 +1486,7 @@ function wireEvents() {
   if (el("btnSentences")) el("btnSentences").addEventListener("click", showSentencesView);
   if (el("sCheck")) el("sCheck").addEventListener("click", checkSentence);
   if (el("sNext")) el("sNext").addEventListener("click", nextSentence);
+  if (el("sSkip")) el("sSkip").addEventListener("click", skipSentence);
   if (el("sAnswer")) el("sAnswer").addEventListener("keydown", function (e) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();

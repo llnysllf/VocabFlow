@@ -1038,6 +1038,7 @@ body.sentences-mode .content-grid{grid-template-columns:minmax(0,1fr)}
 .s-top .qlabel{margin:0}
 .s-top .rankpill{position:static}
 .s-zh{margin:16px 0 14px;font-size:34px;line-height:1.4;font-weight:750;color:#fbfdff;letter-spacing:.5px;overflow-wrap:anywhere}
+.s-substat{font-size:12px;color:var(--faint);font-weight:650;letter-spacing:.2px;margin:-2px 0 14px}
 .s-points{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:22px}
 .spoint{padding:3px 9px;border-radius:999px;background:rgba(123,140,255,.12);border:1px solid rgba(123,140,255,.22);color:#aeb7ff;font-size:11px;font-weight:700;letter-spacing:.3px}
 #sAnswer{min-height:74px}
