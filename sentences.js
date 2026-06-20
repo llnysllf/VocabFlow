@@ -275,5 +275,165 @@ window.SENTENCES = [
     { "id": "uncount", "label": "uncountable noun (information is, no plural)", "reason": "uncountable noun", "need": ["information is"], "wrong": ["informations", "these information are", "information are", "an information", "these informations"] },
     { "id": "v-useful", "label": "the word “useful”", "reason": "vocabulary", "need": ["useful", "helpful"] }
   ]
+},
+{
+  "r": 31, "zh": "如果明天下雨，我们就待在家里。",
+  "en": ["If it rains tomorrow, we will stay home.", "If it rains tomorrow, we'll stay home.", "We will stay home if it rains tomorrow.", "If it rains tomorrow, we will stay at home."],
+  "points": [
+    { "id": "cond1", "label": "first conditional (if + present)", "reason": "conditional", "need": ["if it rains"], "wrong": ["if it will rain", "if it rained", "if it rain "] },
+    { "id": "will", "label": "future result (will + base)", "reason": "tense", "need": ["will stay", "'ll stay"], "wrong": ["stayed home", "would stay", "staying home"] },
+    { "id": "v-home", "label": "the word “home”", "reason": "vocabulary", "need": ["home", "house"] }
+  ]
+},
+{
+  "r": 32, "zh": "你必须现在就走。",
+  "en": ["You must leave now.", "You have to leave now.", "You must go now.", "You have to go now."],
+  "points": [
+    { "id": "must", "label": "modal “must / have to”", "reason": "modal", "need": ["must leave", "have to leave", "must go", "have to go", "must", "have to"], "wrong": ["should leave", "can leave", "must to leave", "have leave"] },
+    { "id": "t-now", "label": "time word “now”", "reason": "time word", "need": ["now"] },
+    { "id": "v-leave", "label": "the word “leave / go”", "reason": "vocabulary", "need": ["leave", "go"] }
+  ]
+},
+{
+  "r": 33, "zh": "你不能在这里抽烟。",
+  "en": ["You can't smoke here.", "You cannot smoke here.", "You must not smoke here.", "You mustn't smoke here."],
+  "points": [
+    { "id": "prohib", "label": "modal “can't / mustn't”", "reason": "modal", "need": ["can't", "cannot", "must not", "mustn't"], "wrong": ["don't smoke", "do not smoke", "can not to smoke"] },
+    { "id": "v-smoke", "label": "the word “smoke”", "reason": "vocabulary", "need": ["smoke"] },
+    { "id": "here", "label": "the word “here”", "reason": "vocabulary", "need": ["here"] }
+  ]
+},
+{
+  "r": 34, "zh": "我以前住在上海。",
+  "en": ["I used to live in Shanghai.", "I used to live in Shanghai before."],
+  "points": [
+    { "id": "usedto", "label": "past habit “used to”", "reason": "past habit (used to)", "need": ["used to live", "used to"], "wrong": ["use to live", "used to lived", "was living in", "used live"] },
+    { "id": "prep", "label": "preposition “in Shanghai”", "reason": "preposition", "need": ["in shanghai"], "wrong": ["at shanghai", "on shanghai"] },
+    { "id": "v-sh", "label": "the place “Shanghai”", "reason": "vocabulary", "need": ["shanghai"] }
+  ]
+},
+{
+  "r": 35, "zh": "我希望我会说法语。",
+  "en": ["I wish I could speak French.", "I wish I spoke French.", "I wish I knew French."],
+  "points": [
+    { "id": "wish", "label": "subjunctive (wish + past / could)", "reason": "subjunctive (wish)", "need": ["wish i could speak", "wish i spoke", "wish i knew", "wish i could"], "wrong": ["wish i can speak", "wish i will speak", "hope i could speak", "wish i can"] },
+    { "id": "v-french", "label": "the word “French”", "reason": "vocabulary", "need": ["french"] }
+  ]
+},
+{
+  "r": 36, "zh": "虽然天气很冷，但他还是去游泳了。",
+  "en": ["Although it was cold, he still went swimming.", "Even though it was cold, he went swimming.", "He went swimming although it was cold.", "Although the weather was cold, he still went swimming."],
+  "points": [
+    { "id": "although", "label": "conjunction “although / even though”", "reason": "conjunction", "need": ["although", "even though"], "wrong": ["but although", "although but", "despite it was"] },
+    { "id": "went", "label": "past tense “went swimming”", "reason": "tense", "need": ["went swimming", "went for a swim"], "wrong": ["go swimming", "goes swimming", "gone swimming"] },
+    { "id": "v-cold", "label": "the word “cold”", "reason": "vocabulary", "need": ["cold"] }
+  ]
+},
+{
+  "r": 37, "zh": "因为他生病了，所以没来。",
+  "en": ["Because he was sick, he didn't come.", "He didn't come because he was sick.", "He didn't come because he was ill.", "Because he was ill, he didn't come."],
+  "points": [
+    { "id": "because", "label": "conjunction “because”", "reason": "conjunction", "need": ["because"], "wrong": ["because of he", "so because", "cause of"] },
+    { "id": "neg", "label": "past negative (didn't come)", "reason": "negation / tense", "need": ["didn't come", "did not come"], "wrong": ["don't come", "didn't came", "not come"] },
+    { "id": "v-sick", "label": "the word “sick / ill”", "reason": "vocabulary", "need": ["sick", "ill"] }
+  ]
+},
+{
+  "r": 38, "zh": "这个箱子太重了，我搬不动。",
+  "en": ["This box is too heavy for me to lift.", "The box is so heavy that I can't lift it.", "This box is too heavy to lift.", "The box is so heavy I can't move it."],
+  "points": [
+    { "id": "toostructure", "label": "structure “too … to / so … that”", "reason": "structure (too/so)", "need": ["too heavy", "so heavy that", "so heavy i"], "wrong": ["very heavy so", "heavy too", "too much heavy"] },
+    { "id": "v-box", "label": "the word “box”", "reason": "vocabulary", "need": ["box"] },
+    { "id": "v-lift", "label": "the word “lift / move”", "reason": "vocabulary", "need": ["lift", "move", "carry"] }
+  ]
+},
+{
+  "r": 39, "zh": "你喜欢咖啡，对吗？",
+  "en": ["You like coffee, don't you?", "You like coffee, right?"],
+  "points": [
+    { "id": "tag", "label": "tag question (don't you?)", "reason": "tag question", "need": ["don't you", "right"], "wrong": ["do you", "isn't it", "aren't you", "didn't you"] },
+    { "id": "v-coffee", "label": "the word “coffee”", "reason": "vocabulary", "need": ["coffee"] }
+  ]
+},
+{
+  "r": 40, "zh": "你妈妈会开车吗？",
+  "en": ["Can your mother drive?", "Does your mother know how to drive?", "Can your mom drive?", "Can your mum drive?"],
+  "points": [
+    { "id": "qform", "label": "question form (Can/Does + subject)", "reason": "question form", "need": ["can your mother", "can your mom", "can your mum", "does your mother", "does your mom"], "wrong": ["your mother can", "your mom can drive", "mother can drive?"] },
+    { "id": "ability", "label": "ability (can / know how to)", "reason": "modal", "need": ["can ", "know how to"], "wrong": ["could to drive", "can to drive"] },
+    { "id": "v-drive", "label": "the word “drive”", "reason": "vocabulary", "need": ["drive", "driving"] }
+  ]
+},
+{
+  "r": 41, "zh": "请把这本书给我。",
+  "en": ["Please give me this book.", "Please give this book to me.", "Give me this book, please.", "Please hand me this book."],
+  "points": [
+    { "id": "object", "label": "object order (give me / give … to me)", "reason": "object pronoun", "need": ["give me", "give this book to me", "hand me"], "wrong": ["give to me this", "give i", "give me to", "give for me"] },
+    { "id": "v-book", "label": "the word “book”", "reason": "vocabulary", "need": ["book"] },
+    { "id": "please", "label": "politeness “please”", "reason": "politeness", "need": ["please"] }
+  ]
+},
+{
+  "r": 42, "zh": "这个蛋糕是他自己做的。",
+  "en": ["He made this cake himself.", "He himself made this cake.", "He made the cake himself."],
+  "points": [
+    { "id": "reflexive", "label": "reflexive pronoun (himself)", "reason": "reflexive pronoun", "need": ["himself"], "wrong": ["hisself", "by him self", "by his self", "his self"] },
+    { "id": "made", "label": "past tense “made”", "reason": "tense", "need": ["made"], "wrong": ["make", "makes", "making", "maked"] },
+    { "id": "v-cake", "label": "the word “cake”", "reason": "vocabulary", "need": ["cake"] }
+  ]
+},
+{
+  "r": 43, "zh": "我们八点在车站见面。",
+  "en": ["We will meet at the station at eight.", "We'll meet at the station at eight o'clock.", "Let's meet at the station at 8.", "We will meet at eight at the station."],
+  "points": [
+    { "id": "at-time", "label": "preposition “at + time”", "reason": "preposition", "need": ["at eight", "at 8"], "wrong": ["on eight", "in eight", "at the eight"] },
+    { "id": "at-place", "label": "preposition “at + place”", "reason": "preposition", "need": ["at the station"], "wrong": ["in the station", "on the station"] },
+    { "id": "v-station", "label": "the word “station”", "reason": "vocabulary", "need": ["station"] }
+  ]
+},
+{
+  "r": 44, "zh": "猫跳到了桌子上。",
+  "en": ["The cat jumped onto the table.", "The cat jumped on the table.", "The cat jumped up onto the table."],
+  "points": [
+    { "id": "onto", "label": "preposition of movement “onto / on”", "reason": "preposition", "need": ["onto the table", "on the table"], "wrong": ["into the table", "at the table", "to the table"] },
+    { "id": "jumped", "label": "past tense “jumped”", "reason": "tense", "need": ["jumped"], "wrong": ["jump", "jumps", "jumping", "jumpped"] },
+    { "id": "v-cat", "label": "the word “cat”", "reason": "vocabulary", "need": ["cat"] }
+  ]
+},
+{
+  "r": 45, "zh": "她唱歌唱得很好。",
+  "en": ["She sings very well.", "She sings beautifully.", "She is a very good singer.", "She sings really well."],
+  "points": [
+    { "id": "adverb", "label": "adverb of manner (well, not “good”)", "reason": "adverb (well)", "need": ["very well", "beautifully", "really well", "good singer"], "wrong": ["sings very good", "sings good", "sing very good"] },
+    { "id": "agree", "label": "agreement (she sings)", "reason": "agreement", "need": ["she sings", "she is a"], "wrong": ["she sing "] },
+    { "id": "v-sing", "label": "the word “sing”", "reason": "vocabulary", "need": ["sing", "singer", "sings"] }
+  ]
+},
+{
+  "r": 46, "zh": "冰箱里只剩一点牛奶了。",
+  "en": ["There is only a little milk left in the fridge.", "There is only a little milk in the fridge.", "There's only a little milk left in the refrigerator."],
+  "points": [
+    { "id": "little", "label": "quantifier “a little” (uncountable)", "reason": "quantifier", "need": ["a little milk", "little milk"], "wrong": ["a few milk", "a little milks", "few milk", "a little milks"] },
+    { "id": "there-is", "label": "existential “there is”", "reason": "existential (there is)", "need": ["there is", "there's"], "wrong": ["there are", "it has", "have only"] },
+    { "id": "v-fridge", "label": "the word “fridge”", "reason": "vocabulary", "need": ["fridge", "refrigerator"] }
+  ]
+},
+{
+  "r": 47, "zh": "今年的游客比去年少。",
+  "en": ["There are fewer tourists this year than last year.", "There are fewer tourists this year than last.", "Fewer tourists came this year than last year."],
+  "points": [
+    { "id": "fewer", "label": "comparative “fewer” (countable)", "reason": "comparative", "need": ["fewer tourists"], "wrong": ["less tourists", "fewer tourist", "more fewer", "lesser tourists"] },
+    { "id": "than", "label": "comparison “than last year”", "reason": "comparison", "need": ["than last year", "than last"], "wrong": ["then last year", "that last year", "as last year"] },
+    { "id": "v-tourist", "label": "the word “tourist”", "reason": "vocabulary", "need": ["tourist", "visitor"] }
+  ]
+},
+{
+  "r": 48, "zh": "我还没吃晚饭呢。",
+  "en": ["I haven't eaten dinner yet.", "I have not eaten dinner yet.", "I haven't had dinner yet.", "I still haven't eaten dinner."],
+  "points": [
+    { "id": "perfect-yet", "label": "present perfect (haven't … yet)", "reason": "tense", "need": ["haven't eaten", "have not eaten", "haven't had", "still haven't"], "wrong": ["didn't eat", "don't eat", "am not eating", "did not eat"] },
+    { "id": "yet", "label": "adverb “yet / still”", "reason": "adverb (yet)", "need": ["yet", "still"], "wrong": ["already", "ever"] },
+    { "id": "v-dinner", "label": "the word “dinner”", "reason": "vocabulary", "need": ["dinner"] }
+  ]
 }
 ];

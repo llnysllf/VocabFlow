@@ -1022,7 +1022,10 @@ function hasTok(norm, token) {
   token = normEn(token);
   if (!token) return false;
   if (token.indexOf(" ") >= 0) return norm.indexOf(token) >= 0;          // phrase
-  return (" " + norm + " ").indexOf(" " + token + " ") >= 0;             // whole word
+  var pad = " " + norm + " ";
+  return pad.indexOf(" " + token + " ") >= 0 ||                          // whole word
+         pad.indexOf(" " + token + "s ") >= 0 ||                         // simple plural
+         pad.indexOf(" " + token + "es ") >= 0;
 }
 /* Accept several phrasings; otherwise diagnose each tested point. */
 function gradeSentence(sent, answer) {
