@@ -593,5 +593,162 @@ window.SENTENCES = [
     { "id": "imperative", "label": "imperative / polite request (Be …)", "reason": "imperative", "need": ["be quiet", "be quieter", "could you be quiet"], "wrong": ["you are quiet", "you quiet", "are quiet please"] },
     { "id": "v-quiet", "label": "the word “quiet”", "reason": "vocabulary", "need": ["quiet"] }
   ]
+},
+{
+  "r": 67, "zh": "昨晚我看电视的时候，电话响了。",
+  "en": ["The phone rang while I was watching TV last night.", "While I was watching TV last night, the phone rang.", "The phone rang while I was watching television last night."],
+  "points": [
+    { "id": "pastcont", "label": "past continuous (was + -ing)", "reason": "tense", "need": ["was watching"], "wrong": ["watched tv when", "am watching", "was watch", "is watching"] },
+    { "id": "pastsimple", "label": "past simple (interrupting action)", "reason": "tense", "need": ["phone rang", "rang"], "wrong": ["phone rings", "phone ringed", "was ringing"] },
+    { "id": "while", "label": "conjunction “while”", "reason": "conjunction", "need": ["while"], "wrong": ["during i was"] }
+  ]
+},
+{
+  "r": 68, "zh": "这些苹果比那些便宜。",
+  "en": ["These apples are cheaper than those.", "These apples are cheaper than those ones.", "These apples are cheaper than those apples."],
+  "points": [
+    { "id": "comp", "label": "comparative (-er than)", "reason": "comparative", "need": ["cheaper than"], "wrong": ["more cheap than", "cheaper then", "more cheaper"] },
+    { "id": "demon", "label": "demonstratives (these / those)", "reason": "demonstrative", "need": ["these apples", "those"], "wrong": ["this apples", "that apples are", "these apple are"] },
+    { "id": "v-apple", "label": "the word “apple”", "reason": "vocabulary", "need": ["apple"] }
+  ]
+},
+{
+  "r": 69, "zh": "我已经把作业做完了。",
+  "en": ["I have finished my homework.", "I have done my homework.", "I've finished my homework.", "I have already finished my homework."],
+  "points": [
+    { "id": "perfect", "label": "present perfect (have + done)", "reason": "tense", "need": ["have finished", "have done", "have already finished"], "wrong": ["am finishing", "will finish", "finishing my homework"] },
+    { "id": "uncount", "label": "the word “homework” (uncountable)", "reason": "vocabulary", "need": ["homework"], "wrong": ["homeworks", "a homework", "my homeworks"] }
+  ]
+},
+{
+  "r": 70, "zh": "他问我住在哪里。",
+  "en": ["He asked me where I lived.", "He asked me where I live.", "He asked where I lived."],
+  "points": [
+    { "id": "reportedq", "label": "reported question (no inversion)", "reason": "reported speech", "need": ["asked me where i lived", "asked where i lived", "asked me where i live"], "wrong": ["asked me where did i live", "asked me where do i live", "asked me where was i"] },
+    { "id": "v-live", "label": "the word “live”", "reason": "vocabulary", "need": ["live"] }
+  ]
+},
+{
+  "r": 71, "zh": "这是世界上最高的建筑。",
+  "en": ["This is the tallest building in the world.", "It is the tallest building in the world.", "This is the highest building in the world."],
+  "points": [
+    { "id": "super", "label": "superlative (the -est)", "reason": "superlative", "need": ["tallest building", "highest building"], "wrong": ["taller building", "most tall building", "most tallest", "more tall building"] },
+    { "id": "prep", "label": "preposition “in the world”", "reason": "preposition", "need": ["in the world"], "wrong": ["of the world", "on the world", "in world"] },
+    { "id": "v-build", "label": "the word “building”", "reason": "vocabulary", "need": ["building"] }
+  ]
+},
+{
+  "r": 72, "zh": "如果我是你，我就不会那样做。",
+  "en": ["If I were you, I wouldn't do that.", "If I were you, I would not do that.", "I wouldn't do that if I were you.", "If I was you, I wouldn't do that."],
+  "points": [
+    { "id": "cond2", "label": "second conditional (if I were)", "reason": "conditional", "need": ["if i were you", "if i was you"], "wrong": ["if i am you", "if i will be you", "if i would be you"] },
+    { "id": "would", "label": "modal “would (not)”", "reason": "modal", "need": ["wouldn't do", "would not do", "wouldn't"], "wrong": ["will not do", "won't do", "don't do that"] }
+  ]
+},
+{
+  "r": 73, "zh": "牛奶在冰箱里。",
+  "en": ["The milk is in the fridge.", "The milk is in the refrigerator.", "Milk is in the fridge."],
+  "points": [
+    { "id": "prep", "label": "preposition “in the fridge”", "reason": "preposition", "need": ["in the fridge", "in the refrigerator"], "wrong": ["on the fridge", "at the fridge", "into the fridge"] },
+    { "id": "uncount", "label": "uncountable agreement (milk is)", "reason": "uncountable noun", "need": ["milk is"], "wrong": ["milks", "milk are", "a milk"] },
+    { "id": "v-fridge", "label": "the word “fridge”", "reason": "vocabulary", "need": ["fridge", "refrigerator"] }
+  ]
+},
+{
+  "r": 74, "zh": "我们应该多锻炼。",
+  "en": ["We should exercise more.", "We should do more exercise.", "We ought to exercise more.", "We should get more exercise."],
+  "points": [
+    { "id": "should", "label": "modal “should / ought to”", "reason": "modal", "need": ["should exercise", "ought to exercise", "should do more", "should get more", "should"], "wrong": ["must exercise", "should to exercise", "will exercise"] },
+    { "id": "more", "label": "quantifier “more”", "reason": "quantifier", "need": ["more"], "wrong": ["mucher", "many exercise"] },
+    { "id": "v-ex", "label": "the word “exercise”", "reason": "vocabulary", "need": ["exercise"] }
+  ]
+},
+{
+  "r": 75, "zh": "那个戴眼镜的男人是我老师。",
+  "en": ["The man who is wearing glasses is my teacher.", "The man with glasses is my teacher.", "The man wearing glasses is my teacher.", "The man who wears glasses is my teacher."],
+  "points": [
+    { "id": "rel", "label": "relative clause (who / with)", "reason": "relative clause", "need": ["who is wearing glasses", "with glasses", "wearing glasses", "who wears glasses"], "wrong": ["which is wearing glasses", "who wear glasses", "that wearing glasses"] },
+    { "id": "v-glasses", "label": "the word “glasses”", "reason": "vocabulary", "need": ["glasses"] },
+    { "id": "v-teacher", "label": "the word “teacher”", "reason": "vocabulary", "need": ["teacher"] }
+  ]
+},
+{
+  "r": 76, "zh": "你去过日本吗？",
+  "en": ["Have you ever been to Japan?", "Have you been to Japan?", "Have you ever gone to Japan?"],
+  "points": [
+    { "id": "perfect-exp", "label": "present perfect — experience (have been)", "reason": "tense", "need": ["have you ever been", "have you been", "have you ever gone"], "wrong": ["did you ever go", "do you ever go", "have you ever went", "are you been"] },
+    { "id": "prep", "label": "preposition “been to”", "reason": "preposition", "need": ["to japan", "been to"], "wrong": ["in japan", "at japan"] },
+    { "id": "v-japan", "label": "the place “Japan”", "reason": "vocabulary", "need": ["japan"] }
+  ]
+},
+{
+  "r": 77, "zh": "这本书值得一读。",
+  "en": ["This book is worth reading.", "This book is worth a read.", "The book is worth reading."],
+  "points": [
+    { "id": "worth", "label": "verb form (worth + -ing)", "reason": "verb form", "need": ["worth reading", "worth a read"], "wrong": ["worth to read", "worth read", "worthy reading", "worth of reading"] },
+    { "id": "v-book", "label": "the word “book”", "reason": "vocabulary", "need": ["book"] },
+    { "id": "v-read", "label": "the word “read”", "reason": "vocabulary", "need": ["read", "reading"] }
+  ]
+},
+{
+  "r": 78, "zh": "天气越来越冷了。",
+  "en": ["The weather is getting colder and colder.", "It is getting colder and colder.", "The weather is getting colder.", "It's getting colder and colder."],
+  "points": [
+    { "id": "comprepeat", "label": "comparative (colder and colder)", "reason": "comparative", "need": ["colder and colder", "getting colder"], "wrong": ["more and more cold", "colder colder", "more cold and more cold"] },
+    { "id": "cont", "label": "continuous (is getting)", "reason": "tense", "need": ["is getting", "'s getting"], "wrong": ["gets colder", "got colder", "is get"] },
+    { "id": "v-cold", "label": "the word “cold”", "reason": "vocabulary", "need": ["cold"] }
+  ]
+},
+{
+  "r": 79, "zh": "请把窗户关上。",
+  "en": ["Please close the window.", "Please shut the window.", "Close the window, please.", "Please close the windows."],
+  "points": [
+    { "id": "imperative", "label": "imperative (Please + base verb)", "reason": "imperative", "need": ["please close", "please shut", "close the window", "shut the window"], "wrong": ["you close the window", "closing the window", "you should close"] },
+    { "id": "v-window", "label": "the word “window”", "reason": "vocabulary", "need": ["window"] }
+  ]
+},
+{
+  "r": 80, "zh": "我宁愿待在家里。",
+  "en": ["I would rather stay home.", "I'd rather stay at home.", "I would rather stay at home.", "I'd rather stay home."],
+  "points": [
+    { "id": "wouldrather", "label": "structure “would rather + base verb”", "reason": "structure (would rather)", "need": ["would rather stay", "rather stay"], "wrong": ["would rather to stay", "would rather staying", "prefer rather", "rather than stay"] },
+    { "id": "v-home", "label": "the word “home”", "reason": "vocabulary", "need": ["home", "house"] }
+  ]
+},
+{
+  "r": 81, "zh": "他工作努力，所以成功了。",
+  "en": ["He worked hard, so he succeeded.", "He worked hard, so he was successful.", "He worked hard and therefore succeeded.", "He worked hard, so he became successful."],
+  "points": [
+    { "id": "so", "label": "result connector (so / therefore)", "reason": "conjunction", "need": ["so he", "therefore"], "wrong": ["because he succeeded", "so that he"] },
+    { "id": "adverb", "label": "adverb (hard, not “hardly”)", "reason": "adverb", "need": ["hard"], "wrong": ["hardly"] },
+    { "id": "v-succeed", "label": "the word “succeed”", "reason": "vocabulary", "need": ["succeed", "succeeded", "succeeds", "successful", "success"] }
+  ]
+},
+{
+  "r": 82, "zh": "桌子上有一些书和两支笔。",
+  "en": ["There are some books and two pens on the table.", "There are some books and 2 pens on the table."],
+  "points": [
+    { "id": "there", "label": "existential “there are”", "reason": "grammar (there are)", "need": ["there are"], "wrong": ["there is", "it has", "have some"] },
+    { "id": "plural", "label": "plurals “books / pens”", "reason": "plural", "need": ["books", "pens"], "wrong": ["two pen", "some book and", "two pen on"] },
+    { "id": "prep", "label": "preposition “on the table”", "reason": "preposition", "need": ["on the table"], "wrong": ["in the table", "at the table"] }
+  ]
+},
+{
+  "r": 83, "zh": "我不知道该说什么。",
+  "en": ["I don't know what to say.", "I do not know what to say.", "I didn't know what to say.", "I have no idea what to say."],
+  "points": [
+    { "id": "clause", "label": "noun clause (what to + verb)", "reason": "noun clause", "need": ["what to say", "what i should say", "what i could say"], "wrong": ["what should i say", "what do i say", "what i say"] },
+    { "id": "neg", "label": "negation (don't / didn't know)", "reason": "negation", "need": ["don't know", "do not know", "didn't know", "no idea"], "wrong": ["not know what", "no know"] },
+    { "id": "v-say", "label": "the word “say”", "reason": "vocabulary", "need": ["say"] }
+  ]
+},
+{
+  "r": 84, "zh": "这件衬衫太贵了，我买不起。",
+  "en": ["This shirt is too expensive for me to buy.", "This shirt is too expensive, I can't afford it.", "This shirt is so expensive that I can't afford it.", "I can't afford this shirt, it's too expensive."],
+  "points": [
+    { "id": "too", "label": "structure “too … to / so … that”", "reason": "structure (too/so)", "need": ["too expensive", "so expensive that"], "wrong": ["very expensive so", "expensive too", "too much expensive"] },
+    { "id": "v-shirt", "label": "the word “shirt”", "reason": "vocabulary", "need": ["shirt"] },
+    { "id": "v-afford", "label": "the word “afford / buy”", "reason": "vocabulary", "need": ["afford", "buy"] }
+  ]
 }
 ];
