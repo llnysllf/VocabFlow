@@ -905,5 +905,158 @@ window.SENTENCES = [
     { "id": "willresult", "label": "future “will” in result clause", "reason": "tense (will in result clause)", "need": ["will stay", "'ll stay"], "wrong": ["would stay", "we stay home if", "we staying home"] },
     { "id": "v-rain", "label": "the word “rain”", "reason": "vocabulary", "need": ["rain"] }
   ]
+},
+{
+  "r": 103, "zh": "他已经在这家公司工作十年了。",
+  "en": ["He has worked at this company for ten years.", "He has been working at this company for ten years.", "He has worked for this company for 10 years.", "He has been working here for ten years."],
+  "points": [
+    { "id": "perfectfor", "label": "present perfect (have + worked)", "reason": "tense (present perfect)", "need": ["has worked", "has been working"], "wrong": ["has work", "is working at this company for", "have work at this", "has been work"] },
+    { "id": "prep-for", "label": "preposition “for + duration”", "reason": "preposition (for + duration)", "need": ["for ten years", "for 10 years"], "wrong": ["since ten years", "for ten year", "during ten years"] },
+    { "id": "v-company", "label": "the word “company”", "reason": "vocabulary", "need": ["company"] }
+  ]
+},
+{
+  "r": 104, "zh": "越早开始越好。",
+  "en": ["The sooner you start, the better.", "The sooner the better.", "The sooner you begin, the better.", "The earlier you start, the better."],
+  "points": [
+    { "id": "soonerbetter", "label": "structure “the sooner … the better”", "reason": "structure (the sooner … the better)", "need": ["the sooner you start, the better", "the sooner the better", "the sooner you begin, the better", "the earlier you start, the better", "the sooner you start the better"], "wrong": ["sooner is better", "more soon the better", "the soonest", "the more soon"] }
+  ]
+},
+{
+  "r": 105, "zh": "我建议你早点睡。",
+  "en": ["I suggest that you go to bed early.", "I suggest you go to bed early.", "I suggest going to bed early.", "I recommend that you go to bed early."],
+  "points": [
+    { "id": "suggest", "label": "verb form (suggest + that … / -ing)", "reason": "verb form (suggest + that / -ing)", "need": ["suggest that you go", "suggest you go", "suggest going", "recommend that you go", "recommend you go"], "wrong": ["suggest you to go", "suggest to go", "suggest that you to go", "suggest you going"] },
+    { "id": "v-early", "label": "the word “early”", "reason": "vocabulary", "need": ["early"] }
+  ]
+},
+{
+  "r": 106, "zh": "那是我一生中最快乐的一天。",
+  "en": ["That was the happiest day of my life.", "It was the happiest day of my life.", "That was the happiest day in my life."],
+  "points": [
+    { "id": "super", "label": "superlative “happiest”", "reason": "superlative (happiest)", "need": ["happiest day"], "wrong": ["most happy day", "happier day", "most happiest day"] },
+    { "id": "prep", "label": "preposition “of my life”", "reason": "preposition (of my life)", "need": ["of my life", "in my life"], "wrong": ["of my live", "in my live", "on my life"] },
+    { "id": "pastbe", "label": "past tense “was”", "reason": "tense (was)", "need": ["that was", "it was"], "wrong": ["that is the happiest", "it is the happiest"] }
+  ]
+},
+{
+  "r": 107, "zh": "你能告诉我邮局怎么走吗？",
+  "en": ["Can you tell me how to get to the post office?", "Could you tell me how to get to the post office?", "Can you tell me the way to the post office?", "Do you know how to get to the post office?"],
+  "points": [
+    { "id": "indirectq", "label": "indirect question (how to get to)", "reason": "indirect question (how to get to …)", "need": ["how to get to", "the way to", "how i can get to", "how to get there"], "wrong": ["how do i get to", "how can i get to the post", "how get to"] },
+    { "id": "modalreq", "label": "modal request (Can/Could you …)", "reason": "modal (can/could you)", "need": ["can you tell me", "could you tell me", "do you know"], "wrong": ["you can tell me", "tell me can you", "can tell me"] },
+    { "id": "v-postoffice", "label": "the word “post office”", "reason": "vocabulary", "need": ["post office"] }
+  ]
+},
+{
+  "r": 108, "zh": "我习惯早起。",
+  "en": ["I am used to getting up early.", "I'm used to getting up early.", "I am used to waking up early.", "I'm used to early mornings."],
+  "points": [
+    { "id": "usedto", "label": "verb form (be used to + -ing)", "reason": "verb form (be used to + -ing)", "need": ["used to getting", "used to waking", "used to early"], "wrong": ["used to get up", "use to getting", "used to got up", "am use to"] },
+    { "id": "v-early", "label": "the word “early / morning”", "reason": "vocabulary", "need": ["early", "morning"] }
+  ]
+},
+{
+  "r": 109, "zh": "无论你做什么，我都会支持你。",
+  "en": ["No matter what you do, I will support you.", "Whatever you do, I will support you.", "No matter what you do, I'll support you.", "I will support you no matter what you do."],
+  "points": [
+    { "id": "nomatter", "label": "structure “no matter what / whatever”", "reason": "structure (no matter what / whatever)", "need": ["no matter what you do", "whatever you do", "no matter what"], "wrong": ["no matter what do you", "whatever do you", "no matter you do"] },
+    { "id": "future", "label": "future “will support”", "reason": "tense (future will)", "need": ["will support", "'ll support"], "wrong": ["would support", "support you no matter", "am supporting"] },
+    { "id": "v-support", "label": "the word “support”", "reason": "vocabulary", "need": ["support"] }
+  ]
+},
+{
+  "r": 110, "zh": "他累得说不出话来。",
+  "en": ["He was so tired that he couldn't speak.", "He was so tired he couldn't speak.", "He was too tired to speak.", "He was so exhausted that he couldn't talk."],
+  "points": [
+    { "id": "sothat", "label": "structure “so … that / too … to”", "reason": "structure (so … that / too … to)", "need": ["so tired that", "so tired he", "too tired to", "so exhausted that"], "wrong": ["so tired to speak", "too tired that", "very tired that he", "so tired for"] },
+    { "id": "couldnt", "label": "modal “couldn't + base verb”", "reason": "modal (couldn't + base)", "need": ["couldn't speak", "couldn't talk", "to speak", "to talk"], "wrong": ["can't speak", "couldn't to speak", "couldn't spoke"] },
+    { "id": "v-tired", "label": "the word “tired”", "reason": "vocabulary", "need": ["tired", "exhausted"] }
+  ]
+},
+{
+  "r": 111, "zh": "请把音量调小一点。",
+  "en": ["Please turn down the volume.", "Please turn the volume down.", "Could you turn down the music?", "Please lower the volume."],
+  "points": [
+    { "id": "phrasal", "label": "phrasal verb “turn down”", "reason": "phrasal verb (turn down)", "need": ["turn down the volume", "turn the volume down", "turn down the music", "lower the volume", "turn it down"], "wrong": ["turn off the volume", "close the volume", "turn small the volume", "open the volume"] },
+    { "id": "v-volume", "label": "the word “volume”", "reason": "vocabulary", "need": ["volume", "music", "sound"] }
+  ]
+},
+{
+  "r": 112, "zh": "自从那以后我再也没见过他。",
+  "en": ["I have never seen him since then.", "I haven't seen him since then.", "I have never seen him again since then.", "I've never seen him since."],
+  "points": [
+    { "id": "perfectneg", "label": "present perfect negative", "reason": "tense (present perfect negative)", "need": ["have never seen him", "haven't seen him", "have not seen him"], "wrong": ["never saw him", "didn't see him since", "have never see him"] },
+    { "id": "since", "label": "preposition “since then”", "reason": "preposition (since then)", "need": ["since then", "since"], "wrong": ["from then", "since that time ago"] }
+  ]
+},
+{
+  "r": 113, "zh": "据天气预报说明天会下雪。",
+  "en": ["According to the weather forecast, it will snow tomorrow.", "According to the forecast, it's going to snow tomorrow.", "The weather forecast says it will snow tomorrow.", "According to the weather report, it will snow tomorrow."],
+  "points": [
+    { "id": "accordingto", "label": "phrase “according to”", "reason": "phrase (according to)", "need": ["according to the", "forecast says", "report says"], "wrong": ["according the", "according with", "accord to the"] },
+    { "id": "future", "label": "future (will / going to)", "reason": "tense (future)", "need": ["will snow", "going to snow"], "wrong": ["snows tomorrow", "would snow", "will snows"] },
+    { "id": "v-snow", "label": "the word “snow”", "reason": "vocabulary", "need": ["snow"] }
+  ]
+},
+{
+  "r": 114, "zh": "我刚吃完午饭。",
+  "en": ["I have just finished lunch.", "I've just had lunch.", "I just finished lunch.", "I have just eaten lunch."],
+  "points": [
+    { "id": "justperfect", "label": "present perfect + just", "reason": "tense (present perfect + just)", "need": ["have just finished", "have just had", "'ve just", "just finished", "just had lunch", "have just eaten"], "wrong": ["have just finish", "am just finishing", "will just finish"] },
+    { "id": "v-lunch", "label": "the word “lunch”", "reason": "vocabulary", "need": ["lunch"] }
+  ]
+},
+{
+  "r": 115, "zh": "他对数学很在行。",
+  "en": ["He is good at math.", "He is good at mathematics.", "He is good at maths.", "He's good at math."],
+  "points": [
+    { "id": "goodat", "label": "collocation “good at”", "reason": "collocation (good at)", "need": ["good at math", "good at maths", "good at mathematics"], "wrong": ["good in math", "good on math", "good to math"] },
+    { "id": "v-math", "label": "the word “math”", "reason": "vocabulary", "need": ["math", "maths", "mathematics"] }
+  ]
+},
+{
+  "r": 116, "zh": "你应该为自己感到骄傲。",
+  "en": ["You should be proud of yourself.", "You ought to be proud of yourself.", "You should feel proud of yourself."],
+  "points": [
+    { "id": "should", "label": "modal “should + be”", "reason": "modal (should + be)", "need": ["should be proud", "ought to be proud", "should feel proud"], "wrong": ["should proud", "should to be proud", "must proud"] },
+    { "id": "reflexive", "label": "reflexive pronoun “yourself”", "reason": "reflexive pronoun (yourself)", "need": ["of yourself", "yourself"], "wrong": ["of you", "of yourselves", "proud of you"] },
+    { "id": "v-proud", "label": "the word “proud”", "reason": "vocabulary", "need": ["proud"] }
+  ]
+},
+{
+  "r": 117, "zh": "这么晚了，他不可能还在工作。",
+  "en": ["He can't still be working this late.", "He can't be working so late.", "It's impossible that he is still working this late.", "He couldn't still be working this late."],
+  "points": [
+    { "id": "modalcertainty", "label": "modal of certainty (can't = impossible)", "reason": "modal (can't = certainty)", "need": ["can't still be working", "can't be working", "couldn't still be working", "impossible that he"], "wrong": ["can't still working", "mustn't be working", "can't be work", "doesn't can be working"] },
+    { "id": "v-late", "label": "the word “late”", "reason": "vocabulary", "need": ["late"] }
+  ]
+},
+{
+  "r": 118, "zh": "这家餐厅以海鲜闻名。",
+  "en": ["This restaurant is famous for its seafood.", "This restaurant is known for its seafood.", "The restaurant is famous for its seafood.", "This restaurant is well known for its seafood."],
+  "points": [
+    { "id": "famousfor", "label": "collocation “famous / known for”", "reason": "collocation (famous/known for)", "need": ["famous for", "known for"], "wrong": ["famous of", "famous as", "known as its seafood", "famous with", "famous by"] },
+    { "id": "possessive", "label": "possessive “its”", "reason": "possessive (its)", "need": ["its seafood", "their seafood"], "wrong": ["it's seafood", "his seafood", "its' seafood"] },
+    { "id": "v-restaurant", "label": "the word “restaurant”", "reason": "vocabulary", "need": ["restaurant"] }
+  ]
+},
+{
+  "r": 119, "zh": "越来越多的人在家工作。",
+  "en": ["More and more people work from home.", "More and more people are working from home.", "An increasing number of people work from home.", "More and more people work at home."],
+  "points": [
+    { "id": "moreandmore", "label": "structure “more and more”", "reason": "structure (more and more)", "need": ["more and more people", "an increasing number of people", "increasingly more people"], "wrong": ["more more people", "much more people", "many and many people"] },
+    { "id": "prep", "label": "preposition “from / at home”", "reason": "preposition (from/at home)", "need": ["from home", "at home"], "wrong": ["in home", "on home", "from the home"] },
+    { "id": "v-work", "label": "the word “work”", "reason": "vocabulary", "need": ["work"] }
+  ]
+},
+{
+  "r": 120, "zh": "我把这本书推荐给所有学生。",
+  "en": ["I recommend this book to all students.", "I recommend this book to every student.", "I would recommend this book to all students.", "I'd recommend this book to all students."],
+  "points": [
+    { "id": "recommendto", "label": "verb pattern (recommend sth to sb)", "reason": "verb pattern (recommend sth to sb)", "need": ["recommend this book to", "recommend it to", "would recommend this book to"], "wrong": ["recommend all students this book", "recommend to all students this book", "recommend you this book", "recommend this book all students"] },
+    { "id": "quantifier", "label": "quantifier “all + plural”", "reason": "quantifier (all + plural)", "need": ["all students", "every student", "all of the students"], "wrong": ["all student", "every students", "all the student"] },
+    { "id": "v-student", "label": "the word “student”", "reason": "vocabulary", "need": ["student"] }
+  ]
 }
 ];
