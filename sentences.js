@@ -1211,5 +1211,156 @@ window.SENTENCES = [
     { "id": "tag", "label": "question tag “isn't it”", "reason": "question tag (isn't it)", "need": ["isn't it", "is it not"], "wrong": ["isn't they", "doesn't it", "is it", "aren't it"] },
     { "id": "v-weather", "label": "the word “weather”", "reason": "vocabulary", "need": ["weather", "day"] }
   ]
+},
+{
+  "r": 139, "zh": "尽管下着雨，他们还是踢了足球。",
+  "en": ["Although it was raining, they still played football.", "Even though it was raining, they played football.", "Despite the rain, they played football.", "Although it was raining, they played soccer."],
+  "points": [
+    { "id": "although", "label": "conjunction “although / despite”", "reason": "conjunction (although / despite)", "need": ["although it was raining", "even though it was raining", "despite the rain", "in spite of the rain"], "wrong": ["despite it was raining", "despite of the rain", "although raining", "inspite of rain"] },
+    { "id": "pastcont", "label": "past continuous “was raining”", "reason": "tense (was raining)", "need": ["was raining", "it rained"], "wrong": ["is raining", "was rain", "were raining"] },
+    { "id": "v-football", "label": "the word “football / soccer”", "reason": "vocabulary", "need": ["football", "soccer"] }
+  ]
+},
+{
+  "r": 140, "zh": "你介意我开窗户吗？",
+  "en": ["Would you mind if I open the window?", "Would you mind if I opened the window?", "Do you mind if I open the window?", "Would you mind my opening the window?"],
+  "points": [
+    { "id": "wouldmind", "label": "verb form (would you mind + if / -ing)", "reason": "verb form (would you mind + if/-ing)", "need": ["would you mind if i open", "would you mind if i opened", "do you mind if i open", "would you mind my opening", "mind if i open"], "wrong": ["would you mind to open", "would you mind if i opening", "do you mind to open", "would you mind that i open"] },
+    { "id": "v-window", "label": "the word “window”", "reason": "vocabulary", "need": ["window"] }
+  ]
+},
+{
+  "r": 141, "zh": "我们一到那儿就给你打电话。",
+  "en": ["We will call you as soon as we get there.", "We'll call you as soon as we arrive.", "As soon as we get there, we will call you.", "We will call you as soon as we arrive there."],
+  "points": [
+    { "id": "assoonas", "label": "conjunction “as soon as + present”", "reason": "conjunction (as soon as + present)", "need": ["as soon as we get there", "as soon as we arrive", "as soon as we get"], "wrong": ["as soon as we will get", "as soon as we will arrive", "as soon when we get", "as soon as we got there"] },
+    { "id": "future", "label": "future “will call”", "reason": "tense (future will)", "need": ["will call you", "'ll call you"], "wrong": ["would call you", "are calling you", "call you as soon"] }
+  ]
+},
+{
+  "r": 142, "zh": "只要你努力，就会成功。",
+  "en": ["As long as you work hard, you will succeed.", "As long as you try hard, you will succeed.", "You will succeed as long as you work hard.", "So long as you work hard, you will succeed."],
+  "points": [
+    { "id": "aslongas", "label": "conjunction “as long as”", "reason": "conjunction (as long as)", "need": ["as long as you work", "as long as you try", "so long as you work"], "wrong": ["as long you work", "so long you work", "as long as you will work", "as long as you worked"] },
+    { "id": "future", "label": "future “will succeed”", "reason": "tense (future will)", "need": ["will succeed", "'ll succeed"], "wrong": ["would succeed", "are succeeding", "succeed as long"] },
+    { "id": "v-succeed", "label": "the word “succeed”", "reason": "vocabulary", "need": ["succeed", "succeeded", "successful", "success"] }
+  ]
+},
+{
+  "r": 143, "zh": "他努力学习以便通过考试。",
+  "en": ["He studied hard in order to pass the exam.", "He studied hard so as to pass the exam.", "He studied hard to pass the exam.", "He studied hard in order to pass the test."],
+  "points": [
+    { "id": "purpose", "label": "structure “in order to / to + base”", "reason": "structure (in order to / to + base)", "need": ["in order to pass", "so as to pass", "hard to pass"], "wrong": ["in order to passing", "for pass the exam", "so as pass the", "in order pass the", "for passing the exam"] },
+    { "id": "v-exam", "label": "the word “exam / test”", "reason": "vocabulary", "need": ["exam", "test"] }
+  ]
+},
+{
+  "r": 144, "zh": "如果我早知道，我就会帮你了。",
+  "en": ["If I had known, I would have helped you.", "If I had known earlier, I would have helped you.", "I would have helped you if I had known.", "Had I known, I would have helped you."],
+  "points": [
+    { "id": "cond3if", "label": "third conditional (if + had + p.p.)", "reason": "conditional (third: if + had + p.p.)", "need": ["if i had known", "had i known"], "wrong": ["if i had know", "if i knew", "if i would have known", "if i have known"] },
+    { "id": "cond3result", "label": "result clause (would have + p.p.)", "reason": "conditional (would have + p.p.)", "need": ["would have helped", "would've helped"], "wrong": ["would helped", "would have help", "will have helped", "would had helped"] },
+    { "id": "v-help", "label": "the word “help”", "reason": "vocabulary", "need": ["help", "helped", "helping", "helps"] }
+  ]
+},
+{
+  "r": 145, "zh": "你应该早点告诉我的。",
+  "en": ["You should have told me earlier.", "You should have told me sooner.", "You ought to have told me earlier."],
+  "points": [
+    { "id": "shouldhave", "label": "modal perfect (should have + p.p.)", "reason": "modal perfect (should have + p.p.)", "need": ["should have told", "ought to have told", "should've told"], "wrong": ["should told me", "should have tell", "should have telled", "should has told", "should of told"] },
+    { "id": "comptime", "label": "comparative “earlier / sooner”", "reason": "comparative (earlier/sooner)", "need": ["earlier", "sooner"], "wrong": ["more early", "more sooner", "early"] }
+  ]
+},
+{
+  "r": 146, "zh": "这是我第一次吃寿司。",
+  "en": ["This is the first time I have eaten sushi.", "This is the first time I've eaten sushi.", "It's the first time I have had sushi.", "This is the first time I have tried sushi."],
+  "points": [
+    { "id": "firsttime", "label": "tense (first time + present perfect)", "reason": "tense (first time + present perfect)", "need": ["first time i have eaten", "first time i've eaten", "first time i have had", "first time i have tried"], "wrong": ["first time i eat sushi", "first time i ate sushi", "first time i am eating", "first time i have ate"] },
+    { "id": "v-sushi", "label": "the word “sushi”", "reason": "vocabulary", "need": ["sushi"] }
+  ]
+},
+{
+  "r": 147, "zh": "火车刚要开的时候我们赶到了。",
+  "en": ["The train was about to leave when we arrived.", "The train was about to depart when we arrived.", "We arrived just as the train was about to leave."],
+  "points": [
+    { "id": "aboutto", "label": "structure “be about to + base verb”", "reason": "structure (be about to + base verb)", "need": ["was about to leave", "was about to depart"], "wrong": ["was about to leaving", "was about leave", "is about to leave", "was about to left"] },
+    { "id": "pastsimple", "label": "past simple “arrived”", "reason": "tense (past simple)", "need": ["we arrived", "we got there"], "wrong": ["we arrive", "we have arrived", "we were arriving"] },
+    { "id": "v-train", "label": "the word “train”", "reason": "vocabulary", "need": ["train"] }
+  ]
+},
+{
+  "r": 148, "zh": "我花了两个小时做作业。",
+  "en": ["I spent two hours doing my homework.", "I spent two hours on my homework.", "It took me two hours to do my homework.", "I spent 2 hours doing my homework."],
+  "points": [
+    { "id": "spend", "label": "verb pattern (spend time doing)", "reason": "verb pattern (spend time doing)", "need": ["spent two hours doing", "spent two hours on", "took me two hours to", "spent 2 hours doing"], "wrong": ["spent two hours to do", "spent two hours for doing", "spent two hours to doing", "cost two hours doing", "spend two hours doing"] },
+    { "id": "v-homework", "label": "the word “homework”", "reason": "vocabulary", "need": ["homework"] }
+  ]
+},
+{
+  "r": 149, "zh": "我们停下来休息了一会儿。",
+  "en": ["We stopped to take a rest.", "We stopped to rest for a while.", "We stopped to have a rest.", "We stopped to take a break."],
+  "points": [
+    { "id": "stoptodo", "label": "verb form (stop to do = purpose)", "reason": "verb form (stop to do = purpose)", "need": ["stopped to take", "stopped to rest", "stopped to have a rest", "stopped to take a break"], "wrong": ["stopped taking a rest", "stopped resting for", "stopped to taking", "stop to take a rest"] },
+    { "id": "v-rest", "label": "the word “rest / break”", "reason": "vocabulary", "need": ["rest", "break"] }
+  ]
+},
+{
+  "r": 150, "zh": "听到这个消息我忍不住笑了。",
+  "en": ["I couldn't help laughing when I heard the news.", "I couldn't help but laugh when I heard the news.", "I could not help laughing at the news."],
+  "points": [
+    { "id": "canthelp", "label": "verb form (can't help + -ing)", "reason": "verb form (can't help + -ing)", "need": ["couldn't help laughing", "couldn't help but laugh", "could not help laughing"], "wrong": ["couldn't help to laugh", "couldn't help laugh", "couldn't help but laughing"] },
+    { "id": "v-news", "label": "the word “news”", "reason": "vocabulary", "need": ["news"] },
+    { "id": "v-laugh", "label": "the word “laugh”", "reason": "vocabulary", "need": ["laugh", "laughing"] }
+  ]
+},
+{
+  "r": 151, "zh": "这本书读起来很容易。",
+  "en": ["This book is easy to read.", "This book is easy to understand.", "The book is easy to read."],
+  "points": [
+    { "id": "easyto", "label": "structure “adj + to + base verb”", "reason": "structure (adj + to + base verb)", "need": ["read", "understand"], "wrong": ["easy to reading", "easy for read", "easy of reading", "easy to be read", "easy reading"] },
+    { "id": "v-book", "label": "the word “book”", "reason": "vocabulary", "need": ["book"] }
+  ]
+},
+{
+  "r": 152, "zh": "据我所知，他还没结婚。",
+  "en": ["As far as I know, he is not married yet.", "As far as I know, he hasn't got married yet.", "As far as I know, he is still single.", "As far as I know, he isn't married yet."],
+  "points": [
+    { "id": "asfaras", "label": "phrase “as far as I know”", "reason": "phrase (as far as I know)", "need": ["as far as i know", "as far as i am aware", "so far as i know"], "wrong": ["as far i know", "as far as i known", "far that i know"] },
+    { "id": "yet", "label": "adverb “yet / still”", "reason": "adverb (yet / still)", "need": ["not married yet", "hasn't got married yet", "still single", "isn't married yet"], "wrong": ["not yet married already", "married yet not"] },
+    { "id": "v-married", "label": "the word “married / single”", "reason": "vocabulary", "need": ["married", "single"] }
+  ]
+},
+{
+  "r": 153, "zh": "他似乎对结果很满意。",
+  "en": ["He seems to be satisfied with the result.", "He seems satisfied with the result.", "He seems to be happy with the result.", "He appears to be satisfied with the result."],
+  "points": [
+    { "id": "seemto", "label": "verb form (seem to + be)", "reason": "verb form (seem to + be)", "need": ["seems to be satisfied", "seems satisfied", "seems to be happy", "appears to be satisfied"], "wrong": ["seems to satisfied", "seem to be satisfied", "seems being satisfied", "seems to be satisfy"] },
+    { "id": "satisfiedwith", "label": "collocation “satisfied with”", "reason": "collocation (satisfied with)", "need": ["satisfied with", "happy with", "pleased with"], "wrong": ["satisfied of", "satisfied about", "satisfied to the", "satisfied for"] },
+    { "id": "v-result", "label": "the word “result”", "reason": "vocabulary", "need": ["result"] }
+  ]
+},
+{
+  "r": 154, "zh": "无论多么困难，都不要放弃。",
+  "en": ["No matter how difficult it is, don't give up.", "However difficult it is, don't give up.", "No matter how hard it is, don't give up.", "However hard it is, never give up."],
+  "points": [
+    { "id": "nomatterhow", "label": "structure “no matter how / however + adj”", "reason": "structure (no matter how / however + adj)", "need": ["no matter how difficult", "no matter how hard", "however difficult", "however hard"], "wrong": ["no matter how is it difficult", "however it is difficult", "no matter how difficulty", "how matter difficult"] },
+    { "id": "giveup", "label": "phrasal verb “give up”", "reason": "phrasal verb (give up)", "need": ["give up", "giving up"], "wrong": ["gave up", "give out", "giving out"] }
+  ]
+},
+{
+  "r": 155, "zh": "这部电影没有我想象的那么好。",
+  "en": ["This movie is not as good as I expected.", "The movie wasn't as good as I expected.", "This movie isn't as good as I thought.", "This movie is not so good as I expected."],
+  "points": [
+    { "id": "notasas", "label": "structure “not as … as”", "reason": "structure (not as … as)", "need": ["not as good as", "wasn't as good as", "isn't as good as", "not so good as"], "wrong": ["not as good than", "not good as i", "not as better as", "not as good like"] },
+    { "id": "v-expect", "label": "the word “expect / thought”", "reason": "vocabulary", "need": ["expect", "expected", "thought", "imagined", "imagine"] }
+  ]
+},
+{
+  "r": 156, "zh": "你最好不要迟到。",
+  "en": ["You had better not be late.", "You'd better not be late.", "You had better not arrive late.", "You'd better not come late."],
+  "points": [
+    { "id": "hadbetternot", "label": "structure “had better not + base verb”", "reason": "structure (had better not + base verb)", "need": ["had better not be late", "'d better not be late", "better not be late", "had better not arrive late", "had better not come late", "better not be"], "wrong": ["had not better be late", "had better don't be late", "had better not to be late", "better not being late", "had better no be late"] },
+    { "id": "v-late", "label": "the word “late”", "reason": "vocabulary", "need": ["late"] }
+  ]
 }
 ];
