@@ -1058,5 +1058,158 @@ window.SENTENCES = [
     { "id": "quantifier", "label": "quantifier “all + plural”", "reason": "quantifier (all + plural)", "need": ["all students", "every student", "all of the students"], "wrong": ["all student", "every students", "all the student"] },
     { "id": "v-student", "label": "the word “student”", "reason": "vocabulary", "need": ["student"] }
   ]
+},
+{
+  "r": 121, "zh": "游泳是很好的锻炼。",
+  "en": ["Swimming is good exercise.", "Swimming is a good exercise.", "Swimming is great exercise."],
+  "points": [
+    { "id": "gerundsubj", "label": "gerund as subject (Swimming is …)", "reason": "gerund as subject", "need": ["swimming is"], "wrong": ["swim is", "to swim is", "swimming are", "swimming it is"] },
+    { "id": "v-exercise", "label": "the word “exercise”", "reason": "vocabulary", "need": ["exercise"] }
+  ]
+},
+{
+  "r": 122, "zh": "他个子高得能够到天花板。",
+  "en": ["He is tall enough to reach the ceiling.", "He's tall enough to reach the ceiling.", "He is tall enough to touch the ceiling."],
+  "points": [
+    { "id": "enoughto", "label": "structure “adj + enough to”", "reason": "structure (adj + enough to)", "need": ["tall enough to"], "wrong": ["enough tall to", "tall enough for reach", "tall enough that he reach", "enough tall that"] },
+    { "id": "v-ceiling", "label": "the word “ceiling”", "reason": "vocabulary", "need": ["ceiling"] },
+    { "id": "v-reach", "label": "the word “reach / touch”", "reason": "vocabulary", "need": ["reach", "touch"] }
+  ]
+},
+{
+  "r": 123, "zh": "我真希望我会弹钢琴。",
+  "en": ["I wish I could play the piano.", "I wish I knew how to play the piano.", "I wish that I could play the piano.", "I wish I could play piano."],
+  "points": [
+    { "id": "wish", "label": "subjunctive “wish + past”", "reason": "subjunctive (wish + past)", "need": ["wish i could play", "wish i knew", "wish that i could"], "wrong": ["wish i can play", "wish i will play", "hope i could play", "wish i could to play", "wish i play"] },
+    { "id": "v-piano", "label": "the word “piano”", "reason": "vocabulary", "need": ["piano"] }
+  ]
+},
+{
+  "r": 124, "zh": "她一定把钥匙落在办公室了。",
+  "en": ["She must have left her keys at the office.", "She must have left her keys in the office.", "She must have forgotten her keys at the office."],
+  "points": [
+    { "id": "musthave", "label": "modal perfect (must have + p.p.)", "reason": "modal perfect (must have + p.p.)", "need": ["must have left", "must have forgotten"], "wrong": ["must left", "must have leave", "must has left", "must of left", "should have left"] },
+    { "id": "prep", "label": "preposition “at/in the office”", "reason": "preposition (at/in the office)", "need": ["at the office", "in the office"], "wrong": ["on the office", "at office"] },
+    { "id": "v-key", "label": "the word “key”", "reason": "vocabulary", "need": ["key"] }
+  ]
+},
+{
+  "r": 125, "zh": "我们小时候常常去那条河里游泳。",
+  "en": ["We used to swim in that river when we were kids.", "We used to swim in that river when we were children.", "When we were kids, we used to swim in that river."],
+  "points": [
+    { "id": "usedtopast", "label": "past habit (used to + base verb)", "reason": "past habit (used to + base verb)", "need": ["used to swim"], "wrong": ["use to swim", "used to swimming", "were used to swim", "used swim"] },
+    { "id": "pastwere", "label": "past tense “were”", "reason": "tense (were)", "need": ["we were kids", "we were children", "we were young"], "wrong": ["we are kids", "we was kids", "when we kids"] },
+    { "id": "v-river", "label": "the word “river”", "reason": "vocabulary", "need": ["river"] }
+  ]
+},
+{
+  "r": 126, "zh": "这座桥是工人们去年建造的。",
+  "en": ["This bridge was built by the workers last year.", "The bridge was built by the workers last year.", "This bridge was constructed by the workers last year."],
+  "points": [
+    { "id": "passiveby", "label": "passive (was + p.p. + by)", "reason": "passive (was + p.p. + by)", "need": ["was built by", "was constructed by"], "wrong": ["was build by", "is built by", "was builded by", "was built from"] },
+    { "id": "pasttime", "label": "time expression “last year”", "reason": "time expression (last year)", "need": ["last year"], "wrong": ["the last year", "in last year", "past year ago"] },
+    { "id": "v-bridge", "label": "the word “bridge”", "reason": "vocabulary", "need": ["bridge"] }
+  ]
+},
+{
+  "r": 127, "zh": "不是约翰就是玛丽拿了我的书。",
+  "en": ["Either John or Mary took my book.", "Either John or Mary has my book.", "It was either John or Mary who took my book."],
+  "points": [
+    { "id": "eitheror", "label": "structure “either … or”", "reason": "structure (either … or)", "need": ["either john or mary", "either john or"], "wrong": ["either john nor mary", "neither john or mary", "john either or mary", "either or john"] },
+    { "id": "v-book", "label": "the word “book”", "reason": "vocabulary", "need": ["book"] }
+  ]
+},
+{
+  "r": 128, "zh": "他既不抽烟也不喝酒。",
+  "en": ["He neither smokes nor drinks.", "He doesn't smoke or drink.", "He neither smokes nor drinks alcohol."],
+  "points": [
+    { "id": "neithernor", "label": "structure “neither … nor”", "reason": "structure (neither … nor)", "need": ["neither smokes nor", "doesn't smoke or drink", "does not smoke or drink"], "wrong": ["neither smokes or drinks", "either smokes nor", "nor smokes nor drinks"] },
+    { "id": "v-smoke", "label": "the word “smoke”", "reason": "vocabulary", "need": ["smoke"] },
+    { "id": "v-drink", "label": "the word “drink”", "reason": "vocabulary", "need": ["drink"] }
+  ]
+},
+{
+  "r": 129, "zh": "他的车和我的一样贵。",
+  "en": ["His car is as expensive as mine.", "His car is as expensive as my car.", "His car costs as much as mine."],
+  "points": [
+    { "id": "asas", "label": "structure “as … as”", "reason": "structure (as … as)", "need": ["as expensive as", "as much as"], "wrong": ["as expensive than", "so expensive as", "as expensive like", "more expensive as"] },
+    { "id": "possessive", "label": "possessive pronoun “mine”", "reason": "possessive pronoun (mine)", "need": ["as mine", "as my car"], "wrong": ["as my", "as me", "as i"] },
+    { "id": "v-car", "label": "the word “car”", "reason": "vocabulary", "need": ["car"] }
+  ]
+},
+{
+  "r": 130, "zh": "直到午夜他才回家。",
+  "en": ["He didn't come home until midnight.", "He did not get home until midnight.", "It was not until midnight that he came home.", "He didn't come home till midnight."],
+  "points": [
+    { "id": "notuntil", "label": "structure “not … until”", "reason": "structure (not … until)", "need": ["didn't come home until", "did not get home until", "not until midnight that", "didn't come home till", "didn't get home until"], "wrong": ["didn't come home before midnight", "came home until midnight", "didn't came home until"] },
+    { "id": "v-midnight", "label": "the word “midnight”", "reason": "vocabulary", "need": ["midnight"] }
+  ]
+},
+{
+  "r": 131, "zh": "我昨天理发了。",
+  "en": ["I had my hair cut yesterday.", "I got my hair cut yesterday.", "I had my hair done yesterday.", "I got a haircut yesterday."],
+  "points": [
+    { "id": "causative", "label": "causative (have/get sth done)", "reason": "causative (have/get sth done)", "need": ["had my hair cut", "got my hair cut", "had my hair done", "got a haircut"], "wrong": ["cut my hair yesterday", "had cut my hair", "had my hair cutted", "have my hair cut yesterday", "did my hair cut"] },
+    { "id": "v-hair", "label": "the word “hair”", "reason": "vocabulary", "need": ["hair"] }
+  ]
+},
+{
+  "r": 132, "zh": "老师让我们写一篇作文。",
+  "en": ["The teacher made us write an essay.", "The teacher made us write a composition.", "Our teacher made us write an essay."],
+  "points": [
+    { "id": "makesodo", "label": "verb form (make sb + base verb)", "reason": "verb form (make sb + base verb)", "need": ["made us write"], "wrong": ["made us to write", "made us writing", "make us write", "made us wrote", "let us to write"] },
+    { "id": "v-essay", "label": "the word “essay”", "reason": "vocabulary", "need": ["essay", "composition"] }
+  ]
+},
+{
+  "r": 133, "zh": "学好一门语言需要时间。",
+  "en": ["It takes time to learn a language well.", "It takes time to master a language.", "Learning a language well takes time.", "It takes time to learn a language."],
+  "points": [
+    { "id": "ittakes", "label": "structure “it takes time to do”", "reason": "structure (it takes time to do)", "need": ["it takes time to", "takes time to learn", "takes time to master", "learning a language well takes time"], "wrong": ["it takes time learning", "it spends time to learn", "it needs time to learning", "it costs time to learn"] },
+    { "id": "v-language", "label": "the word “language”", "reason": "vocabulary", "need": ["language"] }
+  ]
+},
+{
+  "r": 134, "zh": "我盼望着收到你的来信。",
+  "en": ["I am looking forward to hearing from you.", "I'm looking forward to hearing from you.", "I look forward to hearing from you.", "I'm looking forward to your reply."],
+  "points": [
+    { "id": "lookforward", "label": "verb form (look forward to + -ing)", "reason": "verb form (look forward to + -ing)", "need": ["looking forward to hearing", "look forward to hearing", "forward to your reply", "looking forward to your"], "wrong": ["looking forward to hear", "look forward to hear", "looking forward hearing", "forward to hear from"] },
+    { "id": "hearfrom", "label": "collocation “hear from you”", "reason": "collocation (hear from you)", "need": ["hearing from you", "from you", "your reply"], "wrong": ["hear of you", "listen from you"] }
+  ]
+},
+{
+  "r": 135, "zh": "我比起咖啡更喜欢茶。",
+  "en": ["I prefer tea to coffee.", "I prefer tea over coffee.", "I like tea more than coffee."],
+  "points": [
+    { "id": "preferto", "label": "structure “prefer A to B”", "reason": "structure (prefer A to B)", "need": ["prefer tea to coffee", "prefer tea over coffee", "like tea more than coffee", "tea more than coffee"], "wrong": ["prefer tea than coffee", "prefer tea from coffee", "more prefer tea than", "prefer tea coffee"] },
+    { "id": "v-tea", "label": "the word “tea”", "reason": "vocabulary", "need": ["tea"] },
+    { "id": "v-coffee", "label": "the word “coffee”", "reason": "vocabulary", "need": ["coffee"] }
+  ]
+},
+{
+  "r": 136, "zh": "记得出门时锁门。",
+  "en": ["Remember to lock the door when you leave.", "Remember to lock the door when you go out.", "Don't forget to lock the door when you leave."],
+  "points": [
+    { "id": "remembertodo", "label": "verb form (remember to + base verb)", "reason": "verb form (remember to + base verb)", "need": ["remember to lock", "don't forget to lock", "forget to lock the door"], "wrong": ["remember locking the door", "remember lock the door", "remember that lock", "remembering to lock"] },
+    { "id": "when", "label": "conjunction “when + present”", "reason": "conjunction (when + present)", "need": ["when you leave", "when you go out"], "wrong": ["when you will leave", "when do you leave", "while you leave"] },
+    { "id": "v-door", "label": "the word “door”", "reason": "vocabulary", "need": ["door"] }
+  ]
+},
+{
+  "r": 137, "zh": "你认识那个姐姐是医生的男孩吗？",
+  "en": ["Do you know the boy whose sister is a doctor?", "Do you know the boy whose older sister is a doctor?", "Do you know that boy whose sister is a doctor?"],
+  "points": [
+    { "id": "whose", "label": "relative clause “whose”", "reason": "relative clause (whose)", "need": ["whose sister is", "whose older sister"], "wrong": ["boy who sister", "boy that sister", "boy his sister is", "boy which sister"] },
+    { "id": "v-doctor", "label": "the word “doctor”", "reason": "vocabulary", "need": ["doctor"] },
+    { "id": "v-sister", "label": "the word “sister”", "reason": "vocabulary", "need": ["sister"] }
+  ]
+},
+{
+  "r": 138, "zh": "今天天气很好，是吧？",
+  "en": ["The weather is nice today, isn't it?", "It's a nice day today, isn't it?", "The weather is lovely today, isn't it?", "Nice weather today, isn't it?"],
+  "points": [
+    { "id": "tag", "label": "question tag “isn't it”", "reason": "question tag (isn't it)", "need": ["isn't it", "is it not"], "wrong": ["isn't they", "doesn't it", "is it", "aren't it"] },
+    { "id": "v-weather", "label": "the word “weather”", "reason": "vocabulary", "need": ["weather", "day"] }
+  ]
 }
 ];
