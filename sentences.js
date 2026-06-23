@@ -1362,5 +1362,154 @@ window.SENTENCES = [
     { "id": "hadbetternot", "label": "structure “had better not + base verb”", "reason": "structure (had better not + base verb)", "need": ["had better not be late", "'d better not be late", "better not be late", "had better not arrive late", "had better not come late", "better not be"], "wrong": ["had not better be late", "had better don't be late", "had better not to be late", "better not being late", "had better no be late"] },
     { "id": "v-late", "label": "the word “late”", "reason": "vocabulary", "need": ["late"] }
   ]
+},
+{
+  "r": 157, "zh": "这就是我出生的小镇。",
+  "en": ["This is the town where I was born.", "This is the town where I grew up.", "This is the town in which I was born.", "This is the town I was born in."],
+  "points": [
+    { "id": "relwhere", "label": "relative clause (where / in which)", "reason": "relative clause (where / in which)", "need": ["town where i was born", "town where i grew up", "town in which i was born", "town i was born in"], "wrong": ["town which i was born", "town that i was born", "town where was i born"] },
+    { "id": "passiveborn", "label": "passive “was born”", "reason": "passive (was born)", "need": ["was born", "grew up"], "wrong": ["was borned", "am born", "i born in"] },
+    { "id": "v-town", "label": "the word “town”", "reason": "vocabulary", "need": ["town"] }
+  ]
+},
+{
+  "r": 158, "zh": "这里以前有一家书店。",
+  "en": ["There used to be a bookstore here.", "There used to be a book shop here.", "There was a bookstore here before."],
+  "points": [
+    { "id": "thereusedto", "label": "structure “there used to be”", "reason": "structure (there used to be)", "need": ["there used to be", "there used to", "there was a bookstore here before", "there was a book shop here before"], "wrong": ["there use to be", "there used to being", "it used to be a bookstore here", "there used be"] },
+    { "id": "v-bookstore", "label": "the word “bookstore”", "reason": "vocabulary", "need": ["bookstore", "book shop", "bookshop"] }
+  ]
+},
+{
+  "r": 159, "zh": "你本应该早点来的。",
+  "en": ["You were supposed to come earlier.", "You were supposed to arrive earlier.", "You were supposed to be here earlier."],
+  "points": [
+    { "id": "supposedto", "label": "structure “be supposed to + base verb”", "reason": "structure (be supposed to + base verb)", "need": ["were supposed to come", "were supposed to arrive", "were supposed to be here"], "wrong": ["was supposed to come", "were suppose to come", "were supposed to coming", "supposed to came"] },
+    { "id": "comptime", "label": "comparative “earlier”", "reason": "comparative (earlier)", "need": ["earlier", "sooner"], "wrong": ["more early", "more sooner", "early"] }
+  ]
+},
+{
+  "r": 160, "zh": "我明天要去看牙医。",
+  "en": ["I am going to see the dentist tomorrow.", "I'm going to see the dentist tomorrow.", "I am seeing the dentist tomorrow.", "I'm going to the dentist tomorrow."],
+  "points": [
+    { "id": "goingto", "label": "future “be going to / arrangement”", "reason": "tense (be going to / arrangement)", "need": ["am going to", "'m going to", "am seeing the dentist", "going to the dentist"], "wrong": ["will going to see", "go to see the dentist tomorrow", "am going see the dentist", "going to saw the dentist"] },
+    { "id": "v-dentist", "label": "the word “dentist”", "reason": "vocabulary", "need": ["dentist"] }
+  ]
+},
+{
+  "r": 161, "zh": "你不必现在就做决定。",
+  "en": ["You don't have to decide now.", "You don't need to decide right now.", "You needn't decide now.", "You don't have to make a decision now."],
+  "points": [
+    { "id": "noobligation", "label": "modal “don't have to / needn't”", "reason": "modal (don't have to / needn't)", "need": ["don't have to decide", "don't need to decide", "needn't decide", "don't have to make a decision"], "wrong": ["don't must decide", "haven't to decide", "needn't to decide", "mustn't decide"] },
+    { "id": "v-decide", "label": "the word “decide”", "reason": "vocabulary", "need": ["decide", "decision"] }
+  ]
+},
+{
+  "r": 162, "zh": "昨天我不得不步行回家。",
+  "en": ["I had to walk home yesterday.", "Yesterday I had to walk home.", "I had to walk back home yesterday."],
+  "points": [
+    { "id": "hadto", "label": "modal “had to = past of must”", "reason": "modal (had to = past of must)", "need": ["had to walk"], "wrong": ["must walk home yesterday", "had to walked", "had to walking", "must have walked home", "have to walk home yesterday"] },
+    { "id": "prep-home", "label": "preposition “walk home”", "reason": "preposition (walk home)", "need": ["walk home", "walk back home"], "wrong": ["walk to home", "walk at home", "walk home to"] }
+  ]
+},
+{
+  "r": 163, "zh": "他可能已经到家了。",
+  "en": ["He may have already arrived home.", "He might have already gotten home.", "He may have got home already.", "He might already be home."],
+  "points": [
+    { "id": "mighthave", "label": "modal “may/might + have + p.p.”", "reason": "modal (may/might + have + p.p.)", "need": ["may have already arrived", "might have already gotten", "may have got home", "might already be home", "may have arrived"], "wrong": ["may have already arrive", "might have already get", "may has arrived", "may have already arriving"] },
+    { "id": "v-home", "label": "the word “home”", "reason": "vocabulary", "need": ["home"] }
+  ]
+},
+{
+  "r": 164, "zh": "除非你道歉，否则我不会原谅你。",
+  "en": ["I won't forgive you unless you apologize.", "Unless you apologize, I won't forgive you.", "I will not forgive you unless you apologize.", "I won't forgive you unless you say sorry."],
+  "points": [
+    { "id": "unless", "label": "conjunction “unless + present”", "reason": "conjunction (unless + present)", "need": ["unless you apologize", "unless you say sorry"], "wrong": ["unless you will apologize", "unless you don't apologize", "unless if you apologize", "unless you apologized"] },
+    { "id": "future-neg", "label": "future negative “will not”", "reason": "tense (will not)", "need": ["won't forgive", "will not forgive"], "wrong": ["wouldn't forgive", "don't forgive you unless", "am not forgiving"] },
+    { "id": "v-forgive", "label": "the word “forgive / apologize”", "reason": "vocabulary", "need": ["forgive", "apologize", "sorry"] }
+  ]
+},
+{
+  "r": 165, "zh": "万一你需要帮助，给我打电话。",
+  "en": ["Call me in case you need help.", "In case you need help, call me.", "Call me in case you need any help.", "Give me a call in case you need help."],
+  "points": [
+    { "id": "incase", "label": "conjunction “in case + present”", "reason": "conjunction (in case + present)", "need": ["in case you need help", "in case you need any help", "in case you need"], "wrong": ["in case you will need", "in case of you need", "in case that you will need", "in the case you need"] },
+    { "id": "imperative", "label": "imperative (Call me / Give me a call)", "reason": "imperative", "need": ["call me", "give me a call"], "wrong": ["you call me", "calling me", "you should call me"] }
+  ]
+},
+{
+  "r": 166, "zh": "即使下雨我们也会去。",
+  "en": ["We will go even if it rains.", "Even if it rains, we will go.", "We'll go even if it rains.", "We will still go even if it rains."],
+  "points": [
+    { "id": "evenif", "label": "conjunction “even if + present”", "reason": "conjunction (even if + present)", "need": ["even if it rains"], "wrong": ["even if it will rain", "even though it rains", "even if it rain", "even if it rained"] },
+    { "id": "future", "label": "future “will go”", "reason": "tense (future will)", "need": ["will go", "'ll go"], "wrong": ["would go", "go even if"] },
+    { "id": "v-rain", "label": "the word “rain”", "reason": "vocabulary", "need": ["rain"] }
+  ]
+},
+{
+  "r": 167, "zh": "他英语说得和母语者一样好。",
+  "en": ["He speaks English as well as a native speaker.", "He speaks English as fluently as a native speaker.", "He speaks English as well as a native."],
+  "points": [
+    { "id": "asas-adv", "label": "structure “as well as” (adverb)", "reason": "structure (as well as — adverb)", "need": ["as well as a native", "as fluently as a native"], "wrong": ["as good as a native", "as well than a native", "so well as a native"] },
+    { "id": "v-native", "label": "the word “native”", "reason": "vocabulary", "need": ["native"] }
+  ]
+},
+{
+  "r": 168, "zh": "这是一个我从未听说过的词。",
+  "en": ["This is a word I have never heard of.", "This is a word that I have never heard of.", "This is a word I've never heard of.", "It is a word I have never heard before."],
+  "points": [
+    { "id": "relreduced", "label": "relative clause (reduced / contact clause)", "reason": "relative clause (reduced / contact clause)", "need": ["word i have never heard", "word that i have never heard", "word i've never heard"], "wrong": ["word what i have never heard", "word which i have never heard of it", "word i have never heard of it"] },
+    { "id": "heardof", "label": "collocation “hear of”", "reason": "collocation (hear of)", "need": ["heard of", "heard before", "heard about"], "wrong": ["heard from", "listened of", "heard to"] },
+    { "id": "v-word", "label": "the word “word”", "reason": "vocabulary", "need": ["word"] }
+  ]
+},
+{
+  "r": 169, "zh": "我建议你不要熬夜。",
+  "en": ["I advise you not to stay up late.", "I suggest you don't stay up late.", "I'd advise you not to stay up late.", "I suggest that you not stay up late."],
+  "points": [
+    { "id": "advisenotto", "label": "verb form (advise sb not to / suggest)", "reason": "verb form (advise sb not to / suggest)", "need": ["advise you not to stay", "suggest you don't stay", "suggest that you not stay", "advise you not to"], "wrong": ["advise you don't stay", "advise you not staying", "suggest you not to stay"] },
+    { "id": "stayup", "label": "phrasal verb “stay up”", "reason": "phrasal verb (stay up)", "need": ["stay up", "staying up"], "wrong": ["sit up late", "stay up lately"] }
+  ]
+},
+{
+  "r": 170, "zh": "你学英语多久了？",
+  "en": ["How long have you been learning English?", "How long have you been studying English?", "How long have you studied English?", "How long have you learned English?"],
+  "points": [
+    { "id": "howlong", "label": "tense (how long + present perfect)", "reason": "tense (how long + present perfect)", "need": ["how long have you been learning", "how long have you been studying", "how long have you studied", "how long have you learned"], "wrong": ["how long are you learning", "how long do you learn", "how long you have learned", "how long have you been learn", "how long did you learn"] },
+    { "id": "v-english", "label": "the word “English”", "reason": "vocabulary", "need": ["english"] }
+  ]
+},
+{
+  "r": 171, "zh": "这双鞋是我姐姐给我买的。",
+  "en": ["These shoes were bought for me by my sister.", "My sister bought these shoes for me.", "My sister bought me these shoes.", "It was my sister who bought me these shoes."],
+  "points": [
+    { "id": "ditransitive", "label": "verb pattern (buy sb sth / buy sth for sb)", "reason": "verb pattern (buy sb sth / for sb)", "need": ["bought me these shoes", "bought these shoes for me", "were bought for me by", "who bought me these shoes"], "wrong": ["bought these shoes to me", "bought for me these shoes", "bought to me these shoes", "buyed me these shoes"] },
+    { "id": "v-shoes", "label": "the word “shoes”", "reason": "vocabulary", "need": ["shoes"] },
+    { "id": "v-sister", "label": "the word “sister”", "reason": "vocabulary", "need": ["sister"] }
+  ]
+},
+{
+  "r": 172, "zh": "他没有道歉，反而责怪我。",
+  "en": ["Instead of apologizing, he blamed me.", "He blamed me instead of apologizing.", "Rather than apologizing, he blamed me.", "Instead of saying sorry, he blamed me."],
+  "points": [
+    { "id": "insteadof", "label": "verb form (instead of + -ing)", "reason": "verb form (instead of + -ing)", "need": ["instead of apologizing", "instead of saying sorry", "rather than apologizing"], "wrong": ["instead of apologize", "instead to apologize", "instead of he apologize", "instead apologizing", "rather than apologize"] },
+    { "id": "blame", "label": "collocation “blame sb”", "reason": "collocation (blame sb)", "need": ["blamed me", "blamed it on me"], "wrong": ["blamed to me", "blamed at me"] }
+  ]
+},
+{
+  "r": 173, "zh": "通过努力工作，她实现了梦想。",
+  "en": ["By working hard, she achieved her dream.", "She achieved her dream by working hard.", "By working hard, she made her dream come true.", "She realized her dream by working hard."],
+  "points": [
+    { "id": "bygerund", "label": "verb form (by + -ing = means)", "reason": "verb form (by + -ing = means)", "need": ["by working hard", "by studying hard"], "wrong": ["by work hard", "by worked hard", "with working hard", "by to work hard"] },
+    { "id": "achievedream", "label": "collocation “achieve a dream”", "reason": "collocation (achieve a dream)", "need": ["achieved her dream", "made her dream come true", "realized her dream", "realised her dream"], "wrong": ["achieved her dream come true", "reached her dream", "complete her dream", "arrived her dream"] }
+  ]
+},
+{
+  "r": 174, "zh": "现在后悔也没用。",
+  "en": ["It's no use regretting now.", "There's no point in regretting now.", "It is no use regretting it now.", "There's no point regretting now."],
+  "points": [
+    { "id": "nouse", "label": "structure “no use / no point + -ing”", "reason": "structure (no use / no point + -ing)", "need": ["no use regretting", "no point in regretting", "no point regretting"], "wrong": ["no use to regret", "no point to regret", "no use regret", "no point of regretting", "no point in regret"] },
+    { "id": "v-regret", "label": "the word “regret”", "reason": "vocabulary", "need": ["regret", "regretting"] }
+  ]
 }
 ];
