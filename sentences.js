@@ -750,5 +750,160 @@ window.SENTENCES = [
     { "id": "v-shirt", "label": "the word “shirt”", "reason": "vocabulary", "need": ["shirt"] },
     { "id": "v-afford", "label": "the word “afford / buy”", "reason": "vocabulary", "need": ["afford", "buy"] }
   ]
+},
+{
+  "r": 85, "zh": "我从来没有见过这么大的狗。",
+  "en": ["I have never seen such a big dog.", "I've never seen such a big dog.", "I have never seen so big a dog.", "I have never seen a dog this big."],
+  "points": [
+    { "id": "never", "label": "present perfect + never", "reason": "tense", "need": ["have never seen", "never seen"], "wrong": ["never saw", "didn't never see", "have never see", "never see such"] },
+    { "id": "such", "label": "structure “such a + adj + noun”", "reason": "structure (such a …)", "need": ["such a big", "so big a", "this big", "that big"], "wrong": ["so big dog", "a such big", "such big dog"] },
+    { "id": "v-dog", "label": "the word “dog”", "reason": "vocabulary", "need": ["dog"] }
+  ]
+},
+{
+  "r": 86, "zh": "房间需要打扫了。",
+  "en": ["The room needs cleaning.", "The room needs to be cleaned.", "The room needs to be tidied.", "The room needs cleaning up."],
+  "points": [
+    { "id": "needform", "label": "verb form (need + -ing / to be done)", "reason": "verb form (needs …ing / to be done)", "need": ["needs cleaning", "needs to be cleaned", "needs to be tidied", "needs tidying"], "wrong": ["need cleaning", "needs clean", "needs be cleaned", "needs cleaned", "need to clean"] },
+    { "id": "v-room", "label": "the word “room”", "reason": "vocabulary", "need": ["room"] },
+    { "id": "v-clean", "label": "the word “clean / tidy”", "reason": "vocabulary", "need": ["clean", "cleaning", "cleaned", "tidy", "tidied", "tidying"] }
+  ]
+},
+{
+  "r": 87, "zh": "你越努力，就越成功。",
+  "en": ["The harder you work, the more successful you are.", "The harder you work, the more successful you become.", "The more you work, the more successful you are.", "The harder you work, the more successful you will be."],
+  "points": [
+    { "id": "themore", "label": "structure “the …er …, the more …”", "reason": "structure (the more … the more)", "need": ["the harder you work", "the more you work"], "wrong": ["more harder you", "the more hard you work", "harder you work the"] },
+    { "id": "compsucc", "label": "comparative “more successful”", "reason": "comparative (more + long adj)", "need": ["more successful"], "wrong": ["successfuler", "most successful", "more success you"] }
+  ]
+},
+{
+  "r": 88, "zh": "这部电影是根据真实故事改编的。",
+  "en": ["This movie is based on a true story.", "The movie is based on a true story.", "This film is based on a real story.", "This movie was based on a true story."],
+  "points": [
+    { "id": "passive", "label": "passive / phrase “based on”", "reason": "passive (based on)", "need": ["is based on", "was based on", "based on"], "wrong": ["bases on", "based in", "is base on", "is basing on", "based of"] },
+    { "id": "v-movie", "label": "the word “movie / film”", "reason": "vocabulary", "need": ["movie", "film"] },
+    { "id": "v-story", "label": "the word “story”", "reason": "vocabulary", "need": ["story"] }
+  ]
+},
+{
+  "r": 89, "zh": "别担心，一切都会好起来的。",
+  "en": ["Don't worry, everything will be fine.", "Don't worry, everything will be okay.", "Don't worry, everything will work out.", "Don't worry, it will all be fine."],
+  "points": [
+    { "id": "imperneg", "label": "negative imperative (Don't …)", "reason": "imperative (negative)", "need": ["don't worry", "do not worry"], "wrong": ["not worry", "you don't worry", "no worry"] },
+    { "id": "future", "label": "future “will …”", "reason": "tense (future will)", "need": ["will be fine", "will be okay", "will work out", "will be alright", "will all be"], "wrong": ["everything is fine", "going be fine", "will fine", "would be fine"] }
+  ]
+},
+{
+  "r": 90, "zh": "我们到达时，电影已经开始了。",
+  "en": ["When we arrived, the movie had already started.", "The movie had already started when we arrived.", "When we arrived, the film had already begun.", "By the time we arrived, the movie had started."],
+  "points": [
+    { "id": "pastperfect", "label": "past perfect (had + done)", "reason": "tense (past perfect)", "need": ["had already started", "had started", "had already begun", "had begun"], "wrong": ["has already started", "was already started", "had already start", "movie already started", "film already started"] },
+    { "id": "pastsimple", "label": "past simple (arrived)", "reason": "tense (past simple)", "need": ["we arrived", "by the time we arrived"], "wrong": ["we arrive", "we have arrived", "we were arriving"] },
+    { "id": "when", "label": "conjunction “when / by the time”", "reason": "conjunction (when)", "need": ["when we", "by the time"], "wrong": ["while we arrived"] }
+  ]
+},
+{
+  "r": 91, "zh": "这是我读过的最好的书。",
+  "en": ["This is the best book I have ever read.", "This is the best book I've ever read.", "It is the best book I have ever read.", "This is the best book that I have ever read."],
+  "points": [
+    { "id": "super", "label": "superlative “the best”", "reason": "superlative (best)", "need": ["best book"], "wrong": ["better book", "goodest book", "most best book", "most good book"] },
+    { "id": "perfectever", "label": "present perfect + ever", "reason": "tense (present perfect + ever)", "need": ["have ever read", "ever read", "i've ever read"], "wrong": ["ever readed", "did ever read", "have ever readed", "ever reading"] },
+    { "id": "v-book", "label": "the word “book”", "reason": "vocabulary", "need": ["book"] }
+  ]
+},
+{
+  "r": 92, "zh": "请你帮我个忙好吗？",
+  "en": ["Could you do me a favor?", "Can you do me a favor?", "Could you do me a favour?", "Would you do me a favor?"],
+  "points": [
+    { "id": "modalreq", "label": "modal request (Could/Can you …)", "reason": "modal (could/can you)", "need": ["could you", "can you", "would you"], "wrong": ["do you can", "may you do", "you could do", "are you can"] },
+    { "id": "favor", "label": "collocation “do … a favor”", "reason": "collocation (do a favor)", "need": ["a favor", "a favour", "me a favor"], "wrong": ["a help", "favour to me", "favor for help"] }
+  ]
+},
+{
+  "r": 93, "zh": "自从我搬到这里，我就一直很开心。",
+  "en": ["I have been happy since I moved here.", "I've been happy since I moved here.", "Since I moved here, I have been happy.", "I have been very happy since I moved here."],
+  "points": [
+    { "id": "perfectsince", "label": "present perfect + since", "reason": "tense (present perfect + since)", "need": ["have been happy", "have been very happy", "i've been happy"], "wrong": ["am happy since", "was happy since", "have being happy", "have been happy for"] },
+    { "id": "since", "label": "conjunction “since”", "reason": "conjunction (since)", "need": ["since i moved", "since"], "wrong": ["from i moved", "since i move", "for i moved"] },
+    { "id": "v-happy", "label": "the word “happy”", "reason": "vocabulary", "need": ["happy"] }
+  ]
+},
+{
+  "r": 94, "zh": "据说他很富有。",
+  "en": ["It is said that he is rich.", "He is said to be rich.", "It's said that he is very rich.", "People say that he is rich."],
+  "points": [
+    { "id": "reportpassive", "label": "passive reporting (It is said that …)", "reason": "passive (it is said that)", "need": ["it is said that", "he is said to be", "it's said that", "people say that", "is said to be"], "wrong": ["it is say that", "it said that he", "he is said be rich", "it is said he rich"] },
+    { "id": "v-rich", "label": "the word “rich / wealthy”", "reason": "vocabulary", "need": ["rich", "wealthy"] }
+  ]
+},
+{
+  "r": 95, "zh": "我把钥匙忘在家里了。",
+  "en": ["I left my keys at home.", "I forgot my keys at home.", "I left my key at home.", "I have left my keys at home."],
+  "points": [
+    { "id": "pastleave", "label": "irregular past (left / forgot)", "reason": "verb (left / forgot)", "need": ["left my key", "forgot my key", "have left my key"], "wrong": ["leaved my key", "leave my key", "forget my key at", "forgetted my key"] },
+    { "id": "prep-at", "label": "preposition “at home”", "reason": "preposition (at home)", "need": ["at home"], "wrong": ["in home", "on home", "at the home"] },
+    { "id": "v-key", "label": "the word “key”", "reason": "vocabulary", "need": ["key"] }
+  ]
+},
+{
+  "r": 96, "zh": "你最好现在就去睡觉。",
+  "en": ["You had better go to bed now.", "You'd better go to bed now.", "You had better go to sleep now.", "You'd better go to bed right now."],
+  "points": [
+    { "id": "hadbetter", "label": "structure “had better + base verb”", "reason": "structure (had better)", "need": ["had better go", "'d better go", "better go to bed", "better go to sleep"], "wrong": ["had better to go", "would better go", "had better going", "better to go to bed"] },
+    { "id": "v-bed", "label": "the word “bed / sleep”", "reason": "vocabulary", "need": ["bed", "sleep"] }
+  ]
+},
+{
+  "r": 97, "zh": "桌子是木头做的。",
+  "en": ["The table is made of wood.", "The table is made out of wood.", "This table is made of wood."],
+  "points": [
+    { "id": "madeof", "label": "phrase “made of”", "reason": "phrase (made of)", "need": ["made of wood", "made out of wood"], "wrong": ["made from wood", "made by wood", "make of wood", "made in wood"] },
+    { "id": "v-table", "label": "the word “table”", "reason": "vocabulary", "need": ["table"] },
+    { "id": "v-wood", "label": "the word “wood”", "reason": "vocabulary", "need": ["wood"] }
+  ]
+},
+{
+  "r": 98, "zh": "我宁可走路也不愿意等公交车。",
+  "en": ["I would rather walk than wait for the bus.", "I'd rather walk than wait for the bus.", "I would rather walk than wait for a bus.", "I'd rather walk than take the bus."],
+  "points": [
+    { "id": "ratherthan", "label": "structure “would rather … than”", "reason": "structure (would rather … than)", "need": ["would rather walk than", "rather walk than", "'d rather walk than"], "wrong": ["would rather walk then", "would rather to walk than", "prefer walk than", "rather walk that"] },
+    { "id": "v-walk", "label": "the word “walk”", "reason": "vocabulary", "need": ["walk"] },
+    { "id": "v-bus", "label": "the word “bus”", "reason": "vocabulary", "need": ["bus"] }
+  ]
+},
+{
+  "r": 99, "zh": "他装作什么都不知道。",
+  "en": ["He pretended to know nothing.", "He pretended he knew nothing.", "He pretended not to know anything.", "He pretended that he knew nothing."],
+  "points": [
+    { "id": "pretend", "label": "verb form (pretend to + base verb)", "reason": "verb form (pretend to …)", "need": ["pretended to know", "pretended he knew", "pretended not to know", "pretended that he knew"], "wrong": ["pretended knowing", "pretend to know", "pretended to knew", "pretended to knowing"] },
+    { "id": "neg", "label": "negation (nothing / not … anything)", "reason": "negation", "need": ["nothing", "not to know anything", "not know anything", "know anything"], "wrong": ["anything nothing", "not nothing", "didn't know nothing"] }
+  ]
+},
+{
+  "r": 100, "zh": "时间过得太快了。",
+  "en": ["Time goes by so fast.", "Time flies so fast.", "Time passes so quickly.", "Time goes by so quickly."],
+  "points": [
+    { "id": "adverb", "label": "adverb (fast / quickly)", "reason": "adverb (fast / quickly)", "need": ["so fast", "so quickly", "very fast", "very quickly"], "wrong": ["so quick", "so fastly", "very quick", "so quickly fast"] },
+    { "id": "v-time", "label": "the word “time”", "reason": "vocabulary", "need": ["time"] }
+  ]
+},
+{
+  "r": 101, "zh": "我不仅会说英语，还会说法语。",
+  "en": ["I can speak not only English but also French.", "I can speak not only English, but also French.", "Not only can I speak English, but I can also speak French.", "I speak not only English but also French."],
+  "points": [
+    { "id": "notonly", "label": "structure “not only … but also”", "reason": "structure (not only … but also)", "need": ["not only english but also", "not only english, but also", "not only can i speak english"], "wrong": ["not only english but french", "only not english", "not only english also french"] },
+    { "id": "v-english", "label": "the word “English”", "reason": "vocabulary", "need": ["english"] },
+    { "id": "v-french", "label": "the word “French”", "reason": "vocabulary", "need": ["french"] }
+  ]
+},
+{
+  "r": 102, "zh": "如果明天下雨，我们就待在家里。",
+  "en": ["If it rains tomorrow, we will stay home.", "If it rains tomorrow, we'll stay at home.", "We will stay home if it rains tomorrow.", "If it rains tomorrow, we will stay at home."],
+  "points": [
+    { "id": "cond1", "label": "first conditional (if + present)", "reason": "conditional (first: if + present)", "need": ["if it rains tomorrow", "if it rains"], "wrong": ["if it will rain", "if it rain tomorrow", "if it rained tomorrow", "if it raining"] },
+    { "id": "willresult", "label": "future “will” in result clause", "reason": "tense (will in result clause)", "need": ["will stay", "'ll stay"], "wrong": ["would stay", "we stay home if", "we staying home"] },
+    { "id": "v-rain", "label": "the word “rain”", "reason": "vocabulary", "need": ["rain"] }
+  ]
 }
 ];
