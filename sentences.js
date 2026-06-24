@@ -2259,5 +2259,154 @@ window.SENTENCES = [
     { "id": "goodfor", "label": "collocation (good for)", "reason": "collocation (good for)", "need": ["good for your health", "good for you", "good for the health", "good for health"], "wrong": ["good to your health", "good for your healthy", "good at your health", "benefit for your health"] },
     { "id": "v-water", "label": "the word “water”", "reason": "vocabulary", "need": ["water"] }
   ]
+},
+{
+  "r": 265, "zh": "我的航班晚点了两个小时。",
+  "en": ["My flight was delayed by two hours.", "My flight has been delayed by two hours.", "My flight was delayed for two hours.", "My flight got delayed by two hours."],
+  "points": [
+    { "id": "delayed", "label": "passive (was delayed)", "reason": "passive (was delayed)", "need": ["was delayed", "has been delayed", "got delayed"], "wrong": ["was delay", "is delaying", "was delayed since two hours", "delayed two hours"] },
+    { "id": "prep-by", "label": "preposition (by/for + duration)", "reason": "preposition (by/for + duration)", "need": ["by two hours", "for two hours"], "wrong": ["since two hours", "of two hours", "in two hours"] },
+    { "id": "v-flight", "label": "the word “flight”", "reason": "vocabulary", "need": ["flight", "plane"] }
+  ]
+},
+{
+  "r": 266, "zh": "如果发烧了，你应该去看医生。",
+  "en": ["If you have a fever, you should see a doctor.", "If you have a fever, you should go to the doctor.", "You should see a doctor if you have a fever.", "If you've got a fever, you should see a doctor."],
+  "points": [
+    { "id": "cond1", "label": "conditional (if + present)", "reason": "conditional (if + present)", "need": ["if you have a fever", "if you've got a fever"], "wrong": ["if you will have a fever", "if you had a fever you should", "if you would have a fever"] },
+    { "id": "should", "label": "modal (should + base)", "reason": "modal (should + base)", "need": ["should see a doctor", "should go to the doctor"], "wrong": ["should to see a doctor", "should seeing a doctor", "should saw a doctor"] },
+    { "id": "v-fever", "label": "the word “fever”", "reason": "vocabulary", "need": ["fever"] }
+  ]
+},
+{
+  "r": 267, "zh": "我正在考虑换一份新工作。",
+  "en": ["I'm thinking about changing jobs.", "I am thinking of changing jobs.", "I'm thinking about getting a new job.", "I'm considering changing my job."],
+  "points": [
+    { "id": "thinkabout", "label": "verb form (think about + -ing)", "reason": "verb form (think about + -ing)", "need": ["thinking about changing", "thinking of changing", "thinking about getting", "considering changing"], "wrong": ["thinking about to change", "thinking to change", "thinking about change jobs", "think about changing"] },
+    { "id": "v-job", "label": "the word “job”", "reason": "vocabulary", "need": ["job", "jobs", "work"] }
+  ]
+},
+{
+  "r": 268, "zh": "我厌倦了每天做同样的事。",
+  "en": ["I'm tired of doing the same thing every day.", "I'm sick of doing the same thing every day.", "I'm fed up with doing the same thing every day.", "I am tired of the same routine every day."],
+  "points": [
+    { "id": "tiredof", "label": "verb form (tired of / sick of + -ing)", "reason": "verb form (tired of / sick of + -ing)", "need": ["tired of doing", "sick of doing", "fed up with doing", "tired of the same"], "wrong": ["tired of do", "tired to do the same", "tired of to do", "sick of to do"] },
+    { "id": "sameverb", "label": "collocation (the same thing)", "reason": "collocation (the same thing)", "need": ["the same thing", "the same routine", "same thing"], "wrong": ["a same thing", "same things every", "the sames thing"] }
+  ]
+},
+{
+  "r": 269, "zh": "今天能做的事别拖到明天。",
+  "en": ["Don't put off until tomorrow what you can do today.", "Don't put off till tomorrow what you can do today.", "Don't delay until tomorrow what you can do today.", "Don't leave for tomorrow what you can do today."],
+  "points": [
+    { "id": "putoff", "label": "phrasal verb (put off)", "reason": "phrasal verb (put off)", "need": ["put off until tomorrow", "put off till tomorrow", "delay until tomorrow", "leave for tomorrow"], "wrong": ["put off to tomorrow", "put of until tomorrow", "postpone to tomorrow"] },
+    { "id": "canmodal", "label": "modal (can do today)", "reason": "modal (can do today)", "need": ["you can do today", "can do today"], "wrong": ["you can to do today", "you could doing today", "you can did today"] }
+  ]
+},
+{
+  "r": 270, "zh": "自从我搬来这座城市，交到了很多朋友。",
+  "en": ["I've made many friends since I moved to this city.", "I have made a lot of friends since I moved to this city.", "Since I moved to this city, I've made many friends.", "I've made lots of friends since moving here."],
+  "points": [
+    { "id": "perfectsince", "label": "tense (present perfect + since)", "reason": "tense (present perfect + since)", "need": ["i've made many friends since", "have made a lot of friends since", "i've made lots of friends since", "have made many friends since"], "wrong": ["i made many friends since", "i am making many friends since", "i've make many friends since", "i was making friends since"] },
+    { "id": "moveto", "label": "collocation (move to)", "reason": "collocation (move to)", "need": ["moved to this city", "moved here", "moving here", "moved to the city"], "wrong": ["moved in this city", "moved at this city", "moved to here", "move to this city since"] }
+  ]
+},
+{
+  "r": 271, "zh": "这家公司雇佣了五百多名员工。",
+  "en": ["The company employs more than 500 people.", "The company employs over 500 employees.", "The company has more than 500 employees.", "The company hires more than 500 workers."],
+  "points": [
+    { "id": "morethan", "label": "structure (more than + number)", "reason": "structure (more than + number)", "need": ["more than 500", "over 500", "more than five hundred"], "wrong": ["more than 500 of people", "more as 500", "over than 500", "much more than 500"] },
+    { "id": "employ", "label": "the word “employ / employees”", "reason": "vocabulary", "need": ["employs", "employees", "hires", "workers", "staff", "people"] },
+    { "id": "v-company", "label": "the word “company”", "reason": "vocabulary", "need": ["company"] }
+  ]
+},
+{
+  "r": 272, "zh": "请慢点说，我听不懂。",
+  "en": ["Please speak slowly, I can't understand.", "Please speak more slowly, I don't understand.", "Could you speak slowly? I can't understand you.", "Please slow down, I can't follow you."],
+  "points": [
+    { "id": "adverb", "label": "adverb (speak slowly)", "reason": "adverb (speak slowly)", "need": ["speak slowly", "speak more slowly", "slow down"], "wrong": ["speak slow", "speak slowlier", "talk slow", "speak more slow"] },
+    { "id": "understand", "label": "the word “understand”", "reason": "vocabulary", "need": ["can't understand", "don't understand", "can't follow"] }
+  ]
+},
+{
+  "r": 273, "zh": "我们应该互相帮助。",
+  "en": ["We should help each other.", "We should help one another.", "We ought to help each other.", "We should help one another out."],
+  "points": [
+    { "id": "eachother", "label": "pronoun (each other)", "reason": "pronoun (each other)", "need": ["help each other", "help one another"], "wrong": ["help us each other", "help each one another", "help themselves each other"] },
+    { "id": "modal", "label": "modal (should + base)", "reason": "modal (should + base)", "need": ["should help", "ought to help"], "wrong": ["should to help", "should helping", "should helps"] }
+  ]
+},
+{
+  "r": 274, "zh": "别紧张，深呼吸。",
+  "en": ["Don't be nervous, take a deep breath.", "Relax, take a deep breath.", "Don't be nervous, breathe deeply.", "Calm down and take a deep breath."],
+  "points": [
+    { "id": "imperative", "label": "imperative (Don't be …)", "reason": "imperative (Don't be …)", "need": ["don't be nervous", "relax", "calm down"], "wrong": ["don't be nervously", "no be nervous", "not be nervous", "you don't be nervous"] },
+    { "id": "breath", "label": "collocation (take a deep breath)", "reason": "collocation (take a deep breath)", "need": ["take a deep breath", "breathe deeply"], "wrong": ["make a deep breath", "get a deep breath", "do a deep breath"] }
+  ]
+},
+{
+  "r": 275, "zh": "我把车停在了停车场。",
+  "en": ["I parked my car in the parking lot.", "I parked the car in the car park.", "I left my car in the parking lot.", "I parked my car in the garage."],
+  "points": [
+    { "id": "park", "label": "verb (parked — past)", "reason": "verb (parked — past)", "need": ["parked my car", "parked the car", "left my car", "parked"], "wrong": ["parked my car at the parking", "i park my car", "parking my car in", "i parked my car on"] },
+    { "id": "prep-in", "label": "preposition (in the parking lot)", "reason": "preposition (in the parking lot)", "need": ["in the parking lot", "in the car park", "in the garage"], "wrong": ["at the parking lot", "on the parking lot", "in parking lot"] },
+    { "id": "v-car", "label": "the word “car”", "reason": "vocabulary", "need": ["car"] }
+  ]
+},
+{
+  "r": 276, "zh": "我等不及要见你了。",
+  "en": ["I can't wait to see you.", "I can't wait to meet you.", "I can hardly wait to see you.", "I'm looking forward to seeing you."],
+  "points": [
+    { "id": "cantwait", "label": "verb form (can't wait to + base)", "reason": "verb form (can't wait to + base)", "need": ["can't wait to see you", "can't wait to meet you", "can hardly wait to see", "looking forward to seeing"], "wrong": ["can't wait seeing you", "can't wait for see you", "can't wait to seeing you", "can't wait see you", "looking forward to see you"] },
+    { "id": "v-see", "label": "the word “see / meet”", "reason": "vocabulary", "need": ["see", "meet", "seeing"] }
+  ]
+},
+{
+  "r": 277, "zh": "这是个秘密，别告诉任何人。",
+  "en": ["It's a secret, don't tell anyone.", "It's a secret, don't tell anybody.", "This is a secret, don't tell anyone.", "It's a secret, keep it to yourself."],
+  "points": [
+    { "id": "dontany", "label": "negation (don't … anyone)", "reason": "negation (don't … anyone)", "need": ["don't tell anyone", "don't tell anybody", "keep it to yourself"], "wrong": ["don't tell no one", "don't tell to anyone", "don't tell someone", "not tell anyone"] },
+    { "id": "v-secret", "label": "the word “secret”", "reason": "vocabulary", "need": ["secret"] }
+  ]
+},
+{
+  "r": 278, "zh": "你应该为考试做好准备。",
+  "en": ["You should prepare for the exam.", "You should get ready for the exam.", "You should prepare for the test.", "You ought to prepare for the exam."],
+  "points": [
+    { "id": "preparefor", "label": "collocation (prepare for)", "reason": "collocation (prepare for)", "need": ["prepare for the exam", "get ready for the exam", "prepare for the test"], "wrong": ["prepare to the exam", "prepare the exam", "prepare for to the exam", "prepare yourself the exam"] },
+    { "id": "v-exam", "label": "the word “exam / test”", "reason": "vocabulary", "need": ["exam", "test"] }
+  ]
+},
+{
+  "r": 279, "zh": "我从来不吃早饭。",
+  "en": ["I never eat breakfast.", "I never have breakfast.", "I don't usually eat breakfast.", "I rarely eat breakfast."],
+  "points": [
+    { "id": "frequency", "label": "adverb (never / rarely + verb)", "reason": "adverb (never / rarely + verb)", "need": ["never eat breakfast", "never have breakfast", "don't usually eat", "rarely eat breakfast"], "wrong": ["eat never breakfast", "i eat never breakfast", "never not eat breakfast", "i never eating breakfast"] },
+    { "id": "v-breakfast", "label": "the word “breakfast”", "reason": "vocabulary", "need": ["breakfast"] }
+  ]
+},
+{
+  "r": 280, "zh": "你能借我一支笔吗？",
+  "en": ["Can you lend me a pen?", "Could you lend me a pen?", "Can I borrow a pen?", "Could I borrow your pen?"],
+  "points": [
+    { "id": "borrowlend", "label": "verb pattern (lend sb sth / borrow sth)", "reason": "verb pattern (lend sb sth / borrow sth)", "need": ["lend me a pen", "can i borrow a pen", "borrow your pen", "lend me your pen"], "wrong": ["borrow me a pen", "lend a pen from you", "can you borrow me a pen", "lend me to a pen"] },
+    { "id": "v-pen", "label": "the word “pen”", "reason": "vocabulary", "need": ["pen"] }
+  ]
+},
+{
+  "r": 281, "zh": "房子着火了，快跑！",
+  "en": ["The house is on fire, run!", "The house is on fire, get out!", "The house is burning, run!", "The house is on fire, run quickly!"],
+  "points": [
+    { "id": "onfire", "label": "collocation (on fire)", "reason": "collocation (on fire)", "need": ["on fire", "is burning"], "wrong": ["in fire", "on the fire", "is on the fire", "burning fire"] },
+    { "id": "imperative", "label": "imperative (run!)", "reason": "imperative (run!)", "need": ["run", "get out", "run quickly"], "wrong": ["running", "you run", "to run"] },
+    { "id": "v-house", "label": "the word “house”", "reason": "vocabulary", "need": ["house"] }
+  ]
+},
+{
+  "r": 282, "zh": "我手机没电了。",
+  "en": ["My phone is dead.", "My phone has run out of battery.", "My phone battery is dead.", "My phone ran out of battery."],
+  "points": [
+    { "id": "ranout", "label": "phrase (run out of / dead battery)", "reason": "phrase (run out of / dead battery)", "need": ["is out of battery", "has run out of battery", "have run out of battery", "ran out of battery", "phone is dead", "battery is dead"], "wrong": ["run out battery", "run out of the battery", "is run out of battery", "run off battery", "phone is died"] },
+    { "id": "v-phone", "label": "the word “phone / battery”", "reason": "vocabulary", "need": ["phone", "battery"] }
+  ]
 }
 ];
