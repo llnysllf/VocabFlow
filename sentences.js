@@ -1511,5 +1511,150 @@ window.SENTENCES = [
     { "id": "nouse", "label": "structure “no use / no point + -ing”", "reason": "structure (no use / no point + -ing)", "need": ["no use regretting", "no point in regretting", "no point regretting"], "wrong": ["no use to regret", "no point to regret", "no use regret", "no point of regretting", "no point in regret"] },
     { "id": "v-regret", "label": "the word “regret”", "reason": "vocabulary", "need": ["regret", "regretting"] }
   ]
+},
+{
+  "r": 175, "zh": "小时候，奶奶常常给我讲故事。",
+  "en": ["When I was young, my grandmother would tell me stories.", "When I was a child, my grandma would tell me stories.", "My grandmother used to tell me stories when I was young.", "When I was young, my grandmother would tell me stories every night."],
+  "points": [
+    { "id": "wouldhabit", "label": "past habit (would / used to)", "reason": "past habit (would / used to)", "need": ["would tell me stories", "used to tell me stories"], "wrong": ["will tell me stories", "would told me stories", "would telling me stories", "would tells me"] },
+    { "id": "pastwhen", "label": "past tense “when I was …”", "reason": "tense (when I was …)", "need": ["when i was young", "when i was a child", "when i was little", "when i was a kid"], "wrong": ["when i am young", "when i was being young"] },
+    { "id": "v-grandmother", "label": "the word “grandmother”", "reason": "vocabulary", "need": ["grandmother", "grandma", "grandmom", "granny"] }
+  ]
+},
+{
+  "r": 176, "zh": "他说得好像他亲眼看见过一样。",
+  "en": ["He talks as if he had seen it himself.", "He talks as though he had seen it himself.", "He speaks as if he saw it himself.", "He talks as if he had witnessed it."],
+  "points": [
+    { "id": "asif", "label": "conjunction “as if / as though”", "reason": "conjunction (as if / as though)", "need": ["as if he had seen", "as though he had seen", "as if he saw", "as if he had witnessed"], "wrong": ["as if he has seen", "as if he sees", "like he had seen", "as if he had see"] },
+    { "id": "reflexive", "label": "reflexive pronoun “himself”", "reason": "reflexive pronoun (himself)", "need": ["himself"], "wrong": ["by his self", "hisself", "himselves"] }
+  ]
+},
+{
+  "r": 177, "zh": "既然你来了，就留下吃晚饭吧。",
+  "en": ["Now that you're here, stay for dinner.", "Now that you are here, stay for dinner.", "Since you're here, stay for dinner.", "Now that you're here, why don't you stay for dinner?"],
+  "points": [
+    { "id": "nowthat", "label": "conjunction “now that”", "reason": "conjunction (now that)", "need": ["now that you're here", "now that you are here", "since you're here"], "wrong": ["now that you here", "now you are here that", "now that you will be here", "now that here you are"] },
+    { "id": "imperative", "label": "imperative / suggestion", "reason": "imperative / suggestion", "need": ["stay for dinner", "why don't you stay"], "wrong": ["you stay for dinner", "staying for dinner", "you should stay for dinner"] },
+    { "id": "v-dinner", "label": "the word “dinner”", "reason": "vocabulary", "need": ["dinner"] }
+  ]
+},
+{
+  "r": 178, "zh": "我不确定他是否会来。",
+  "en": ["I'm not sure whether he will come or not.", "I'm not sure if he will come.", "I'm not sure whether he'll come.", "I am not sure whether or not he will come."],
+  "points": [
+    { "id": "whether", "label": "clause “whether / if”", "reason": "clause (whether / if)", "need": ["whether he will come", "whether he'll come", "if he will come", "whether or not he will come"], "wrong": ["whether he will come or no", "whether will he come", "whether that he will come"] },
+    { "id": "notsure", "label": "phrase “not sure”", "reason": "phrase (not sure)", "need": ["not sure", "not certain"], "wrong": ["no sure", "not sured", "don't sure"] }
+  ]
+},
+{
+  "r": 179, "zh": "看来要下雨了。",
+  "en": ["It looks like it's going to rain.", "It looks like it is going to rain.", "It seems like it's going to rain.", "It looks as if it's going to rain."],
+  "points": [
+    { "id": "lookslike", "label": "structure “it looks like / as if”", "reason": "structure (it looks like / as if)", "need": ["looks like it's going to rain", "looks like it is going to rain", "seems like it's going to rain", "looks as if it's going to rain", "looks like it will rain"], "wrong": ["looks like to rain", "look like it's going to rain", "looks like raining", "it looks like will rain"] },
+    { "id": "v-rain", "label": "the word “rain”", "reason": "vocabulary", "need": ["rain"] }
+  ]
+},
+{
+  "r": 180, "zh": "学这门课我有困难。",
+  "en": ["I have difficulty learning this course.", "I have difficulty in learning this subject.", "I have trouble learning this course.", "I'm having difficulty with this course."],
+  "points": [
+    { "id": "difficulty", "label": "verb form (have difficulty (in) doing)", "reason": "verb form (have difficulty (in) doing)", "need": ["difficulty learning", "difficulty in learning", "trouble learning", "difficulty with this"], "wrong": ["difficulty to learn", "difficulty learn", "trouble to learn", "difficulty on learning"] },
+    { "id": "v-course", "label": "the word “course / subject”", "reason": "vocabulary", "need": ["course", "subject"] }
+  ]
+},
+{
+  "r": 181, "zh": "我整个下午都在忙着写报告。",
+  "en": ["I was busy writing a report all afternoon.", "I was busy writing the report all afternoon.", "I spent all afternoon busy writing a report.", "I was busy with a report all afternoon."],
+  "points": [
+    { "id": "busydoing", "label": "verb form (be busy doing)", "reason": "verb form (be busy doing)", "need": ["busy writing", "busy with a report", "busy with the report"], "wrong": ["busy to write", "busy write", "busy for writing"] },
+    { "id": "v-report", "label": "the word “report”", "reason": "vocabulary", "need": ["report"] }
+  ]
+},
+{
+  "r": 182, "zh": "我们去看电影怎么样？",
+  "en": ["How about going to the movies?", "What about going to the movies?", "How about seeing a movie?", "How about we go to the movies?"],
+  "points": [
+    { "id": "howabout", "label": "structure “how about + -ing”", "reason": "structure (how about + -ing)", "need": ["how about going", "what about going", "how about seeing", "how about we go"], "wrong": ["how about to go", "what about to go", "how about go to the", "how about goes"] },
+    { "id": "v-movie", "label": "the word “movie”", "reason": "vocabulary", "need": ["movie", "cinema", "film"] }
+  ]
+},
+{
+  "r": 183, "zh": "老师让学生们朗读课文。",
+  "en": ["The teacher had the students read the text aloud.", "The teacher made the students read the text aloud.", "The teacher got the students to read the text aloud.", "The teacher had the students read the passage aloud."],
+  "points": [
+    { "id": "causativeverb", "label": "verb form (have/make sb do, get sb to do)", "reason": "verb form (have/make sb do, get sb to do)", "need": ["had the students read", "made the students read", "got the students to read"], "wrong": ["had the students to read", "made the students to read", "got the students read", "had the students reading", "let the students to read"] },
+    { "id": "v-text", "label": "the word “text / passage”", "reason": "vocabulary", "need": ["text", "passage"] }
+  ]
+},
+{
+  "r": 184, "zh": "这是两者中较好的一个。",
+  "en": ["This is the better one of the two.", "This is the better of the two.", "This is the nicer one of the two."],
+  "points": [
+    { "id": "comptwo", "label": "comparative (the + -er of the two)", "reason": "comparative (the + -er of the two)", "need": ["the better one of the two", "the better of the two", "the nicer one of the two"], "wrong": ["the best of the two", "the better two", "the more better of the two", "best one of the two"] }
+  ]
+},
+{
+  "r": 185, "zh": "你的包和我的一模一样。",
+  "en": ["Your bag is the same as mine.", "Your bag is exactly the same as mine.", "Your bag is identical to mine.", "Your bag and mine are the same."],
+  "points": [
+    { "id": "sameas", "label": "structure “the same as”", "reason": "structure (the same as)", "need": ["the same as mine", "identical to mine", "and mine are the same", "the same as my bag"], "wrong": ["the same with mine", "the same like mine", "the same than mine", "same to mine"] },
+    { "id": "v-bag", "label": "the word “bag”", "reason": "vocabulary", "need": ["bag"] }
+  ]
+},
+{
+  "r": 186, "zh": "这个房间和那个很不一样。",
+  "en": ["This room is different from that one.", "This room is very different from that one.", "This room is different to that one.", "This room differs from that one."],
+  "points": [
+    { "id": "differentfrom", "label": "structure “different from”", "reason": "structure (different from)", "need": ["different from", "different to", "differs from"], "wrong": ["different than that one", "different with that", "different of that", "difference from that"] },
+    { "id": "v-room", "label": "the word “room”", "reason": "vocabulary", "need": ["room"] }
+  ]
+},
+{
+  "r": 187, "zh": "这部手机是那部的两倍贵。",
+  "en": ["This phone is twice as expensive as that one.", "This phone costs twice as much as that one.", "This phone is twice the price of that one.", "This phone is two times as expensive as that one."],
+  "points": [
+    { "id": "multiple", "label": "structure “twice as … as”", "reason": "structure (twice as … as)", "need": ["twice as expensive as", "twice as much as", "twice the price of", "two times as expensive as"], "wrong": ["twice more expensive than", "twice as expensive than", "two times more expensive", "as twice expensive as"] },
+    { "id": "v-phone", "label": "the word “phone”", "reason": "vocabulary", "need": ["phone"] }
+  ]
+},
+{
+  "r": 188, "zh": "房间里几乎没有家具。",
+  "en": ["There is little furniture in the room.", "There was little furniture in the room.", "There is hardly any furniture in the room."],
+  "points": [
+    { "id": "littlefurn", "label": "quantifier (little + uncountable)", "reason": "quantifier (little / few)", "need": ["little furniture", "hardly any furniture"], "wrong": ["few furniture", "many furniture", "a few furniture"] },
+    { "id": "v-furniture", "label": "the word “furniture”", "reason": "vocabulary", "need": ["furniture"] }
+  ]
+},
+{
+  "r": 189, "zh": "我花了很长时间才适应这里的生活。",
+  "en": ["It took me a long time to get used to living here.", "It took a long time to get used to life here.", "I took a long time to get used to living here.", "It took me ages to get used to living here."],
+  "points": [
+    { "id": "getusedto", "label": "verb form (get used to + -ing)", "reason": "verb form (get used to + -ing)", "need": ["get used to living", "get used to life here"], "wrong": ["get used to live here", "get use to living", "get used living here"] },
+    { "id": "ittook", "label": "structure (it takes/took time to)", "reason": "structure (it took time to)", "need": ["it took me a long time to", "it took a long time to", "took me ages to"], "wrong": ["it spent a long time", "it cost me a long time", "i spent a long time to get"] }
+  ]
+},
+{
+  "r": 190, "zh": "我喜欢咖啡，她也喜欢。",
+  "en": ["I like coffee, and so does she.", "I like coffee, and she does too.", "I like coffee. So does she.", "I like coffee, and she likes it too."],
+  "points": [
+    { "id": "soaux", "label": "structure “so does she / she does too”", "reason": "structure (so does she / she does too)", "need": ["so does she", "she does too", "she likes it too"], "wrong": ["so she does", "so is she", "so does her", "also she does", "so do she"] },
+    { "id": "v-coffee", "label": "the word “coffee”", "reason": "vocabulary", "need": ["coffee"] }
+  ]
+},
+{
+  "r": 191, "zh": "我也不喜欢。",
+  "en": ["I don't like it either.", "Neither do I.", "Nor do I.", "Me neither."],
+  "points": [
+    { "id": "neitheraux", "label": "structure “neither do I / not … either”", "reason": "structure (neither do I / not … either)", "need": ["neither do i", "nor do i", "don't like it either", "me neither"], "wrong": ["neither i do", "also i don't", "i don't like it neither", "either do i"] }
+  ]
+},
+{
+  "r": 192, "zh": "无论你去哪里，我都会跟着你。",
+  "en": ["Wherever you go, I will follow you.", "No matter where you go, I will follow you.", "Wherever you go, I'll follow you.", "I will follow you wherever you go."],
+  "points": [
+    { "id": "wherever", "label": "structure “wherever / no matter where”", "reason": "structure (wherever / no matter where)", "need": ["wherever you go", "no matter where you go"], "wrong": ["where ever you go", "whereever you go", "wherever you will go", "wherever do you go", "wherever you went"] },
+    { "id": "future", "label": "future “will follow”", "reason": "tense (future will)", "need": ["will follow", "'ll follow"], "wrong": ["would follow", "am following", "follow you wherever"] },
+    { "id": "v-follow", "label": "the word “follow”", "reason": "vocabulary", "need": ["follow"] }
+  ]
 }
 ];
