@@ -1656,5 +1656,154 @@ window.SENTENCES = [
     { "id": "future", "label": "future “will follow”", "reason": "tense (future will)", "need": ["will follow", "'ll follow"], "wrong": ["would follow", "am following", "follow you wherever"] },
     { "id": "v-follow", "label": "the word “follow”", "reason": "vocabulary", "need": ["follow"] }
   ]
+},
+{
+  "r": 193, "zh": "明天这个时候我将在飞往北京的飞机上。",
+  "en": ["This time tomorrow, I will be flying to Beijing.", "This time tomorrow, I'll be flying to Beijing.", "At this time tomorrow, I will be on a plane to Beijing.", "This time tomorrow I will be flying to Beijing."],
+  "points": [
+    { "id": "futurecont", "label": "future continuous (will be doing)", "reason": "tense (future continuous)", "need": ["will be flying", "'ll be flying", "will be on a plane"], "wrong": ["will fly to beijing", "am flying to beijing tomorrow", "will be fly", "would be flying", "will flying"] },
+    { "id": "v-beijing", "label": "the place “Beijing”", "reason": "vocabulary", "need": ["beijing"] }
+  ]
+},
+{
+  "r": 194, "zh": "到下个月我就在这里工作满五年了。",
+  "en": ["By next month, I will have worked here for five years.", "By next month, I'll have worked here for 5 years.", "By next month, I will have been here for five years.", "Next month, I will have worked here for five years."],
+  "points": [
+    { "id": "futureperfect", "label": "future perfect (will have done)", "reason": "tense (future perfect)", "need": ["will have worked", "'ll have worked", "will have been here"], "wrong": ["will work here for five", "will have work", "would have worked", "will have been worked", "am working here for five"] },
+    { "id": "prep-by", "label": "preposition “by + time”", "reason": "preposition (by + time)", "need": ["by next month", "by the next month"], "wrong": ["until next month", "in next month", "at next month"] }
+  ]
+},
+{
+  "r": 195, "zh": "我到那儿时，他们已经等了两个小时了。",
+  "en": ["By the time I got there, they had been waiting for two hours.", "When I arrived, they had been waiting for two hours.", "By the time I got there, they had already been waiting for two hours.", "They had been waiting for two hours by the time I arrived."],
+  "points": [
+    { "id": "pastperfcont", "label": "past perfect continuous (had been doing)", "reason": "tense (past perfect continuous)", "need": ["had been waiting"], "wrong": ["had waited for two hours", "were waiting for two hours", "have been waiting", "had been wait", "had being waiting"] },
+    { "id": "prep-for", "label": "preposition “for + duration”", "reason": "preposition (for + duration)", "need": ["for two hours"], "wrong": ["since two hours", "for two hour", "during two hours"] }
+  ]
+},
+{
+  "r": 196, "zh": "你该理发了。",
+  "en": ["It's time you had a haircut.", "It's time you got a haircut.", "It's time for you to get a haircut.", "It is time you had your hair cut."],
+  "points": [
+    { "id": "itstime", "label": "subjunctive “it's time you did”", "reason": "subjunctive (it's time you did)", "need": ["time you had a haircut", "time you got a haircut", "time for you to get a haircut", "time you had your hair cut"], "wrong": ["time you have a haircut", "time you get a haircut", "time that you get a haircut", "time you having a haircut"] },
+    { "id": "v-haircut", "label": "the word “haircut”", "reason": "vocabulary", "need": ["haircut", "hair cut", "hair"] }
+  ]
+},
+{
+  "r": 197, "zh": "要是我没错过那趟火车就好了。",
+  "en": ["If only I hadn't missed the train.", "If only I had not missed that train.", "I wish I hadn't missed the train.", "If only I hadn't missed that train."],
+  "points": [
+    { "id": "ifonly", "label": "subjunctive (if only / wish + past perfect)", "reason": "subjunctive (if only / wish + past perfect)", "need": ["if only i hadn't missed", "if only i had not missed", "wish i hadn't missed", "wish i had not missed"], "wrong": ["if only i didn't miss", "if only i don't miss", "if only i haven't missed", "if only i wouldn't miss", "wish i didn't miss"] },
+    { "id": "v-train", "label": "the word “train”", "reason": "vocabulary", "need": ["train"] }
+  ]
+},
+{
+  "r": 198, "zh": "我确实给你发过邮件。",
+  "en": ["I did send you an email.", "I did email you.", "I really did send you an email.", "I did send you a message."],
+  "points": [
+    { "id": "emphaticdo", "label": "emphatic “do/did” + base verb", "reason": "emphatic do/did + base verb", "need": ["did send you", "did email you", "did send you an email", "did send you a message"], "wrong": ["did sent you", "do sent you", "did sended you"] },
+    { "id": "v-email", "label": "the word “email”", "reason": "vocabulary", "need": ["email", "message", "mail"] }
+  ]
+},
+{
+  "r": 199, "zh": "我需要的是一个好的解释。",
+  "en": ["What I need is a good explanation.", "What I want is a good explanation.", "A good explanation is what I need.", "What I need is a proper explanation."],
+  "points": [
+    { "id": "cleftwhat", "label": "cleft (What … is)", "reason": "cleft (What … is)", "need": ["what i need is", "what i want is", "is what i need"], "wrong": ["what i need it is", "that i need is", "what do i need is", "what i need are", "the what i need is"] },
+    { "id": "v-explanation", "label": "the word “explanation”", "reason": "vocabulary", "need": ["explanation"] }
+  ]
+},
+{
+  "r": 200, "zh": "正是他帮助了我。",
+  "en": ["It was he who helped me.", "It was him who helped me.", "It was he that helped me.", "He was the one who helped me."],
+  "points": [
+    { "id": "cleftit", "label": "cleft (It was … who/that)", "reason": "cleft (It was … who/that)", "need": ["it was he who", "it was him who", "it was he that", "he was the one who"], "wrong": ["it was he helped me", "it was who helped me", "it is he who helped", "it was he which helped", "was he who helped me"] },
+    { "id": "v-help", "label": "the word “help”", "reason": "vocabulary", "need": ["help", "helped", "helping", "helps"] }
+  ]
+},
+{
+  "r": 201, "zh": "由于大雨，比赛被取消了。",
+  "en": ["The game was cancelled because of the heavy rain.", "The match was cancelled due to the heavy rain.", "Because of the heavy rain, the game was cancelled.", "The game was called off because of the heavy rain."],
+  "points": [
+    { "id": "becauseof", "label": "preposition (because of / due to + noun)", "reason": "preposition (because of / due to + noun)", "need": ["because of the heavy rain", "due to the heavy rain", "because of the rain", "due to the rain"], "wrong": ["because the heavy rain", "because of it was raining", "due to it rained", "because of heavy rain was"] },
+    { "id": "passive-cancel", "label": "passive (was cancelled)", "reason": "passive (was cancelled)", "need": ["was cancelled", "was canceled", "was called off"], "wrong": ["was cancel", "cancelled the game", "is cancelled", "was cancelling"] },
+    { "id": "v-game", "label": "the word “game / match”", "reason": "vocabulary", "need": ["game", "match"] }
+  ]
+},
+{
+  "r": 202, "zh": "那是一个如此感人的故事，我们都哭了。",
+  "en": ["It was such a moving story that we all cried.", "It was such a touching story that we all cried.", "It was such an emotional story that we all cried.", "It was such a moving story that we all wept."],
+  "points": [
+    { "id": "suchthat", "label": "structure “such a … that”", "reason": "structure (such a … that)", "need": ["such a moving story that", "such a touching story that", "such an emotional story that"], "wrong": ["so a moving story that", "such moving story that", "such a moving story so", "so moving story that we"] },
+    { "id": "v-cry", "label": "the word “cry”", "reason": "vocabulary", "need": ["cried", "cry", "wept", "weep"] },
+    { "id": "v-story", "label": "the word “story”", "reason": "vocabulary", "need": ["story"] }
+  ]
+},
+{
+  "r": 203, "zh": "这本字典对学生很有用。",
+  "en": ["This dictionary is very useful for students.", "This dictionary is very useful to students.", "This dictionary is really useful for students.", "This dictionary is helpful for students."],
+  "points": [
+    { "id": "usefulfor", "label": "collocation (useful for/to)", "reason": "collocation (useful for/to)", "need": ["useful for students", "useful to students", "helpful for students", "helpful to students"], "wrong": ["useful of students", "useful with students", "use for students"] },
+    { "id": "v-dictionary", "label": "the word “dictionary”", "reason": "vocabulary", "need": ["dictionary"] }
+  ]
+},
+{
+  "r": 204, "zh": "我喜欢在雨中散步。",
+  "en": ["I enjoy walking in the rain.", "I love walking in the rain.", "I like walking in the rain.", "I enjoy taking walks in the rain."],
+  "points": [
+    { "id": "enjoydoing", "label": "verb form (enjoy + -ing)", "reason": "verb form (enjoy + -ing)", "need": ["enjoy walking", "love walking", "like walking", "enjoy taking walks"], "wrong": ["enjoy to walk", "enjoy walk in", "like to walking", "enjoy walked"] },
+    { "id": "prep-in", "label": "preposition “in the rain”", "reason": "preposition (in the rain)", "need": ["in the rain"], "wrong": ["on the rain", "under the rain", "at the rain", "in rain"] }
+  ]
+},
+{
+  "r": 205, "zh": "他答应帮我搬家。",
+  "en": ["He promised to help me move.", "He promised to help me move house.", "He promised that he would help me move.", "He promised to help me with the move."],
+  "points": [
+    { "id": "promiseto", "label": "verb form (promise to + base verb)", "reason": "verb form (promise to + base verb)", "need": ["promised to help", "promised that he would help", "promised to help me move", "promised to help me with"], "wrong": ["promised helping me", "promised help me", "promised to helped"] },
+    { "id": "v-move", "label": "the word “move”", "reason": "vocabulary", "need": ["move", "moving", "moved"] }
+  ]
+},
+{
+  "r": 206, "zh": "我设法按时完成了工作。",
+  "en": ["I managed to finish the work on time.", "I managed to complete the work on time.", "I managed to get the work done on time.", "I managed to finish the job on time."],
+  "points": [
+    { "id": "manageto", "label": "verb form (manage to + base verb)", "reason": "verb form (manage to + base verb)", "need": ["managed to finish", "managed to complete", "managed to get the work done"], "wrong": ["managed finishing", "managed finish", "managed to finished", "manage to finish the work"] },
+    { "id": "ontime", "label": "collocation “on time”", "reason": "collocation (on time)", "need": ["on time"], "wrong": ["in time", "on the time", "at time"] }
+  ]
+},
+{
+  "r": 207, "zh": "这家公司是2010年成立的。",
+  "en": ["The company was founded in 2010.", "The company was established in 2010.", "This company was founded in 2010.", "The company was set up in 2010."],
+  "points": [
+    { "id": "passivefound", "label": "passive (was founded)", "reason": "passive (was founded / established)", "need": ["was founded in", "was established in", "was set up in"], "wrong": ["was found in 2010", "is founded in", "was founding in", "was build in 2010"] },
+    { "id": "prep-in-year", "label": "preposition “in + year”", "reason": "preposition (in + year)", "need": ["in 2010"], "wrong": ["on 2010", "at 2010", "in the 2010"] },
+    { "id": "v-company", "label": "the word “company”", "reason": "vocabulary", "need": ["company"] }
+  ]
+},
+{
+  "r": 208, "zh": "听到这个好消息，他高兴得跳了起来。",
+  "en": ["Hearing the good news, he jumped for joy.", "On hearing the good news, he jumped for joy.", "When he heard the good news, he jumped for joy.", "Hearing the good news, he jumped up with joy."],
+  "points": [
+    { "id": "participle", "label": "participle clause (Hearing …)", "reason": "participle clause (Hearing …)", "need": ["hearing the good news", "on hearing the good news", "when he heard the good news"], "wrong": ["when he hear the good news", "because hearing the good news", "for hearing the good news"] },
+    { "id": "joy", "label": "collocation “jump for joy”", "reason": "collocation (jump for joy)", "need": ["jumped for joy", "jumped up with joy", "jumped with joy", "jumped up"], "wrong": ["jumped of joy", "jumped by joy", "jumped from joy"] },
+    { "id": "v-news", "label": "the word “news”", "reason": "vocabulary", "need": ["news"] }
+  ]
+},
+{
+  "r": 209, "zh": "无论谁打电话来，告诉他们我出去了。",
+  "en": ["Whoever calls, tell them I'm out.", "No matter who calls, tell them I'm out.", "Whoever calls, tell them that I'm out.", "Whoever phones, tell them I'm out."],
+  "points": [
+    { "id": "whoever", "label": "structure “whoever + verb”", "reason": "structure (whoever + verb)", "need": ["whoever calls", "no matter who calls", "whoever phones"], "wrong": ["whoever call", "who ever calls", "whoever will call", "whomever calls", "whoever calling"] },
+    { "id": "imperative", "label": "imperative (tell them …)", "reason": "imperative", "need": ["tell them", "tell them that"], "wrong": ["you tell them", "telling them", "you should tell them"] }
+  ]
+},
+{
+  "r": 210, "zh": "冬天她容易感冒。",
+  "en": ["She tends to catch colds in winter.", "She is likely to catch a cold in winter.", "She tends to get colds in winter.", "She often catches colds in winter."],
+  "points": [
+    { "id": "tendto", "label": "verb form (tend to / be likely to + base)", "reason": "verb form (tend to / be likely to + base)", "need": ["tends to catch", "is likely to catch", "tends to get", "often catches"], "wrong": ["tends to catching", "tend to catch", "tends catch", "is likely catch", "tends to caught"] },
+    { "id": "prep-in", "label": "preposition “in winter”", "reason": "preposition (in winter)", "need": ["in winter", "in the winter"], "wrong": ["on winter", "at winter", "in winters"] },
+    { "id": "v-cold", "label": "the word “cold”", "reason": "vocabulary", "need": ["cold", "colds"] }
+  ]
 }
 ];
