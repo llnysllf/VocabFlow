@@ -1960,5 +1960,152 @@ window.SENTENCES = [
     { "id": "v-concert", "label": "the word “concert”", "reason": "vocabulary", "need": ["concert"] },
     { "id": "v-singer", "label": "the word “singer”", "reason": "vocabulary", "need": ["singer"] }
   ]
+},
+{
+  "r": 229, "zh": "直到他离开我才意识到我爱他。",
+  "en": ["Not until he left did I realize that I loved him.", "Not until he left did I realise I loved him.", "It was not until he left that I realized I loved him.", "Only after he left did I realize I loved him."],
+  "points": [
+    { "id": "notuntilinv", "label": "inversion (Not until … did I)", "reason": "inversion (Not until … did I)", "need": ["not until he left did i realize", "not until he left did i realise", "it was not until he left that i", "only after he left did i realize"], "wrong": ["not until he left i realized", "not until he left that i realized", "until he left i did not realize"] },
+    { "id": "v-realize", "label": "the word “realize”", "reason": "vocabulary", "need": ["realize", "realise", "realized", "realised"] }
+  ]
+},
+{
+  "r": 230, "zh": "我钱花得越多，存得越少。",
+  "en": ["The more money I spend, the less I save.", "The more I spend, the less I save.", "The more money I spend, the less money I save."],
+  "points": [
+    { "id": "morelessstruct", "label": "structure “the more … the less”", "reason": "structure (the more … the less)", "need": ["the more money i spend, the less i save", "the more i spend, the less i save", "the more money i spend, the less money i save", "the more i spend the less i save"], "wrong": ["more i spend less i save", "the more i spend, the lesser i save", "the much i spend the less i save", "the more i spend, the least i save"] },
+    { "id": "v-save", "label": "the word “save / spend”", "reason": "vocabulary", "need": ["save", "spend"] }
+  ]
+},
+{
+  "r": 231, "zh": "那个站在门口的男人是我老师。",
+  "en": ["The man standing at the door is my teacher.", "The man standing in the doorway is my teacher.", "The man who is standing at the door is my teacher.", "The man standing by the door is my teacher."],
+  "points": [
+    { "id": "reducedrel", "label": "relative clause (reduced -ing)", "reason": "relative clause (reduced -ing)", "need": ["man standing at the door", "man standing in the doorway", "man who is standing at the door", "man standing by the door"], "wrong": ["man stand at the door", "man is standing at the door is", "man stood at the door is my"] },
+    { "id": "v-teacher", "label": "the word “teacher”", "reason": "vocabulary", "need": ["teacher"] }
+  ]
+},
+{
+  "r": 232, "zh": "你能帮我拿一下那个箱子吗？",
+  "en": ["Could you help me carry this box?", "Can you help me carry this box?", "Could you help me to carry this box?", "Could you give me a hand with this box?"],
+  "points": [
+    { "id": "helpdo", "label": "verb form (help sb (to) do)", "reason": "verb form (help sb (to) do)", "need": ["carry", "give me a hand"], "wrong": ["help me carrying", "help to me carry", "help me carried", "help me to carrying", "help me carries"] },
+    { "id": "modalreq", "label": "modal request (Could/Can you)", "reason": "modal (could/can you)", "need": ["could you", "can you"], "wrong": ["do you can", "you could help", "may you to"] },
+    { "id": "v-box", "label": "the word “box”", "reason": "vocabulary", "need": ["box"] }
+  ]
+},
+{
+  "r": 233, "zh": "我宁可饿着也不吃那个。",
+  "en": ["I would sooner starve than eat that.", "I'd sooner starve than eat that.", "I would rather starve than eat that.", "I'd rather go hungry than eat that."],
+  "points": [
+    { "id": "wouldsooner", "label": "structure “would sooner/rather … than”", "reason": "structure (would sooner/rather … than)", "need": ["would sooner starve than", "'d sooner starve than", "would rather starve than", "'d rather go hungry than"], "wrong": ["would sooner starve then", "would sooner to starve than", "would sooner starve that", "would sooner starve as"] },
+    { "id": "v-starve", "label": "the word “starve / hungry”", "reason": "vocabulary", "need": ["starve", "hungry", "starving"] }
+  ]
+},
+{
+  "r": 234, "zh": "他一边走路一边听音乐。",
+  "en": ["He listens to music while walking.", "He listens to music while he walks.", "He walks while listening to music.", "He listens to music while he is walking."],
+  "points": [
+    { "id": "whileing", "label": "structure “while + -ing / present”", "reason": "structure (while + -ing / present)", "need": ["while walking", "while he walks", "while listening", "while he is walking"], "wrong": ["while walk", "while he walk", "during walking", "while to walk"] },
+    { "id": "listento", "label": "collocation “listen to”", "reason": "collocation (listen to)", "need": ["listens to music", "listen to music", "listening to music"], "wrong": ["listens music", "hears to music", "listen music"] }
+  ]
+},
+{
+  "r": 235, "zh": "我的电脑出了点问题。",
+  "en": ["There's something wrong with my computer.", "There is something wrong with my computer.", "Something is wrong with my computer.", "Something's wrong with my computer."],
+  "points": [
+    { "id": "somethingwrong", "label": "structure “something wrong with”", "reason": "structure (something wrong with)", "need": ["something wrong with my computer", "something is wrong with my computer", "wrong with my computer"], "wrong": ["something wrong in my computer", "something wrong of my computer", "there is something wrong my computer", "something wrong to my computer"] },
+    { "id": "v-computer", "label": "the word “computer”", "reason": "vocabulary", "need": ["computer"] }
+  ]
+},
+{
+  "r": 236, "zh": "他连走路都困难，更别说跑步了。",
+  "en": ["He can hardly walk, let alone run.", "He can barely walk, let alone run.", "He has trouble walking, let alone running."],
+  "points": [
+    { "id": "letalone", "label": "structure “let alone + verb”", "reason": "structure (let alone + verb)", "need": ["let alone run", "let alone running"], "wrong": ["let alone to run", "let it alone run", "not to mention to run", "let alone he runs"] },
+    { "id": "hardly", "label": "adverb “hardly / barely”", "reason": "adverb (hardly / barely)", "need": ["can hardly walk", "can barely walk", "has trouble walking"], "wrong": ["can hardly to walk", "can't hardly walk", "hardly can walk", "can hard walk"] }
+  ]
+},
+{
+  "r": 237, "zh": "难怪你这么累，你工作了一整天。",
+  "en": ["No wonder you're so tired; you've worked all day.", "It's no wonder you're so tired; you worked all day.", "No wonder you are so tired, you have worked all day.", "No wonder you're tired, you've been working all day."],
+  "points": [
+    { "id": "nowonder", "label": "structure “no wonder …”", "reason": "structure (no wonder …)", "need": ["no wonder you're so tired", "no wonder you are so tired", "it's no wonder you're so tired", "no wonder you're tired"], "wrong": ["no wander you're so tired", "no wonder are you so tired", "its a no wonder you so tired"] },
+    { "id": "perfect", "label": "tense (present perfect / past)", "reason": "tense (worked all day)", "need": ["you've worked all day", "you have worked all day", "you've been working all day", "worked all day"], "wrong": ["you have work all day", "you been working all day"] }
+  ]
+},
+{
+  "r": 238, "zh": "我再也受不了这种噪音了。",
+  "en": ["I can't stand this noise any longer.", "I can't stand this noise anymore.", "I can't bear this noise any longer.", "I can no longer stand this noise."],
+  "points": [
+    { "id": "cantstand", "label": "verb form (can't stand / bear)", "reason": "verb form (can't stand / bear)", "need": ["can't stand this noise", "can't bear this noise", "can no longer stand"], "wrong": ["can't stand to this noise", "don't can stand this noise", "can't standing this noise"] },
+    { "id": "anylonger", "label": "adverb “any longer / anymore”", "reason": "adverb (any longer / anymore)", "need": ["any longer", "anymore", "any more", "no longer"], "wrong": ["any more longer", "no more longer", "not longer"] },
+    { "id": "v-noise", "label": "the word “noise”", "reason": "vocabulary", "need": ["noise"] }
+  ]
+},
+{
+  "r": 239, "zh": "他迟到的可能性很大。",
+  "en": ["He is likely to be late.", "He's likely to be late.", "He is bound to be late.", "He will probably be late."],
+  "points": [
+    { "id": "likelyto", "label": "structure “be likely/bound to + base”", "reason": "structure (be likely/bound to + base)", "need": ["likely to be late", "bound to be late", "will probably be late", "probably be late"], "wrong": ["likely be late", "likely to being late", "likely that he late", "likely to late", "bound to being late"] },
+    { "id": "v-late", "label": "the word “late”", "reason": "vocabulary", "need": ["late"] }
+  ]
+},
+{
+  "r": 240, "zh": "你想喝点什么吗？",
+  "en": ["Would you like something to drink?", "Would you like anything to drink?", "Do you want something to drink?", "Would you like a drink?"],
+  "points": [
+    { "id": "wouldlike", "label": "structure “would you like + noun / to”", "reason": "structure (would you like + noun / to)", "need": ["would you like something to drink", "would you like anything to drink", "would you like a drink", "do you want something to drink"], "wrong": ["do you would like a drink", "are you like a drink", "would you liked a drink"] },
+    { "id": "v-drink", "label": "the word “drink”", "reason": "vocabulary", "need": ["drink"] }
+  ]
+},
+{
+  "r": 241, "zh": "我把这件事告诉了他。",
+  "en": ["I told him about it.", "I told him the news.", "I told him what happened.", "I told him about the matter."],
+  "points": [
+    { "id": "tellsb", "label": "verb pattern (tell sb (about) sth)", "reason": "verb pattern (tell sb (about) sth)", "need": ["told him about", "told him the news", "told him what happened", "told him about the matter"], "wrong": ["told to him about", "said him about", "spoke him about", "said to him the news"] },
+    { "id": "v-tell", "label": "the word “tell”", "reason": "vocabulary", "need": ["told", "tell"] }
+  ]
+},
+{
+  "r": 242, "zh": "这本书是用简单的英语写的。",
+  "en": ["This book is written in simple English.", "The book is written in plain English.", "This book is written in easy English.", "This book was written in simple English."],
+  "points": [
+    { "id": "writtenin", "label": "passive (written in)", "reason": "passive (written in)", "need": ["is written in", "was written in"], "wrong": ["is wrote in", "is written by simple english", "is writing in", "is written with simple english"] },
+    { "id": "v-english", "label": "the word “English”", "reason": "vocabulary", "need": ["english"] }
+  ]
+},
+{
+  "r": 243, "zh": "无论发生什么，保持冷静。",
+  "en": ["Whatever happens, stay calm.", "No matter what happens, stay calm.", "Whatever happens, keep calm.", "No matter what happens, remain calm."],
+  "points": [
+    { "id": "whatever", "label": "structure “whatever + present”", "reason": "structure (whatever + present)", "need": ["whatever happens", "no matter what happens"], "wrong": ["whatever happen", "what ever happens", "whatever will happen", "whatever happened", "no matter what happen"] },
+    { "id": "staycalm", "label": "collocation “stay calm”", "reason": "collocation (stay calm)", "need": ["stay calm", "keep calm", "remain calm"], "wrong": ["stay calmly", "be calm down", "stay in calm", "keep calmly"] }
+  ]
+},
+{
+  "r": 244, "zh": "我们应该保护环境。",
+  "en": ["We should protect the environment.", "We ought to protect the environment.", "We should protect our environment.", "We must protect the environment."],
+  "points": [
+    { "id": "modal", "label": "modal “should + base verb”", "reason": "modal (should + base verb)", "need": ["should protect", "ought to protect", "must protect"], "wrong": ["should to protect", "should protecting", "should protects", "must to protect"] },
+    { "id": "v-environment", "label": "the word “environment”", "reason": "vocabulary", "need": ["environment"] }
+  ]
+},
+{
+  "r": 245, "zh": "他对我撒了谎。",
+  "en": ["He lied to me.", "He told me a lie.", "He lied to my face.", "He didn't tell me the truth."],
+  "points": [
+    { "id": "lieto", "label": "collocation “lie to sb”", "reason": "collocation (lie to sb)", "need": ["lied to me", "told me a lie", "lied to my face", "didn't tell me the truth"], "wrong": ["lied me", "lied at me", "lied on me", "told me lie"] },
+    { "id": "v-lie", "label": "the word “lie / truth”", "reason": "vocabulary", "need": ["lie", "lied", "truth"] }
+  ]
+},
+{
+  "r": 246, "zh": "多亏了你的帮助，我们按时完成了。",
+  "en": ["Thanks to your help, we finished on time.", "Thanks to your help, we finished it on time.", "We finished on time thanks to your help.", "Thanks to you, we finished on time."],
+  "points": [
+    { "id": "thanksto", "label": "preposition “thanks to + noun”", "reason": "preposition (thanks to + noun)", "need": ["thanks to your help", "thanks to you"], "wrong": ["thank to your help", "thanks of your help", "thank you to your help"] },
+    { "id": "ontime", "label": "collocation “on time”", "reason": "collocation (on time)", "need": ["on time"], "wrong": ["in time", "on the time", "at time"] },
+    { "id": "v-finish", "label": "the word “finish”", "reason": "vocabulary", "need": ["finish", "finished", "completed"] }
+  ]
 }
 ];
