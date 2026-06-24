@@ -2107,5 +2107,157 @@ window.SENTENCES = [
     { "id": "ontime", "label": "collocation “on time”", "reason": "collocation (on time)", "need": ["on time"], "wrong": ["in time", "on the time", "at time"] },
     { "id": "v-finish", "label": "the word “finish”", "reason": "vocabulary", "need": ["finish", "finished", "completed"] }
   ]
+},
+{
+  "r": 247, "zh": "请问洗手间在哪里？",
+  "en": ["Excuse me, where is the bathroom?", "Excuse me, where is the restroom?", "Excuse me, where's the toilet?", "Excuse me, where can I find the bathroom?"],
+  "points": [
+    { "id": "whereis", "label": "question (where is …)", "reason": "question (where is …)", "need": ["where is the bathroom", "where is the restroom", "where's the toilet", "where can i find the bathroom", "where is the toilet"], "wrong": ["where the bathroom is", "where is have the bathroom", "where bathroom is", "where does the bathroom"] },
+    { "id": "excuseme", "label": "phrase “excuse me”", "reason": "phrase (excuse me)", "need": ["excuse me"], "wrong": ["excuse me to ask", "sorry me", "excuse i"] },
+    { "id": "v-bathroom", "label": "the word “bathroom”", "reason": "vocabulary", "need": ["bathroom", "restroom", "toilet"] }
+  ]
+},
+{
+  "r": 248, "zh": "我想点一份牛排。",
+  "en": ["I'd like to order a steak.", "I would like to order a steak.", "I'd like to order steak.", "Can I order a steak?"],
+  "points": [
+    { "id": "wouldliketo", "label": "verb form (would like to + base)", "reason": "verb form (would like to + base)", "need": ["like to order", "can i order", "want to order"], "wrong": ["like order a steak", "like to ordering", "would like order a steak", "like ordering a steak"] },
+    { "id": "v-steak", "label": "the word “steak”", "reason": "vocabulary", "need": ["steak"] }
+  ]
+},
+{
+  "r": 249, "zh": "这件多少钱？",
+  "en": ["How much is this?", "How much does this cost?", "How much is it?", "What's the price of this?"],
+  "points": [
+    { "id": "howmuch", "label": "question (how much …)", "reason": "question (how much …)", "need": ["how much is this", "how much does this cost", "how much is it", "what's the price of this", "how much for this"], "wrong": ["how much this is", "how much cost this", "how many is this", "how much this cost", "how much does this costs"] },
+    { "id": "v-price", "label": "the word “price / cost”", "reason": "vocabulary", "need": ["price", "cost", "much"] }
+  ]
+},
+{
+  "r": 250, "zh": "我对花生过敏。",
+  "en": ["I'm allergic to peanuts.", "I am allergic to peanuts.", "I'm allergic to nuts.", "I have an allergy to peanuts."],
+  "points": [
+    { "id": "allergicto", "label": "collocation “allergic to”", "reason": "collocation (allergic to)", "need": ["allergic to peanuts", "allergic to nuts", "allergy to peanuts", "allergic to"], "wrong": ["allergic of peanuts", "allergic with peanuts", "allergic from peanuts", "allergic for peanuts"] },
+    { "id": "v-peanut", "label": "the word “peanut”", "reason": "vocabulary", "need": ["peanut", "peanuts", "nut", "nuts"] }
+  ]
+},
+{
+  "r": 251, "zh": "火车几点出发？",
+  "en": ["What time does the train leave?", "What time does the train depart?", "When does the train leave?", "What time is the train leaving?"],
+  "points": [
+    { "id": "whattime", "label": "question (what time does …)", "reason": "question (what time does …)", "need": ["what time does the train leave", "what time does the train depart", "when does the train leave", "what time is the train leaving"], "wrong": ["what time the train leaves", "what time does the train leaves", "what time do the train leave", "when the train leaves"] },
+    { "id": "v-train", "label": "the word “train”", "reason": "vocabulary", "need": ["train"] }
+  ]
+},
+{
+  "r": 252, "zh": "你能推荐一家好餐厅吗？",
+  "en": ["Can you recommend a good restaurant?", "Could you recommend a good restaurant?", "Can you suggest a good restaurant?", "Do you know a good restaurant?"],
+  "points": [
+    { "id": "recommend", "label": "verb pattern (recommend sth)", "reason": "verb pattern (recommend sth)", "need": ["recommend a good restaurant", "suggest a good restaurant", "know a good restaurant", "recommend me a good restaurant"], "wrong": ["recommend to go a restaurant", "recommend going a restaurant", "recommend for a good restaurant"] },
+    { "id": "modalreq", "label": "modal request (Can/Could you)", "reason": "modal (can/could you)", "need": ["can you", "could you", "do you"], "wrong": ["do you can", "you can recommend", "may you"] },
+    { "id": "v-restaurant", "label": "the word “restaurant”", "reason": "vocabulary", "need": ["restaurant"] }
+  ]
+},
+{
+  "r": 253, "zh": "我头疼。",
+  "en": ["I have a headache.", "I've got a headache.", "My head hurts.", "I have got a headache."],
+  "points": [
+    { "id": "haveache", "label": "structure (have a headache / head hurts)", "reason": "structure (have a headache / head hurts)", "need": ["have a headache", "'ve got a headache", "my head hurts", "have got a headache"], "wrong": ["have headache", "i am headache", "have a head pain", "my head is hurt"] },
+    { "id": "v-head", "label": "the word “head / headache”", "reason": "vocabulary", "need": ["head", "headache"] }
+  ]
+},
+{
+  "r": 254, "zh": "外面很冷，多穿点衣服。",
+  "en": ["It's cold outside, dress warmly.", "It's cold outside, put on more clothes.", "It's cold outside, wear warm clothes.", "It's cold outside, bundle up."],
+  "points": [
+    { "id": "imperative", "label": "imperative + adverb (dress warmly)", "reason": "imperative + adverb (dress warmly)", "need": ["dress warmly", "put on more clothes", "wear warm clothes", "bundle up", "wear more clothes"], "wrong": ["dress warm", "wear more clothe", "dress yourself warm", "wear much clothes"] },
+    { "id": "v-cold", "label": "the word “cold”", "reason": "vocabulary", "need": ["cold"] },
+    { "id": "v-clothes", "label": "the word “clothes / warm”", "reason": "vocabulary", "need": ["clothes", "clothing", "warmly", "warm"] }
+  ]
+},
+{
+  "r": 255, "zh": "你考虑过出国留学吗？",
+  "en": ["Have you considered studying abroad?", "Have you thought about studying abroad?", "Have you considered going abroad to study?", "Did you consider studying abroad?"],
+  "points": [
+    { "id": "considering", "label": "verb form (consider + -ing)", "reason": "verb form (consider + -ing)", "need": ["considered studying", "thought about studying", "considered going abroad", "consider studying"], "wrong": ["considered to study", "considered study abroad", "thought studying abroad", "considered studied"] },
+    { "id": "abroad", "label": "collocation (study abroad — no preposition)", "reason": "collocation (study abroad)", "need": ["studying abroad", "study abroad", "abroad to study", "go abroad"], "wrong": ["studying in abroad", "study in abroad", "to abroad", "studying at abroad"] }
+  ]
+},
+{
+  "r": 256, "zh": "我们必须在五点前离开。",
+  "en": ["We must leave before five.", "We have to leave before five o'clock.", "We need to leave by five.", "We must leave before 5."],
+  "points": [
+    { "id": "mustleave", "label": "modal (must / have to + base)", "reason": "modal (must / have to + base)", "need": ["must leave", "have to leave", "need to leave"], "wrong": ["must to leave", "must leaving", "have leave", "must leaves"] },
+    { "id": "prep-time", "label": "preposition (before/by + time)", "reason": "preposition (before/by + time)", "need": ["before five", "before 5", "by five", "before five o'clock"], "wrong": ["before of five", "until five we leave", "at before five"] }
+  ]
+},
+{
+  "r": 257, "zh": "这家商店每天营业到晚上十点。",
+  "en": ["This shop is open until 10 p.m. every day.", "The store is open until 10 pm every day.", "This shop stays open until 10 p.m. daily.", "The shop opens until 10 p.m. every day."],
+  "points": [
+    { "id": "presenthabit", "label": "tense (present simple — opening hours)", "reason": "tense (present simple)", "need": ["is open until", "stays open until", "opens until"], "wrong": ["is opening until", "is opened until", "are open until"] },
+    { "id": "v-shop", "label": "the word “shop / store”", "reason": "vocabulary", "need": ["shop", "store"] }
+  ]
+},
+{
+  "r": 258, "zh": "别担心，我会照顾好孩子们的。",
+  "en": ["Don't worry, I'll look after the kids.", "Don't worry, I'll take care of the kids.", "Don't worry, I will look after the children.", "Don't worry, I'll watch the kids."],
+  "points": [
+    { "id": "lookafter", "label": "phrasal verb (look after / take care of)", "reason": "phrasal verb (look after / take care of)", "need": ["look after the kids", "take care of the kids", "look after the children", "watch the kids", "look after them"], "wrong": ["look after of the kids", "take care the kids", "look after for the kids", "care the kids"] },
+    { "id": "future", "label": "future “I'll …”", "reason": "tense (future will)", "need": ["i'll look", "i will look", "i'll take care", "i will take care", "i'll watch"], "wrong": ["i look after the kids", "i looking after", "i would look after"] },
+    { "id": "v-kid", "label": "the word “kid / child”", "reason": "vocabulary", "need": ["kid", "kids", "child", "children"] }
+  ]
+},
+{
+  "r": 259, "zh": "我喝咖啡不加糖。",
+  "en": ["I drink coffee without sugar.", "I drink my coffee without sugar.", "I take my coffee without sugar.", "I have my coffee without sugar."],
+  "points": [
+    { "id": "without", "label": "preposition (without + noun)", "reason": "preposition (without + noun)", "need": ["without sugar"], "wrong": ["without of sugar", "without sugars", "with no sugars", "without to sugar"] },
+    { "id": "v-coffee", "label": "the word “coffee”", "reason": "vocabulary", "need": ["coffee"] },
+    { "id": "v-sugar", "label": "the word “sugar”", "reason": "vocabulary", "need": ["sugar"] }
+  ]
+},
+{
+  "r": 260, "zh": "你介意把盐递给我吗？",
+  "en": ["Would you mind passing me the salt?", "Could you pass me the salt?", "Would you mind passing the salt?", "Can you pass the salt, please?"],
+  "points": [
+    { "id": "mindpassing", "label": "verb form (would you mind + -ing)", "reason": "verb form (would you mind + -ing)", "need": ["mind passing", "you pass the salt", "pass me the salt"], "wrong": ["mind to pass the salt", "mind pass the salt", "mind you pass the salt"] },
+    { "id": "v-salt", "label": "the word “salt”", "reason": "vocabulary", "need": ["salt"] }
+  ]
+},
+{
+  "r": 261, "zh": "自从大学毕业后我就一直在找工作。",
+  "en": ["I've been looking for a job since I graduated.", "I have been looking for a job since I graduated from college.", "I've been job hunting since I graduated.", "I have been searching for a job since graduation."],
+  "points": [
+    { "id": "perfectcontsince", "label": "tense (present perfect continuous + since)", "reason": "tense (present perfect continuous + since)", "need": ["i've been looking for a job since", "have been looking for a job since", "i've been job hunting since", "have been searching for a job since"], "wrong": ["i am looking for a job since", "i looked for a job since", "i've been look for a job since", "i was looking for a job since"] },
+    { "id": "v-job", "label": "the word “job”", "reason": "vocabulary", "need": ["job", "work"] },
+    { "id": "v-graduate", "label": "the word “graduate”", "reason": "vocabulary", "need": ["graduated", "graduation", "graduate"] }
+  ]
+},
+{
+  "r": 262, "zh": "这是我吃过的最辣的菜。",
+  "en": ["This is the spiciest dish I have ever eaten.", "This is the spiciest food I've ever had.", "This is the hottest dish I have ever eaten.", "It's the spiciest dish I have ever tasted."],
+  "points": [
+    { "id": "super", "label": "superlative (spiciest)", "reason": "superlative (spiciest)", "need": ["spiciest dish", "spiciest food", "hottest dish"], "wrong": ["most spicy dish", "more spicy dish", "most spiciest dish", "spicyest dish"] },
+    { "id": "perfectever", "label": "tense (present perfect + ever)", "reason": "tense (present perfect + ever)", "need": ["ever eaten", "ever had", "ever tasted"], "wrong": ["i ever eat", "i have ever ate", "i did ever eat", "i have ever eated"] },
+    { "id": "v-dish", "label": "the word “dish / food”", "reason": "vocabulary", "need": ["dish", "food"] }
+  ]
+},
+{
+  "r": 263, "zh": "飞机正点起飞。",
+  "en": ["The plane took off on time.", "The plane took off on schedule.", "The flight took off on time.", "The plane departed on time."],
+  "points": [
+    { "id": "takeoff", "label": "phrasal verb (take off) + past", "reason": "phrasal verb (take off) + past", "need": ["took off on time", "took off on schedule", "departed on time"], "wrong": ["take off on time", "took of on time", "took off in time", "taked off on time", "was took off"] },
+    { "id": "v-plane", "label": "the word “plane / flight”", "reason": "vocabulary", "need": ["plane", "flight", "aircraft"] }
+  ]
+},
+{
+  "r": 264, "zh": "多喝水对健康有好处。",
+  "en": ["Drinking more water is good for your health.", "Drinking plenty of water is good for your health.", "Drinking more water is good for you.", "Drinking lots of water is good for the health."],
+  "points": [
+    { "id": "gerundsubj", "label": "gerund as subject (Drinking … is)", "reason": "gerund as subject (Drinking … is)", "need": ["drinking more water is", "drinking plenty of water is", "drinking lots of water is"], "wrong": ["drink more water is", "to drink more water is", "drinking more water are", "drinking more water it is"] },
+    { "id": "goodfor", "label": "collocation (good for)", "reason": "collocation (good for)", "need": ["good for your health", "good for you", "good for the health", "good for health"], "wrong": ["good to your health", "good for your healthy", "good at your health", "benefit for your health"] },
+    { "id": "v-water", "label": "the word “water”", "reason": "vocabulary", "need": ["water"] }
+  ]
 }
 ];
