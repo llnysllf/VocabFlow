@@ -236,17 +236,19 @@
   </div>
 </div>
 
-<!-- data + Supabase SDK (CDN; fails gracefully offline) + app -->
-<script src="words.js"></script>
-<script src="idioms.js"></script>
-<script src="phrasal.js"></script>
-<script src="slang.js"></script>
-<script src="proverbs.js"></script>
-<script src="sayings.js"></script>
-<script src="sentences.js"></script>
-<script src="js/config.js"></script>
+<!-- data + Supabase SDK (CDN; fails gracefully offline) + app
+     ?v= busts the GitHub Pages cache (~10min) so returning users get fresh data.
+     Bump the version of ONLY the file you changed (avoids re-downloading 3MB words.js). -->
+<script src="words.js?v=1"></script>
+<script src="idioms.js?v=1"></script>
+<script src="phrasal.js?v=1"></script>
+<script src="slang.js?v=1"></script>
+<script src="proverbs.js?v=1"></script>
+<script src="sayings.js?v=1"></script>
+<script src="sentences.js?v=11"></script>
+<script src="js/config.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/cloud.js"></script>
+<script src="js/cloud.js?v=1"></script>
 <script src="js/app.js?v=20"></script>
 </body>
 </html>
