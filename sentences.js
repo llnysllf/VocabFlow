@@ -1805,5 +1805,160 @@ window.SENTENCES = [
     { "id": "prep-in", "label": "preposition “in winter”", "reason": "preposition (in winter)", "need": ["in winter", "in the winter"], "wrong": ["on winter", "at winter", "in winters"] },
     { "id": "v-cold", "label": "the word “cold”", "reason": "vocabulary", "need": ["cold", "colds"] }
   ]
+},
+{
+  "r": 211, "zh": "我刚到家就开始下雨了。",
+  "en": ["No sooner had I got home than it started to rain.", "Hardly had I got home when it started to rain.", "No sooner had I gotten home than it began to rain.", "Hardly had I arrived home when it started raining."],
+  "points": [
+    { "id": "inversion", "label": "inversion (no sooner … than / hardly … when)", "reason": "inversion (no sooner … than / hardly … when)", "need": ["no sooner had i got home than", "hardly had i got home when", "no sooner had i gotten home than", "hardly had i arrived home when"], "wrong": ["no sooner i had got home than", "no sooner had i got home when", "hardly had i got home than", "no sooner did i get home than", "hardly i had got home when"] },
+    { "id": "v-rain", "label": "the word “rain”", "reason": "vocabulary", "need": ["rain", "raining"] }
+  ]
+},
+{
+  "r": 212, "zh": "我从没见过这么美的日落。",
+  "en": ["Never have I seen such a beautiful sunset.", "Never had I seen such a beautiful sunset.", "Never have I seen so beautiful a sunset.", "Never have I seen a more beautiful sunset."],
+  "points": [
+    { "id": "neverinv", "label": "inversion (Never have I …)", "reason": "inversion (Never have I …)", "need": ["never have i seen", "never had i seen"], "wrong": ["never i have seen", "never have i saw", "never have seen i", "never i saw"] },
+    { "id": "such", "label": "structure “such a … / so … a”", "reason": "structure (such a … / so … a)", "need": ["such a beautiful sunset", "so beautiful a sunset", "a more beautiful sunset"], "wrong": ["such beautiful sunset", "so a beautiful sunset", "a such beautiful sunset"] },
+    { "id": "v-sunset", "label": "the word “sunset”", "reason": "vocabulary", "need": ["sunset"] }
+  ]
+},
+{
+  "r": 213, "zh": "只有努力工作，你才能成功。",
+  "en": ["Only by working hard can you succeed.", "Only through hard work can you succeed.", "Only by working hard can you be successful.", "You can only succeed by working hard."],
+  "points": [
+    { "id": "onlyinv", "label": "inversion (Only by … can you)", "reason": "inversion (Only by … can you)", "need": ["only by working hard can you", "only through hard work can you", "you can only succeed by working hard"], "wrong": ["only by working hard you can", "only by work hard can you", "only by working hard can you to succeed", "only by working hard you can succeed"] },
+    { "id": "v-succeed", "label": "the word “succeed”", "reason": "vocabulary", "need": ["succeed", "successful", "success"] }
+  ]
+},
+{
+  "r": 214, "zh": "要是我当时学了医就好了，现在我就是医生了。",
+  "en": ["If I had studied medicine, I would be a doctor now.", "If I had studied medicine, I'd be a doctor now.", "Had I studied medicine, I would be a doctor now.", "If I had studied medicine, I would be a doctor today."],
+  "points": [
+    { "id": "mixedif", "label": "mixed conditional (if + had + p.p.)", "reason": "conditional (mixed: if + had + p.p.)", "need": ["if i had studied medicine", "had i studied medicine"], "wrong": ["if i studied medicine", "if i had study medicine", "if i would have studied medicine", "if i have studied medicine"] },
+    { "id": "mixedresult", "label": "present result (would be …)", "reason": "conditional (would be — present result)", "need": ["would be a doctor", "'d be a doctor"], "wrong": ["would have been a doctor now", "will be a doctor", "would been a doctor", "would be a doctor then"] },
+    { "id": "v-doctor", "label": "the word “doctor”", "reason": "vocabulary", "need": ["doctor"] }
+  ]
+},
+{
+  "r": 215, "zh": "请尽快回复我。",
+  "en": ["Please reply to me as soon as possible.", "Please get back to me as soon as possible.", "Please reply as soon as you can.", "Please answer me as soon as possible."],
+  "points": [
+    { "id": "asaspossible", "label": "structure “as … as possible”", "reason": "structure (as … as possible)", "need": ["as soon as possible", "as soon as you can"], "wrong": ["as soon as possibly", "as soon possible", "so soon as possible", "as soon as it possible"] },
+    { "id": "replyto", "label": "collocation “reply to sb”", "reason": "collocation (reply to sb)", "need": ["reply to me", "reply as soon", "get back to me", "answer me", "reply to"], "wrong": ["reply me as soon", "response to me", "reply me back"] }
+  ]
+},
+{
+  "r": 216, "zh": "与其说他懒，不如说他累了。",
+  "en": ["He is not so much lazy as tired.", "He's not so much lazy as tired.", "It's not so much that he's lazy as that he's tired.", "He is not so much lazy as he is tired."],
+  "points": [
+    { "id": "notsomuch", "label": "structure “not so much … as”", "reason": "structure (not so much … as)", "need": ["not so much lazy as", "not so much that he's lazy as"], "wrong": ["not so much lazy than", "not so much lazy but", "not as much lazy as", "not so lazy as much"] },
+    { "id": "v-lazy", "label": "the word “lazy”", "reason": "vocabulary", "need": ["lazy"] },
+    { "id": "v-tired", "label": "the word “tired”", "reason": "vocabulary", "need": ["tired"] }
+  ]
+},
+{
+  "r": 217, "zh": "老板坚持要我们准时到。",
+  "en": ["The boss insisted that we arrive on time.", "The boss insisted that we be on time.", "The boss insisted that we should arrive on time.", "The boss insisted on us arriving on time."],
+  "points": [
+    { "id": "insistsubj", "label": "subjunctive (insist that … (should) do)", "reason": "subjunctive (insist that … (should) do)", "need": ["insisted that we arrive", "insisted that we be on time", "insisted that we should arrive", "insisted on us arriving", "insisted on our arriving"], "wrong": ["insisted us to arrive", "insisted that we to arrive", "insisted us arriving"] },
+    { "id": "ontime", "label": "collocation “on time”", "reason": "collocation (on time)", "need": ["on time"], "wrong": ["in time", "on the time", "at time"] },
+    { "id": "v-boss", "label": "the word “boss”", "reason": "vocabulary", "need": ["boss"] }
+  ]
+},
+{
+  "r": 218, "zh": "她害怕一个人待着。",
+  "en": ["She is afraid of being alone.", "She's afraid of being alone.", "She is afraid of staying alone.", "She is scared of being alone."],
+  "points": [
+    { "id": "afraidof", "label": "verb form (afraid of + -ing)", "reason": "verb form (afraid of + -ing)", "need": ["afraid of being alone", "afraid of staying alone", "scared of being alone", "afraid of being on her own"], "wrong": ["afraid of be alone", "afraid to being alone", "afraid of stay alone", "afraid being alone", "scared of be alone"] },
+    { "id": "v-alone", "label": "the word “alone”", "reason": "vocabulary", "need": ["alone"] }
+  ]
+},
+{
+  "r": 219, "zh": "成功取决于努力。",
+  "en": ["Success depends on hard work.", "Success depends on effort.", "Success depends upon hard work.", "Whether you succeed depends on how hard you work."],
+  "points": [
+    { "id": "dependon", "label": "collocation “depend on”", "reason": "collocation (depend on)", "need": ["depends on", "depends upon", "depend on", "depend upon"], "wrong": ["depends of", "depends to", "depends in", "is depend on", "depending of"] },
+    { "id": "v-success", "label": "the word “success”", "reason": "vocabulary", "need": ["success", "succeed"] },
+    { "id": "v-effort", "label": "the word “effort / hard work”", "reason": "vocabulary", "need": ["hard work", "effort", "how hard you work"] }
+  ]
+},
+{
+  "r": 220, "zh": "他成功地通过了考试。",
+  "en": ["He succeeded in passing the exam.", "He succeeded in passing the test.", "He managed to pass the exam.", "He succeeded in passing his exam."],
+  "points": [
+    { "id": "succeedin", "label": "verb form (succeed in + -ing)", "reason": "verb form (succeed in + -ing)", "need": ["succeeded in passing", "managed to pass"], "wrong": ["succeeded to pass", "succeeded in pass", "succeeded passing", "succeed in passing", "succeeded in to pass"] },
+    { "id": "v-exam", "label": "the word “exam / test”", "reason": "vocabulary", "need": ["exam", "test"] }
+  ]
+},
+{
+  "r": 221, "zh": "我们应该对自己的行为负责。",
+  "en": ["We should be responsible for our own actions.", "We should be responsible for our actions.", "We should take responsibility for our own actions.", "We must be responsible for our own behavior."],
+  "points": [
+    { "id": "responsiblefor", "label": "collocation “responsible for”", "reason": "collocation (responsible for)", "need": ["responsible for our", "responsibility for our", "responsible for", "responsibility for"], "wrong": ["responsible of our", "responsible to our actions", "responsible for to our", "responsable for"] },
+    { "id": "modal", "label": "modal “should + be”", "reason": "modal (should + be)", "need": ["should be responsible", "should take responsibility", "must be responsible"], "wrong": ["should responsible", "should to be responsible", "should being responsible"] },
+    { "id": "v-action", "label": "the word “action / behavior”", "reason": "vocabulary", "need": ["action", "actions", "behavior", "behaviour"] }
+  ]
+},
+{
+  "r": 222, "zh": "我打算下周去看望我祖母。",
+  "en": ["I plan to visit my grandmother next week.", "I am planning to visit my grandmother next week.", "I intend to visit my grandmother next week.", "I'm going to visit my grandmother next week."],
+  "points": [
+    { "id": "planto", "label": "verb form (plan/intend to + base verb)", "reason": "verb form (plan/intend to + base verb)", "need": ["plan to visit", "planning to visit", "intend to visit", "going to visit"], "wrong": ["plan visiting", "plan to visiting", "plan on visit", "intend visiting", "plan to visited"] },
+    { "id": "nexttime", "label": "time expression “next week”", "reason": "time expression (next week)", "need": ["next week"], "wrong": ["the next week", "in next week", "on next week"] },
+    { "id": "v-grandmother", "label": "the word “grandmother”", "reason": "vocabulary", "need": ["grandmother", "grandma", "granny"] }
+  ]
+},
+{
+  "r": 223, "zh": "我们偶然在街上遇见了一位老朋友。",
+  "en": ["We ran into an old friend on the street.", "We came across an old friend on the street.", "We bumped into an old friend on the street.", "We ran into an old friend in the street."],
+  "points": [
+    { "id": "runinto", "label": "phrasal verb (run into / come across)", "reason": "phrasal verb (run into / come across)", "need": ["ran into an old friend", "came across an old friend", "bumped into an old friend"], "wrong": ["run into an old friend", "ran into with an old friend", "ran in an old friend", "met into an old friend", "ran into to an old friend"] },
+    { "id": "prep-street", "label": "preposition “on/in the street”", "reason": "preposition (on/in the street)", "need": ["on the street", "in the street"], "wrong": ["at the street", "on street", "in street"] },
+    { "id": "v-friend", "label": "the word “friend”", "reason": "vocabulary", "need": ["friend"] }
+  ]
+},
+{
+  "r": 224, "zh": "别忘了把灯关掉。",
+  "en": ["Don't forget to turn off the lights.", "Don't forget to turn the lights off.", "Don't forget to switch off the lights.", "Remember to turn off the lights."],
+  "points": [
+    { "id": "turnoff", "label": "phrasal verb (turn off)", "reason": "phrasal verb (turn off)", "need": ["turn off the lights", "turn the lights off", "switch off the lights", "turn off the light", "turn them off"], "wrong": ["close the lights", "open the lights", "turn down the lights"] },
+    { "id": "v-light", "label": "the word “light”", "reason": "vocabulary", "need": ["light", "lights"] }
+  ]
+},
+{
+  "r": 225, "zh": "这个项目是由一个国际团队执行的。",
+  "en": ["The project was carried out by an international team.", "The project was conducted by an international team.", "This project was carried out by an international team.", "The project was carried out by a global team."],
+  "points": [
+    { "id": "passivecarry", "label": "passive (was carried out by)", "reason": "passive (was carried out by)", "need": ["was carried out by", "was conducted by"], "wrong": ["was carry out by", "is carried out by", "was carried out from", "was carrying out by", "were carried out by"] },
+    { "id": "v-project", "label": "the word “project”", "reason": "vocabulary", "need": ["project"] },
+    { "id": "v-team", "label": "the word “team”", "reason": "vocabulary", "need": ["team"] }
+  ]
+},
+{
+  "r": 226, "zh": "无论何时你需要我，我都在。",
+  "en": ["Whenever you need me, I'll be there.", "Whenever you need me, I will be there.", "No matter when you need me, I'll be there.", "I'll be there whenever you need me."],
+  "points": [
+    { "id": "whenever", "label": "structure “whenever + present”", "reason": "structure (whenever + present)", "need": ["whenever you need me", "no matter when you need me"], "wrong": ["when ever you need me", "whenever you will need me", "whenever do you need me", "whenever you needed me"] },
+    { "id": "future", "label": "future “will be there”", "reason": "tense (future will)", "need": ["will be there", "'ll be there"], "wrong": ["would be there", "am being there", "be there whenever"] }
+  ]
+},
+{
+  "r": 227, "zh": "这正是我一直在找的东西。",
+  "en": ["This is exactly what I have been looking for.", "This is exactly what I've been looking for.", "This is just what I have been looking for.", "This is precisely what I have been looking for."],
+  "points": [
+    { "id": "whatclause", "label": "clause “what … for”", "reason": "clause (what … for)", "need": ["what i have been looking for", "what i've been looking for", "what i was looking for"], "wrong": ["what i have been looking for it", "that i have been looking for", "what i have been looking", "which i have been looking for"] },
+    { "id": "perfectcont", "label": "present perfect continuous", "reason": "tense (present perfect continuous)", "need": ["have been looking for", "'ve been looking for", "had been looking for"], "wrong": ["have been look for", "am looking for", "has been looking for"] }
+  ]
+},
+{
+  "r": 228, "zh": "据报道，那位歌手将举办一场演唱会。",
+  "en": ["It is reported that the singer will hold a concert.", "It's reported that the singer will give a concert.", "The singer is reported to be holding a concert.", "It is reported that the singer will perform a concert."],
+  "points": [
+    { "id": "reportpassive", "label": "passive (it is reported that)", "reason": "passive (it is reported that)", "need": ["it is reported that", "it's reported that", "is reported to be", "is reported to", "reportedly"], "wrong": ["it is report that", "it reported that", "it is reporting that"] },
+    { "id": "future", "label": "future (will + base verb)", "reason": "tense (future will)", "need": ["will hold", "will give", "will perform", "be holding"], "wrong": ["would hold a concert", "held a concert", "will held a concert"] },
+    { "id": "v-concert", "label": "the word “concert”", "reason": "vocabulary", "need": ["concert"] },
+    { "id": "v-singer", "label": "the word “singer”", "reason": "vocabulary", "need": ["singer"] }
+  ]
 }
 ];
