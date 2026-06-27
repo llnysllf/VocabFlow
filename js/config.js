@@ -25,21 +25,16 @@ window.VOCABFLOW_CONFIG = {
   // Custom backend (AWS) for progress sync. Set to the SAM stack's ApiUrl
   // output, e.g. "https://abc123.execute-api.us-east-1.amazonaws.com".
   // Leave blank to use the Supabase `progress` table. See backend/README.md.
-  API_BASE_URL: "",
+  API_BASE_URL: "https://b82ayxojhh.execute-api.ap-southeast-2.amazonaws.com",
 
   // --- AWS Cognito (accounts) ------------------------------------------
-  // Fill these from the SAM stack outputs to move sign-in off Supabase and
-  // onto Cognito (fully AWS — Supabase is then no longer used at all).
-  // Leave blank to keep using Supabase auth above. Outputs:
-  //   COGNITO_REGION       <- Region
-  //   COGNITO_USER_POOL_ID <- UserPoolId
-  //   COGNITO_CLIENT_ID    <- UserPoolClientId
-  COGNITO_REGION: "",
-  COGNITO_USER_POOL_ID: "",
-  COGNITO_CLIENT_ID: "",
+  // From the SAM stack outputs (vocabflow-backend, ap-southeast-2). With these
+  // set, sign-in runs on Cognito and Supabase is no longer used.
+  COGNITO_REGION: "ap-southeast-2",
+  COGNITO_USER_POOL_ID: "ap-southeast-2_lWjRUeL9I",
+  COGNITO_CLIENT_ID: "1b5724qkhfnri88a6vd30p3n2n",
 
-  // For Google sign-in via Cognito Hosted UI. Set to the stack's CognitoDomain
-  // output (e.g. "https://vocabflow-auth.auth.us-east-1.amazoncognito.com") and
-  // flip ENABLE_GOOGLE to true. See backend/README.md for the Google setup.
-  COGNITO_DOMAIN: ""
+  // For Google sign-in via Cognito Hosted UI (set ENABLE_GOOGLE: true once the
+  // Google IdP is deployed — see backend/README.md "Google sign-in").
+  COGNITO_DOMAIN: "https://vocabflow-auth.auth.ap-southeast-2.amazoncognito.com"
 };
