@@ -2,15 +2,38 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
   VocabFlow backend — accounts + per-user progress sync, fully on AWS.
-  Cognito (auth) + API Gateway (HTTP API) -> Lambda -> DynamoDB (data).
-  No Supabase. Each /progress request is authenticated by verifying the
-  Cognito-issued JWT; the token's `sub` keys the user's row.
+  Cognito (email/password + optional Google via Hosted UI) for auth, and
+  API Gateway (HTTP API) -> Lambda -> DynamoDB for data. No Supabase.
 
 Parameters:
   AllowOrigin:
     Type: String
     Default: "*"
-    Description: Allowed CORS origin, e.g. https://llnysllf.github.io
+    Description: Allowed CORS origin for the API, e.g. https://llnysllf.github.io
+  AppUrl:
+    Type: String
+    Default: "https://llnysllf.github.io/VocabFlow/"
+    Description: >
+      The app's URL — used as the OAuth callback/logout URL for Hosted UI
+      (Google sign-in). Must match where the page is actually served.
+  CognitoDomainPrefix:
+    Type: String
+    Default: "vocabflow-auth"
+    Description: >
+      Hosted UI domain prefix (globally unique per region). The Hosted UI lives
+      at https://<prefix>.auth.<region>.amazoncognito.com — change if taken.
+  GoogleClientId:
+    Type: String
+    Default: ""
+    Description: Google OAuth client ID (leave blank to skip Google sign-in).
+  GoogleClientSecret:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Google OAuth client secret (leave blank to skip Google sign-in).
+
+Conditions:
+  HasGoogle: !Not [!Equals [!Ref GoogleClientId, ""]]
 
 Globals:
   Function:
@@ -24,8 +47,8 @@ Resources:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: vocabflow-users
-      UsernameAttributes: [email]          # sign in with email
-      AutoVerifiedAttributes: [email]      # marked verified by the trigger below
+      UsernameAttributes: [email]
+      AutoVerifiedAttributes: [email]
       Policies:
         PasswordPolicy:
           MinimumLength: 8
@@ -41,8 +64,6 @@ Resources:
     Properties:
       Handler: presignup.handler
       CodeUri: src/
-      # Auto-confirms new users (no emailed code) and marks their email verified,
-      # so sign-up -> sign-in is immediate, matching the previous UX.
 
   PreSignUpInvokePermission:
     Type: AWS::Lambda::Permission
@@ -52,22 +73,55 @@ Resources:
       Principal: cognito-idp.amazonaws.com
       SourceArn: !GetAtt UserPool.Arn
 
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      UserPoolId: !Ref UserPool
+      Domain: !Ref CognitoDomainPrefix
+
+  GoogleIdP:
+    Type: AWS::Cognito::UserPoolIdentityProvider
+    Condition: HasGoogle
+    Properties:
+      UserPoolId: !Ref UserPool
+      ProviderName: Google
+      ProviderType: Google
+      ProviderDetails:
+        client_id: !Ref GoogleClientId
+        client_secret: !Ref GoogleClientSecret
+        authorize_scopes: "openid email profile"
+      AttributeMapping:
+        email: email
+
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       UserPoolId: !Ref UserPool
       ClientName: vocabflow-web
-      GenerateSecret: false                # public SPA client — no secret
+      GenerateSecret: false
       ExplicitAuthFlows:
-        - ALLOW_USER_SRP_AUTH              # secure password auth (SRP)
+        - ALLOW_USER_SRP_AUTH            # email/password (SRP)
         - ALLOW_REFRESH_TOKEN_AUTH
       PreventUserExistenceErrors: ENABLED
+      # Hosted UI / OAuth (used by the Google button, PKCE code flow)
+      SupportedIdentityProviders: !If
+        - HasGoogle
+        - [COGNITO, !Ref GoogleIdP]      # !Ref returns "Google" AND orders after the IdP
+        - [COGNITO]
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows: [code]
+      AllowedOAuthScopes: [openid, email, profile]
+      CallbackURLs:
+        - !Ref AppUrl
+        - !Sub "${AppUrl}index.html"
+      LogoutURLs:
+        - !Ref AppUrl
 
   # ---------- Data (DynamoDB + API) ----------
   ProgressTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      BillingMode: PAY_PER_REQUEST          # scales to zero; no fixed cost
+      BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: userId
           AttributeType: S
@@ -130,3 +184,9 @@ Outputs:
   UserPoolClientId:
     Description: Put in js/config.js as COGNITO_CLIENT_ID.
     Value: !Ref UserPoolClient
+  CognitoDomain:
+    Description: Put in js/config.js as COGNITO_DOMAIN (needed for Google sign-in).
+    Value: !Sub "https://${CognitoDomainPrefix}.auth.${AWS::Region}.amazoncognito.com"
+  GoogleCallbackUrl:
+    Description: Add this as an "Authorized redirect URI" on your Google OAuth client.
+    Value: !Sub "https://${CognitoDomainPrefix}.auth.${AWS::Region}.amazoncognito.com/oauth2/idpresponse"

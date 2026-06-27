@@ -50,6 +50,10 @@ Answer the prompts:
 - **Stack Name:** `vocabflow-backend`
 - **AWS Region:** e.g. `us-east-1`
 - **Parameter AllowOrigin:** `https://llnysllf.github.io` (your Pages origin — scheme + host)
+- **Parameter AppUrl:** `https://llnysllf.github.io/VocabFlow/` (where the page is served)
+- **Parameter CognitoDomainPrefix:** `vocabflow-auth` (must be globally unique — change if taken)
+- **Parameter GoogleClientId / GoogleClientSecret:** leave **blank** for now (email/password
+  only). Fill them later once you've created a Google OAuth client — see *Google sign-in* below.
 - Confirm changes / allow IAM role creation: **Yes**
 - Save arguments to `samconfig.toml`: **Yes** (future deploys are just `sam deploy`)
 
@@ -61,12 +65,13 @@ When it finishes it prints **Outputs**:
 | `Region`           | `COGNITO_REGION`            |
 | `UserPoolId`       | `COGNITO_USER_POOL_ID`      |
 | `UserPoolClientId` | `COGNITO_CLIENT_ID`         |
+| `CognitoDomain`    | `COGNITO_DOMAIN` (Google only) |
 
 ---
 
 ## Point the app at it
 
-In [`../js/config.js`](../js/config.js) fill the four values above, e.g.:
+In [`../js/config.js`](../js/config.js) fill the values above, e.g.:
 
 ```js
 API_BASE_URL:         "https://abc123.execute-api.us-east-1.amazonaws.com",
@@ -103,6 +108,42 @@ curl -s "$API/progress"                                              # 401 (no t
 
 ---
 
+## Google sign-in (optional)
+
+Cognito federates to Google through its Hosted UI; the app uses the OAuth
+authorization-code flow with PKCE. Setup is a one-time chicken-and-egg dance —
+the Google client needs Cognito's callback URL, which the stack prints.
+
+1. **First deploy** (above) with the Google params blank. Note the two outputs:
+   - `CognitoDomain` — e.g. `https://vocabflow-auth.auth.us-east-1.amazoncognito.com`
+   - `GoogleCallbackUrl` — that domain + `/oauth2/idpresponse`
+
+2. **Create a Google OAuth client** (you do this — I can't):
+   - [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services →
+     Credentials → **Create Credentials → OAuth client ID → Web application**.
+   - **Authorized JavaScript origins:** `https://llnysllf.github.io`
+   - **Authorized redirect URIs:** paste the `GoogleCallbackUrl` from step 1.
+   - Copy the generated **Client ID** and **Client secret**.
+
+3. **Redeploy with the Google creds** so Cognito adds Google as an IdP:
+   ```bash
+   sam deploy --parameter-overrides \
+     GoogleClientId=<client-id> GoogleClientSecret=<client-secret>
+   ```
+   (Or `sam deploy --guided` again and answer the two Google prompts. The secret
+   goes straight into AWS, never committed.)
+
+4. **Turn it on in the app:** in `js/config.js` set
+   `COGNITO_DOMAIN` to the `CognitoDomain` output and flip `ENABLE_GOOGLE: true`.
+   Bump `config.js?v=`, commit, push. The "Continue with Google" button now runs
+   the Hosted-UI flow and lands back on the app signed in.
+
+> The app's redirect URL is `location.origin + location.pathname`. The stack
+> registers `AppUrl` and `AppUrl + index.html` as callback URLs — make sure
+> `AppUrl` matches where the page actually loads (trailing slash matters).
+
+---
+
 ## Notes
 
 - **Existing Supabase accounts don't carry over.** Cognito is a separate user
@@ -112,8 +153,9 @@ curl -s "$API/progress"                                              # 401 (no t
   and marks the email verified, matching the previous "confirmation off" UX. To
   require email verification instead, edit `src/presignup.mjs` and the pool's
   `AutoVerifiedAttributes` in `template.yaml`.
-- **Google sign-in** isn't wired for Cognito yet (it needs a Hosted UI domain +
-  Google as a federated IdP). Email/password works without it; ask if you want it.
+- **Google sign-in** is wired through the Cognito Hosted UI (see the section
+  above). It's optional — leave the Google params blank and `ENABLE_GOOGLE: false`
+  to run email/password only.
 - **Cost:** Cognito's first 10k monthly active users are free; DynamoDB is
   on-demand and Lambda/API Gateway scale to zero — a personal app stays free.
 - **Security:** the user id comes from the *verified* JWT `sub` (issuer +

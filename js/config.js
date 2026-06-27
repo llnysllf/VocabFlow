@@ -36,5 +36,10 @@ window.VOCABFLOW_CONFIG = {
   //   COGNITO_CLIENT_ID    <- UserPoolClientId
   COGNITO_REGION: "",
   COGNITO_USER_POOL_ID: "",
-  COGNITO_CLIENT_ID: ""
+  COGNITO_CLIENT_ID: "",
+
+  // For Google sign-in via Cognito Hosted UI. Set to the stack's CognitoDomain
+  // output (e.g. "https://vocabflow-auth.auth.us-east-1.amazoncognito.com") and
+  // flip ENABLE_GOOGLE to true. See backend/README.md for the Google setup.
+  COGNITO_DOMAIN: ""
 };
