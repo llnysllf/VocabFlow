@@ -2552,5 +2552,149 @@ window.SENTENCES = [
     { "id": "havetrip", "label": "structure (Have a + adj + noun)", "reason": "structure (Have a + adj + noun)", "need": ["have a good trip", "have a nice trip", "have a safe trip", "have a pleasant journey", "have a great trip"], "wrong": ["have good trip", "have a good travel", "having a good trip", "have an good trip"] },
     { "id": "v-trip", "label": "the word “trip / journey”", "reason": "vocabulary", "need": ["trip", "journey", "travel"] }
   ]
+},
+{
+  "r": 301, "zh": "我可以试穿这件吗？",
+  "en": ["Can I try this on?", "Could I try this on?", "May I try this on?", "Can I try on this jacket?"],
+  "points": [
+    { "id": "tryon", "label": "phrasal verb (try on)", "reason": "phrasal verb (try on)", "need": ["try this on", "try on this", "try it on"], "wrong": ["try on this on", "try on it", "wear on this"] },
+    { "id": "modalreq", "label": "modal (can/may I)", "reason": "modal (can/may I)", "need": ["can i", "could i", "may i"], "wrong": ["do i can", "i can try", "can i to"] }
+  ]
+},
+{
+  "r": 302, "zh": "这附近有银行吗？",
+  "en": ["Is there a bank near here?", "Is there a bank nearby?", "Is there a bank around here?", "Are there any banks near here?"],
+  "points": [
+    { "id": "istherenear", "label": "structure (Is there a … nearby)", "reason": "structure (Is there a … nearby)", "need": ["is there a bank near here", "is there a bank nearby", "is there a bank around here", "are there any banks near here", "is there a bank close by"], "wrong": ["is there have a bank", "is it a bank near here", "have a bank near here", "is there bank near here"] },
+    { "id": "v-bank", "label": "the word “bank”", "reason": "vocabulary", "need": ["bank"] }
+  ]
+},
+{
+  "r": 303, "zh": "我想预订一个两人桌。",
+  "en": ["I'd like to book a table for two.", "I would like to reserve a table for two.", "I'd like to reserve a table for two people.", "Can I book a table for two?"],
+  "points": [
+    { "id": "bookfor", "label": "collocation (a table for two)", "reason": "collocation (a table for two)", "need": ["book a table for two", "reserve a table for two", "table for two people", "book a table for 2"], "wrong": ["book a table of two", "reserve a table to two", "book a table by two"] },
+    { "id": "wouldliketo", "label": "verb form (would like to + base)", "reason": "verb form (would like to + base)", "need": ["like to book", "like to reserve", "can i book"], "wrong": ["like book a table", "like to booking", "would like book a table"] }
+  ]
+},
+{
+  "r": 304, "zh": "我们迷路了。",
+  "en": ["We got lost.", "We've got lost.", "We are lost.", "We have lost our way."],
+  "points": [
+    { "id": "getlost", "label": "structure (get lost / be lost)", "reason": "structure (get lost / be lost)", "need": ["got lost", "are lost", "lost our way", "we're lost"], "wrong": ["got lose", "are losted", "were lost our way", "have lost ourselves"] },
+    { "id": "v-lost", "label": "the word “lost / way”", "reason": "vocabulary", "need": ["lost", "lose", "way"] }
+  ]
+},
+{
+  "r": 305, "zh": "你能给我指路去车站吗？",
+  "en": ["Can you give me directions to the station?", "Could you tell me the way to the station?", "Can you show me the way to the station?", "How do I get to the station?"],
+  "points": [
+    { "id": "directions", "label": "verb pattern (give directions to)", "reason": "verb pattern (give directions to)", "need": ["give me directions to", "tell me the way to", "show me the way to", "how do i get to"], "wrong": ["give me the directions for", "tell me the way for", "show me way to", "give me direction to the station"] },
+    { "id": "v-station", "label": "the word “station”", "reason": "vocabulary", "need": ["station"] }
+  ]
+},
+{
+  "r": 306, "zh": "大多数学生都通过了考试。",
+  "en": ["Most of the students passed the exam.", "Most students passed the exam.", "Most of the students passed the test.", "The majority of students passed the exam."],
+  "points": [
+    { "id": "mostof", "label": "quantifier (most of the / most)", "reason": "quantifier (most of the / most)", "need": ["most of the students", "most students", "majority of students", "most of the student"], "wrong": ["most of students", "the most of students", "most of student", "almost students", "most the students"] },
+    { "id": "v-student", "label": "the word “student”", "reason": "vocabulary", "need": ["student", "students"] }
+  ]
+},
+{
+  "r": 307, "zh": "这个消息让我很惊讶。",
+  "en": ["The news surprised me.", "I was surprised by the news.", "The news made me very surprised.", "I was surprised at the news."],
+  "points": [
+    { "id": "surprised", "label": "passive (surprised by / at)", "reason": "passive (surprised by / at)", "need": ["news surprised me", "was surprised by the news", "made me very surprised", "was surprised at the news"], "wrong": ["was surprised of the news", "news was surprised me", "i surprised by the news", "was surprising by the news"] },
+    { "id": "v-news", "label": "the word “news”", "reason": "vocabulary", "need": ["news"] }
+  ]
+},
+{
+  "r": 308, "zh": "别插队。",
+  "en": ["Don't cut in line.", "Don't jump the queue.", "Please don't cut in line.", "Don't cut in front of me."],
+  "points": [
+    { "id": "cutinline", "label": "collocation (cut in line / jump the queue)", "reason": "collocation (cut in line / jump the queue)", "need": ["cut in line", "jump the queue", "cut in front"], "wrong": ["cut the line in", "cut on line", "cut in the line of", "cut line"] },
+    { "id": "imperative", "label": "imperative (Don't …)", "reason": "imperative (Don't …)", "need": ["don't cut", "don't jump", "please don't"], "wrong": ["not cut in line", "you don't cut", "no cutting in line"] }
+  ]
+},
+{
+  "r": 309, "zh": "这取决于你。",
+  "en": ["It's up to you.", "It is up to you.", "That's up to you.", "The decision is up to you."],
+  "points": [
+    { "id": "uptoyou", "label": "collocation (up to you)", "reason": "collocation (up to you)", "need": ["up to you"], "wrong": ["up on you", "depends to you", "up of you", "on you to decide"] },
+    { "id": "v-decide", "label": "the word “decision / decide”", "reason": "vocabulary", "need": ["you", "decision", "decide"] }
+  ]
+},
+{
+  "r": 310, "zh": "我快迟到了。",
+  "en": ["I'm going to be late.", "I'm almost late.", "I'm running late.", "I'll be late."],
+  "points": [
+    { "id": "runninglate", "label": "structure (going to be / running late)", "reason": "structure (going to be / running late)", "need": ["going to be late", "running late", "i'll be late", "almost late"], "wrong": ["going to late", "will be lately", "am late soon", "going to be lately"] },
+    { "id": "v-late", "label": "the word “late”", "reason": "vocabulary", "need": ["late"] }
+  ]
+},
+{
+  "r": 311, "zh": "你怎么了？",
+  "en": ["What's wrong?", "What's the matter?", "What happened?", "What's wrong with you?"],
+  "points": [
+    { "id": "whatswrong", "label": "question (what's wrong / the matter)", "reason": "question (what's wrong / the matter)", "need": ["what's wrong", "what is wrong", "what's the matter", "what happened"], "wrong": ["what's happen", "what wrong with you", "what is matter", "what's the matter you"] }
+  ]
+},
+{
+  "r": 312, "zh": "我没有零钱。",
+  "en": ["I don't have any change.", "I have no change.", "I don't have change.", "I haven't got any change."],
+  "points": [
+    { "id": "nochange", "label": "negation (don't have any)", "reason": "negation (don't have any)", "need": ["don't have any change", "have no change", "don't have change", "haven't got any change"], "wrong": ["don't have no change", "no have change", "don't have some change"] },
+    { "id": "v-change", "label": "the word “change / coins”", "reason": "vocabulary", "need": ["change", "coins", "cash"] }
+  ]
+},
+{
+  "r": 313, "zh": "请系好安全带。",
+  "en": ["Please fasten your seatbelt.", "Please put on your seatbelt.", "Please buckle up.", "Fasten your seat belt, please."],
+  "points": [
+    { "id": "fasten", "label": "collocation (fasten your seatbelt)", "reason": "collocation (fasten your seatbelt)", "need": ["fasten your seatbelt", "put on your seatbelt", "buckle up", "fasten your seat belt"], "wrong": ["fast your seatbelt", "close your seatbelt", "tie your seatbelt", "open your seatbelt"] },
+    { "id": "v-seatbelt", "label": "the word “seatbelt”", "reason": "vocabulary", "need": ["seatbelt", "seat belt"] }
+  ]
+},
+{
+  "r": 314, "zh": "你想喝咖啡还是茶？",
+  "en": ["Would you like coffee or tea?", "Do you want coffee or tea?", "Would you prefer coffee or tea?", "Coffee or tea?"],
+  "points": [
+    { "id": "orchoice", "label": "question (A or B choice)", "reason": "question (A or B choice)", "need": ["coffee or tea", "would you like coffee or tea", "do you want coffee or tea"], "wrong": ["coffee and tea", "coffee either tea", "do you like coffee or the tea"] },
+    { "id": "v-coffee", "label": "the word “coffee”", "reason": "vocabulary", "need": ["coffee"] },
+    { "id": "v-tea", "label": "the word “tea”", "reason": "vocabulary", "need": ["tea"] }
+  ]
+},
+{
+  "r": 315, "zh": "我等了一个小时了。",
+  "en": ["I've been waiting for an hour.", "I have been waiting for an hour.", "I've been waiting for an hour now.", "I have waited for an hour."],
+  "points": [
+    { "id": "perfectcont", "label": "tense (present perfect (continuous))", "reason": "tense (present perfect (continuous))", "need": ["i've been waiting for an hour", "have been waiting for an hour", "have waited for an hour"], "wrong": ["i am waiting for an hour", "i waited for an hour ago", "i've been wait for an hour", "i was waiting for an hour"] },
+    { "id": "prep-for", "label": "preposition (for + duration)", "reason": "preposition (for + duration)", "need": ["for an hour", "for one hour"], "wrong": ["since an hour", "for a hour", "during an hour"] }
+  ]
+},
+{
+  "r": 316, "zh": "没关系，别担心。",
+  "en": ["It doesn't matter, don't worry.", "Never mind, it's okay.", "It's okay, don't worry about it.", "It doesn't matter."],
+  "points": [
+    { "id": "doesntmatter", "label": "structure (it doesn't matter / never mind)", "reason": "structure (it doesn't matter / never mind)", "need": ["doesn't matter", "never mind", "it's okay", "it's alright"], "wrong": ["not matter", "isn't matter", "does not matters"] },
+    { "id": "v-worry", "label": "the word “worry / mind”", "reason": "vocabulary", "need": ["worry", "okay", "mind"] }
+  ]
+},
+{
+  "r": 317, "zh": "我们走着去还是开车去？",
+  "en": ["Shall we walk or drive?", "Should we walk or drive?", "Do you want to walk or drive?", "Shall we go on foot or by car?"],
+  "points": [
+    { "id": "shallwe", "label": "question (Shall we …?)", "reason": "question (Shall we …?)", "need": ["shall we walk or drive", "should we walk or drive", "do you want to walk or drive", "shall we go on foot or by car"], "wrong": ["shall we to walk or drive", "shall we walking or driving", "shall walk or drive we", "do we shall walk"] },
+    { "id": "onfoot", "label": "collocation (on foot / by car)", "reason": "collocation (on foot / by car)", "need": ["on foot", "by car", "walk", "drive"], "wrong": ["by foot", "on car", "with car", "by walk"] }
+  ]
+},
+{
+  "r": 318, "zh": "你今天感觉怎么样？",
+  "en": ["How do you feel today?", "How are you feeling today?", "How are you feeling?", "How do you feel?"],
+  "points": [
+    { "id": "howfeel", "label": "question (how do you feel)", "reason": "question (how do you feel)", "need": ["how do you feel", "how are you feeling"], "wrong": ["how do you feeling", "how are you feel", "how you feel today", "how do you feels"] },
+    { "id": "v-feel", "label": "the word “feel”", "reason": "vocabulary", "need": ["feel", "feeling"] }
+  ]
 }
 ];
