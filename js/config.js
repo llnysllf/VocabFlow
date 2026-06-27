@@ -20,5 +20,13 @@ window.VOCABFLOW_CONFIG = {
   // Google sign-in stays off until you configure the Google provider in
   // Supabase (Authentication -> Providers). Email/password works without it.
   // Flip this to true once Google is set up.
-  ENABLE_GOOGLE: false
+  ENABLE_GOOGLE: false,
+
+  // Custom backend (AWS) for progress sync. When set, the app stores per-user
+  // progress in OUR API instead of Supabase's database — Supabase is then only
+  // the login service. Leave blank to keep using the Supabase `progress` table.
+  // Set this to the SAM stack's ApiUrl output, e.g.
+  //   "https://abc123.execute-api.us-east-1.amazonaws.com"
+  // See backend/README.md to deploy. (Sign-in is unchanged either way.)
+  API_BASE_URL: ""
 };

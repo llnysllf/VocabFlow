@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  VocabFlow backend — per-user progress sync.
+  API Gateway (HTTP API) -> Lambda -> DynamoDB. Each request is authenticated
+  by verifying the Supabase-issued JWT (Supabase stays the login service).
+
+Parameters:
+  SupabaseUrl:
+    Type: String
+    Description: Your Supabase project URL, e.g. https://xxxx.supabase.co
+  SupabaseJwtSecret:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: >
+      Legacy HS256 JWT secret (Supabase dashboard -> Project Settings -> API ->
+      JWT keys -> "JWT Secret"). Leave blank if your project signs tokens with
+      asymmetric keys (RS256/ES256) — the Lambda then verifies via the public JWKS.
+  AllowOrigin:
+    Type: String
+    Default: "*"
+    Description: Allowed CORS origin, e.g. https://llnysllf.github.io
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 10
+    MemorySize: 256
+
+Resources:
+  ProgressTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST          # scales to zero; no fixed cost
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref AllowOrigin
+        AllowMethods:
+          - GET
+          - PUT
+          - OPTIONS
+        AllowHeaders:
+          - authorization
+          - content-type
+
+  ProgressFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.handler
+      CodeUri: src/
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ProgressTable
+          SUPABASE_URL: !Ref SupabaseUrl
+          SUPABASE_JWT_SECRET: !Ref SupabaseJwtSecret
+          ALLOW_ORIGIN: !Ref AllowOrigin
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProgressTable
+      Events:
+        GetProgress:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: GET
+            Path: /progress
+        PutProgress:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: PUT
+            Path: /progress
+
+Outputs:
+  ApiUrl:
+    Description: Base URL of the API. Put this in js/config.js as API_BASE_URL.
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"

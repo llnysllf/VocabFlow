@@ -12,6 +12,10 @@
   var hasKeys = !!(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY);
   var sdkReady = typeof window.supabase !== "undefined" && !!window.supabase.createClient;
 
+  // When set, progress is synced through our own AWS backend (Supabase stays
+  // the login service only). Blank -> fall back to the Supabase `progress` table.
+  var apiBase = (cfg.API_BASE_URL || "").replace(/\/+$/, "");
+
   var client = null;
   if (hasKeys && sdkReady) {
     try {
@@ -24,6 +28,17 @@
   function mapUser(u) {
     if (!u) return null;
     return { id: u.id, email: u.email || (u.user_metadata && u.user_metadata.email) || "account" };
+  }
+
+  // The current Supabase access token (a JWT). Our AWS backend verifies it and
+  // reads `sub` to key each user's row, so progress stays private per account.
+  function accessToken() {
+    if (!client) return Promise.resolve(null);
+    return client.auth.getSession()
+      .then(function (res) {
+        return res && res.data && res.data.session ? res.data.session.access_token : null;
+      })
+      .catch(function () { return null; });
   }
 
   var Cloud = {
@@ -101,6 +116,25 @@
        ok=true with state=null means the account genuinely has no data yet. */
     loadState: function () {
       if (!client || !Cloud.user) return Promise.resolve({ ok: true, state: null });
+
+      // Custom AWS backend.
+      if (apiBase) {
+        return accessToken().then(function (tok) {
+          if (!tok) return { ok: false, state: null };
+          return fetch(apiBase + "/progress", {
+            headers: { Authorization: "Bearer " + tok }
+          })
+            .then(function (r) {
+              if (!r.ok) return { ok: false, state: null };
+              return r.json().then(function (j) {
+                return { ok: true, state: j && j.state ? j.state : null };
+              });
+            })
+            .catch(function () { return { ok: false, state: null }; });
+        });
+      }
+
+      // Supabase `progress` table (default).
       return client.from("progress")
         .select("state")
         .eq("user_id", Cloud.user.id)
@@ -115,6 +149,25 @@
     /* Upsert this user's state. Returns true on success. */
     saveState: function (state) {
       if (!client || !Cloud.user) return Promise.resolve(false);
+
+      // Custom AWS backend.
+      if (apiBase) {
+        return accessToken().then(function (tok) {
+          if (!tok) return false;
+          return fetch(apiBase + "/progress", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + tok
+            },
+            body: JSON.stringify({ state: state })
+          })
+            .then(function (r) { return r.ok; })
+            .catch(function () { return false; });
+        });
+      }
+
+      // Supabase `progress` table (default).
       return client.from("progress")
         .upsert({
           user_id: Cloud.user.id,
