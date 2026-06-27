@@ -2408,5 +2408,149 @@ window.SENTENCES = [
     { "id": "ranout", "label": "phrase (run out of / dead battery)", "reason": "phrase (run out of / dead battery)", "need": ["is out of battery", "has run out of battery", "have run out of battery", "ran out of battery", "phone is dead", "battery is dead"], "wrong": ["run out battery", "run out of the battery", "is run out of battery", "run off battery", "phone is died"] },
     { "id": "v-phone", "label": "the word “phone / battery”", "reason": "vocabulary", "need": ["phone", "battery"] }
   ]
+},
+{
+  "r": 283, "zh": "我每天乘地铁上班。",
+  "en": ["I take the subway to work every day.", "I go to work by subway every day.", "I commute to work by subway.", "I take the metro to work every day."],
+  "points": [
+    { "id": "bytransport", "label": "preposition (by + transport)", "reason": "preposition (by + transport)", "need": ["by subway", "by metro", "by train", "take the subway", "take the metro"], "wrong": ["by the subway", "with subway", "on subway every", "by a subway"] },
+    { "id": "presenthabit", "label": "tense (present simple habit)", "reason": "tense (present simple habit)", "need": ["i take the subway", "i go to work", "i commute"], "wrong": ["i am taking the subway every day", "i took the subway every day", "i takes the subway"] },
+    { "id": "v-work", "label": "the word “work”", "reason": "vocabulary", "need": ["work"] }
+  ]
+},
+{
+  "r": 284, "zh": "外面正在下大雨。",
+  "en": ["It's raining heavily outside.", "It is raining hard outside.", "It's pouring outside.", "It's raining heavily outside right now."],
+  "points": [
+    { "id": "raincont", "label": "tense (present continuous)", "reason": "tense (present continuous)", "need": ["it's raining", "it is raining", "it's pouring"], "wrong": ["it rains heavily outside", "it raining outside", "it's rain heavily"] },
+    { "id": "adverb", "label": "adverb (heavily / hard)", "reason": "adverb (heavily / hard)", "need": ["raining heavily", "raining hard", "pouring"], "wrong": ["raining heavy", "raining strong", "raining big"] }
+  ]
+},
+{
+  "r": 285, "zh": "你多大了？",
+  "en": ["How old are you?", "What is your age?", "May I ask how old you are?", "How old are you now?"],
+  "points": [
+    { "id": "howold", "label": "question (how old are you)", "reason": "question (how old are you)", "need": ["how old are you", "what is your age", "what's your age", "ask how old you are"], "wrong": ["how many years you have", "how old do you have", "how age are you", "how many years old are you"] }
+  ]
+},
+{
+  "r": 286, "zh": "我妹妹比我小三岁。",
+  "en": ["My sister is three years younger than me.", "My sister is three years younger than I am.", "My younger sister is three years younger than me.", "My sister is 3 years younger than me."],
+  "points": [
+    { "id": "younger", "label": "comparative (younger than)", "reason": "comparative (younger than)", "need": ["three years younger than", "3 years younger than", "years younger than me"], "wrong": ["three years more young than", "younger three years than", "more younger than", "three years young than"] },
+    { "id": "v-sister", "label": "the word “sister”", "reason": "vocabulary", "need": ["sister"] }
+  ]
+},
+{
+  "r": 287, "zh": "请把这个翻译成英文。",
+  "en": ["Please translate this into English.", "Could you translate this into English?", "Please translate this to English.", "Please put this into English."],
+  "points": [
+    { "id": "translateinto", "label": "collocation (translate into)", "reason": "collocation (translate into)", "need": ["translate this into english", "translate this to english", "put this into english", "translate it into english"], "wrong": ["translate this in english", "translate this english", "translate this for english", "translate this on english"] },
+    { "id": "v-english", "label": "the word “English”", "reason": "vocabulary", "need": ["english"] }
+  ]
+},
+{
+  "r": 288, "zh": "别让我失望。",
+  "en": ["Don't let me down.", "Please don't let me down.", "Don't disappoint me.", "Don't let me down again."],
+  "points": [
+    { "id": "letdown", "label": "phrasal verb (let sb down)", "reason": "phrasal verb (let sb down)", "need": ["let me down", "disappoint me"], "wrong": ["let down me", "let me down to", "let me fall down", "let me feel down"] },
+    { "id": "imperative", "label": "imperative (Don't …)", "reason": "imperative (Don't …)", "need": ["don't let me down", "don't disappoint me", "please don't let"], "wrong": ["not let me down", "you don't let me down", "don't lets me down"] }
+  ]
+},
+{
+  "r": 289, "zh": "这个箱子太重了，我搬不动。",
+  "en": ["This box is too heavy to lift.", "This box is too heavy for me to lift.", "This box is too heavy to carry.", "This box is so heavy that I can't lift it."],
+  "points": [
+    { "id": "tooheavy", "label": "structure (too … to / so … that)", "reason": "structure (too … to / so … that)", "need": ["too heavy to lift", "too heavy for me to lift", "too heavy to carry", "so heavy that i can't"], "wrong": ["too heavy to lifting", "too heavy for lift", "so heavy to lift", "too much heavy to lift", "too heavy that i can't"] },
+    { "id": "v-box", "label": "the word “box”", "reason": "vocabulary", "need": ["box"] }
+  ]
+},
+{
+  "r": 290, "zh": "这个座位有人坐吗？",
+  "en": ["Is this seat taken?", "Is anyone sitting here?", "Is this seat free?", "Is someone sitting here?"],
+  "points": [
+    { "id": "seattaken", "label": "question (Is this seat taken?)", "reason": "question (Is this seat taken?)", "need": ["is this seat taken", "is anyone sitting here", "is this seat free", "is someone sitting here", "is this seat occupied"], "wrong": ["is this seat take", "does this seat taken", "is sitting here anyone", "is this seat is taken"] },
+    { "id": "v-seat", "label": "the word “seat”", "reason": "vocabulary", "need": ["seat"] }
+  ]
+},
+{
+  "r": 291, "zh": "我们应该减少塑料的使用。",
+  "en": ["We should reduce the use of plastic.", "We should cut down on plastic.", "We should use less plastic.", "We ought to reduce our plastic use."],
+  "points": [
+    { "id": "reduce", "label": "collocation (reduce / cut down on)", "reason": "collocation (reduce / cut down on)", "need": ["reduce the use of plastic", "cut down on plastic", "use less plastic", "reduce our plastic use"], "wrong": ["cut down plastic on", "reduce less plastic", "use fewer plastic", "reduce plastic down"] },
+    { "id": "v-plastic", "label": "the word “plastic”", "reason": "vocabulary", "need": ["plastic"] }
+  ]
+},
+{
+  "r": 292, "zh": "他把我介绍给了他的父母。",
+  "en": ["He introduced me to his parents.", "He introduced me to his mom and dad.", "He introduced me to his family.", "He introduced me to his parents last night."],
+  "points": [
+    { "id": "introduceto", "label": "verb pattern (introduce sb to sb)", "reason": "verb pattern (introduce sb to sb)", "need": ["introduced me to his parents", "introduced me to his", "introduced me to"], "wrong": ["introduced me with his parents", "introduced me his parents", "introduced to me his parents", "introduced me at his parents"] },
+    { "id": "v-parents", "label": "the word “parents / family”", "reason": "vocabulary", "need": ["parents", "family", "mom and dad"] }
+  ]
+},
+{
+  "r": 293, "zh": "天色越来越晚了，我们该走了。",
+  "en": ["It's getting late, we should go.", "It's getting late, we'd better go.", "It's getting dark, we should leave.", "It's getting late, let's go."],
+  "points": [
+    { "id": "getting", "label": "structure (it's getting + adj)", "reason": "structure (it's getting + adj)", "need": ["it's getting late", "it is getting late", "it's getting dark"], "wrong": ["it's getting lately", "it gets late", "it's get late", "it becoming late"] },
+    { "id": "shouldgo", "label": "modal (should / had better)", "reason": "modal (should / had better)", "need": ["we should go", "we'd better go", "we should leave", "let's go"], "wrong": ["we should to go", "we should going", "we better to go"] }
+  ]
+},
+{
+  "r": 294, "zh": "我的电脑刚才死机了。",
+  "en": ["My computer just crashed.", "My computer crashed just now.", "My computer has just crashed.", "My computer froze just now."],
+  "points": [
+    { "id": "crashed", "label": "verb (crashed — past)", "reason": "verb (crashed — past)", "need": ["computer just crashed", "computer crashed just now", "computer has just crashed", "computer froze just now", "just crashed"], "wrong": ["computer just crash", "computer is crashed", "computer just crashes", "computer just was crashed"] },
+    { "id": "v-computer", "label": "the word “computer”", "reason": "vocabulary", "need": ["computer"] }
+  ]
+},
+{
+  "r": 295, "zh": "我得走了，再见。",
+  "en": ["I have to go now, goodbye.", "I've got to go now, bye.", "I need to go now, see you.", "I have to leave now, goodbye."],
+  "points": [
+    { "id": "havetogo", "label": "modal (have to / have got to + base)", "reason": "modal (have to / have got to + base)", "need": ["go", "leave"], "wrong": ["have to going", "must to go now", "have to gone", "have to leaving"] },
+    { "id": "v-bye", "label": "the word “goodbye / bye”", "reason": "vocabulary", "need": ["goodbye", "bye", "see you"] }
+  ]
+},
+{
+  "r": 296, "zh": "出门记得带钥匙。",
+  "en": ["Remember to take your keys when you go out.", "Don't forget to bring your keys when you leave.", "Remember to take your keys with you.", "Remember to bring your keys."],
+  "points": [
+    { "id": "remembertodo", "label": "verb form (remember to + base verb)", "reason": "verb form (remember to + base verb)", "need": ["remember to take your keys", "don't forget to bring your keys", "remember to bring your keys", "remember to take"], "wrong": ["remember taking your keys", "remember take your keys", "remember bringing your keys", "remember of taking keys"] },
+    { "id": "v-key", "label": "the word “key”", "reason": "vocabulary", "need": ["key", "keys"] }
+  ]
+},
+{
+  "r": 297, "zh": "这道菜是用鸡肉做的。",
+  "en": ["This dish is made with chicken.", "This dish is made from chicken.", "This dish is made of chicken.", "This dish is cooked with chicken."],
+  "points": [
+    { "id": "madewith", "label": "passive (made with / from)", "reason": "passive (made with / from)", "need": ["made with chicken", "made from chicken", "made of chicken", "cooked with chicken"], "wrong": ["made by chicken", "made in chicken", "is make with chicken", "made for chicken"] },
+    { "id": "v-chicken", "label": "the word “chicken”", "reason": "vocabulary", "need": ["chicken"] }
+  ]
+},
+{
+  "r": 298, "zh": "我为你感到骄傲。",
+  "en": ["I'm proud of you.", "I am proud of you.", "I'm so proud of you.", "I feel proud of you."],
+  "points": [
+    { "id": "proudof", "label": "collocation (proud of)", "reason": "collocation (proud of)", "need": ["proud of you"], "wrong": ["proud for you", "proud about you", "proud on you", "proud to you"] },
+    { "id": "v-proud", "label": "the word “proud”", "reason": "vocabulary", "need": ["proud"] }
+  ]
+},
+{
+  "r": 299, "zh": "我同意你的看法。",
+  "en": ["I agree with you.", "I agree with your opinion.", "I agree with what you said.", "I share your opinion."],
+  "points": [
+    { "id": "agreewith", "label": "collocation (agree with sb)", "reason": "collocation (agree with sb)", "need": ["agree with you", "agree with your", "agree with what", "share your opinion"], "wrong": ["agree to you", "agree on you", "agree you"] },
+    { "id": "v-opinion", "label": "the word “opinion / view”", "reason": "vocabulary", "need": ["opinion", "you", "view"] }
+  ]
+},
+{
+  "r": 300, "zh": "祝你旅途愉快！",
+  "en": ["Have a good trip!", "Have a nice trip!", "Have a safe trip!", "Have a pleasant journey!"],
+  "points": [
+    { "id": "havetrip", "label": "structure (Have a + adj + noun)", "reason": "structure (Have a + adj + noun)", "need": ["have a good trip", "have a nice trip", "have a safe trip", "have a pleasant journey", "have a great trip"], "wrong": ["have good trip", "have a good travel", "having a good trip", "have an good trip"] },
+    { "id": "v-trip", "label": "the word “trip / journey”", "reason": "vocabulary", "need": ["trip", "journey", "travel"] }
+  ]
 }
 ];
