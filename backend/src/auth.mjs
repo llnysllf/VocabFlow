@@ -1,18 +1,24 @@
 /*
- * auth.mjs — verify a Supabase-issued JWT with zero external dependencies.
+ * auth.mjs — verify a JWT with zero external dependencies.
  *
- * Supports the algorithms Supabase actually uses:
- *   - HS256  (legacy shared-secret signing)  -> needs SUPABASE_JWT_SECRET
- *   - RS256 / ES256 (asymmetric signing)      -> fetched from the project's
- *                                                public JWKS, no secret needed
+ * Driven by env vars so it isn't tied to any one provider:
+ *   JWT_ISSUER    expected `iss` (also where the JWKS lives). For Cognito:
+ *                 https://cognito-idp.<region>.amazonaws.com/<userPoolId>
+ *   JWT_AUDIENCE  expected audience — matched against `aud` OR `client_id`
+ *                 (Cognito access tokens use `client_id`, id tokens use `aud`).
+ *   JWKS_URL      optional override; defaults to JWT_ISSUER/.well-known/jwks.json
+ *   JWT_HS_SECRET optional HS256 shared secret (not used by Cognito).
  *
- * Throws on any failure (bad signature, expired, wrong audience). On success
- * returns the decoded payload, whose `sub` is the Supabase user id.
+ * Supports RS256 / ES256 (asymmetric, via JWKS) and HS256 (shared secret).
+ * Throws on any failure. On success returns the decoded payload; `sub` is the
+ * user id used to key each row.
  */
 import crypto from "node:crypto";
 
-const SECRET = process.env.SUPABASE_JWT_SECRET || "";
-const SUPABASE_URL = (process.env.SUPABASE_URL || "").replace(/\/+$/, "");
+const HS_SECRET = process.env.JWT_HS_SECRET || "";
+const ISSUER = (process.env.JWT_ISSUER || "").replace(/\/+$/, "");
+const AUDIENCE = process.env.JWT_AUDIENCE || "";
+const JWKS_URL = process.env.JWKS_URL || (ISSUER ? ISSUER + "/.well-known/jwks.json" : "");
 
 let jwksCache = null;
 let jwksFetchedAt = 0;
@@ -28,8 +34,8 @@ function b64urlJson(s) {
 async function getJwks() {
   const now = Date.now();
   if (jwksCache && now - jwksFetchedAt < JWKS_TTL_MS) return jwksCache;
-  if (!SUPABASE_URL) throw new Error("SUPABASE_URL not configured");
-  const res = await fetch(SUPABASE_URL + "/auth/v1/.well-known/jwks.json");
+  if (!JWKS_URL) throw new Error("JWKS_URL / JWT_ISSUER not configured");
+  const res = await fetch(JWKS_URL);
   if (!res.ok) throw new Error("jwks fetch failed: " + res.status);
   const data = await res.json();
   jwksCache = data.keys || [];
@@ -49,8 +55,8 @@ export async function verifyToken(token) {
   const alg = header.alg;
 
   if (alg === "HS256") {
-    if (!SECRET) throw new Error("HS256 token but no SUPABASE_JWT_SECRET set");
-    const expected = crypto.createHmac("sha256", SECRET).update(signingInput).digest();
+    if (!HS_SECRET) throw new Error("HS256 token but no JWT_HS_SECRET set");
+    const expected = crypto.createHmac("sha256", HS_SECRET).update(signingInput).digest();
     if (sig.length !== expected.length || !crypto.timingSafeEqual(sig, expected)) {
       throw new Error("bad signature");
     }
@@ -72,10 +78,16 @@ export async function verifyToken(token) {
   if (payload.exp && now >= payload.exp) throw new Error("token expired");
   if (payload.nbf && now < payload.nbf) throw new Error("token not yet valid");
 
-  // Supabase access tokens carry aud "authenticated".
-  const aud = payload.aud;
-  const audOk = aud === "authenticated" || (Array.isArray(aud) && aud.includes("authenticated"));
-  if (aud && !audOk) throw new Error("bad audience");
+  if (ISSUER && payload.iss !== ISSUER) throw new Error("bad issuer");
+
+  if (AUDIENCE) {
+    const aud = payload.aud;
+    const audOk =
+      aud === AUDIENCE ||
+      payload.client_id === AUDIENCE ||
+      (Array.isArray(aud) && aud.includes(AUDIENCE));
+    if (!audOk) throw new Error("bad audience");
+  }
 
   return payload;
 }

@@ -22,11 +22,19 @@ window.VOCABFLOW_CONFIG = {
   // Flip this to true once Google is set up.
   ENABLE_GOOGLE: false,
 
-  // Custom backend (AWS) for progress sync. When set, the app stores per-user
-  // progress in OUR API instead of Supabase's database — Supabase is then only
-  // the login service. Leave blank to keep using the Supabase `progress` table.
-  // Set this to the SAM stack's ApiUrl output, e.g.
-  //   "https://abc123.execute-api.us-east-1.amazonaws.com"
-  // See backend/README.md to deploy. (Sign-in is unchanged either way.)
-  API_BASE_URL: ""
+  // Custom backend (AWS) for progress sync. Set to the SAM stack's ApiUrl
+  // output, e.g. "https://abc123.execute-api.us-east-1.amazonaws.com".
+  // Leave blank to use the Supabase `progress` table. See backend/README.md.
+  API_BASE_URL: "",
+
+  // --- AWS Cognito (accounts) ------------------------------------------
+  // Fill these from the SAM stack outputs to move sign-in off Supabase and
+  // onto Cognito (fully AWS — Supabase is then no longer used at all).
+  // Leave blank to keep using Supabase auth above. Outputs:
+  //   COGNITO_REGION       <- Region
+  //   COGNITO_USER_POOL_ID <- UserPoolId
+  //   COGNITO_CLIENT_ID    <- UserPoolClientId
+  COGNITO_REGION: "",
+  COGNITO_USER_POOL_ID: "",
+  COGNITO_CLIENT_ID: ""
 };

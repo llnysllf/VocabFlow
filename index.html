@@ -246,9 +246,12 @@
 <script src="proverbs.js?v=1"></script>
 <script src="sayings.js?v=1"></script>
 <script src="sentences.js?v=17"></script>
-<script src="js/config.js?v=2"></script>
+<script src="js/config.js?v=3"></script>
+<!-- Auth SDKs (CDN; fail gracefully offline). cloud.js picks the provider:
+     Cognito when COGNITO_* is configured, else Supabase. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/cloud.js?v=2"></script>
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="js/cloud.js?v=3"></script>
 <script src="js/app.js?v=20"></script>
 </body>
 </html>

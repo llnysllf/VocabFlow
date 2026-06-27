@@ -1,21 +1,20 @@
-# VocabFlow backend (AWS)
+# VocabFlow backend (AWS) — accounts + progress sync
 
-Per-user progress sync on **API Gateway (HTTP API) → Lambda → DynamoDB**, with
-each request authenticated by verifying the **Supabase-issued JWT**. Supabase
-stays the login service; the progress data lives in your own AWS account.
+Fully on AWS, no Supabase:
 
 ```
 Browser (GitHub Pages)
-   │  signs in with Supabase  → gets a JWT
+   │  sign up / sign in with Cognito  → gets a JWT
    │  GET/PUT /progress  with  Authorization: Bearer <JWT>
    ▼
-API Gateway (HTTP API)  →  Lambda  →  DynamoDB (one row per user)
-                              │
-                              └─ verifies the Supabase JWT (HS256 secret,
-                                 or RS256/ES256 via the public JWKS)
+Cognito (user pool)          API Gateway (HTTP API) → Lambda → DynamoDB
+   issues & signs JWTs          │
+                                └─ verifies the Cognito JWT (RS256 via the
+                                   pool's public JWKS); `sub` keys the row
 ```
 
-The API has exactly two routes:
+One `sam deploy` creates everything: the Cognito user pool + app client, the
+DynamoDB table, the HTTP API, and the Lambda. The API has two routes:
 
 | Method | Path        | Body            | Returns                                  |
 |--------|-------------|-----------------|------------------------------------------|
@@ -26,21 +25,14 @@ The API has exactly two routes:
 
 ## What you need (you do these — I can't enter your credentials)
 
-1. **An AWS account** and the credentials configured locally:
-   - Install the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-     and the [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
-   - Run `aws configure` and paste an IAM user's access key / secret (an admin
-     or a user with CloudFormation/Lambda/DynamoDB/API Gateway/IAM permissions).
-   - Node.js installed (so `sam build` can `npm install` the one dependency).
+- **An AWS account** with credentials configured locally:
+  - Install the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+    and [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
+  - `aws configure` with an IAM user that can create CloudFormation / Lambda /
+    DynamoDB / API Gateway / **Cognito** / IAM resources.
+  - Node.js installed (so `sam build` can install the one dependency).
 
-2. **Your Supabase JWT secret** (only if your project still signs with HS256):
-   - Supabase dashboard → **Project Settings → API → JWT keys** → copy the
-     **JWT Secret**. You'll paste it into the deploy prompt below — it goes
-     straight into AWS as a hidden parameter and is **never committed**.
-   - If your project uses **asymmetric keys (RS256/ES256)**, leave the secret
-     blank; the Lambda verifies tokens against the project's public JWKS.
-   - Not sure which? Provide the secret if it's shown — it's harmless, and the
-     Lambda picks the right method per token.
+No Supabase keys needed anymore.
 
 ---
 
@@ -53,75 +45,80 @@ sam build
 sam deploy --guided
 ```
 
-The guided deploy asks a few questions. Answer:
+Answer the prompts:
 
 - **Stack Name:** `vocabflow-backend`
 - **AWS Region:** e.g. `us-east-1`
-- **Parameter SupabaseUrl:** `https://gmumbqqmlvghuwizdnut.supabase.co`
-- **Parameter SupabaseJwtSecret:** paste the JWT Secret (or leave blank for
-  asymmetric projects). Input is hidden.
-- **Parameter AllowOrigin:** `https://llnysllf.github.io`
-  (your GitHub Pages origin — scheme + host, no trailing path)
-- Confirm changes / allow IAM role creation: **Yes**.
-- Save arguments to `samconfig.toml`: **Yes** (so future deploys are just `sam deploy`).
+- **Parameter AllowOrigin:** `https://llnysllf.github.io` (your Pages origin — scheme + host)
+- Confirm changes / allow IAM role creation: **Yes**
+- Save arguments to `samconfig.toml`: **Yes** (future deploys are just `sam deploy`)
 
-When it finishes it prints **Outputs → ApiUrl**, e.g.
-`https://abc123.execute-api.us-east-1.amazonaws.com`.
+When it finishes it prints **Outputs**:
+
+| Output             | Goes into `js/config.js` as |
+|--------------------|-----------------------------|
+| `ApiUrl`           | `API_BASE_URL`              |
+| `Region`           | `COGNITO_REGION`            |
+| `UserPoolId`       | `COGNITO_USER_POOL_ID`      |
+| `UserPoolClientId` | `COGNITO_CLIENT_ID`         |
 
 ---
 
 ## Point the app at it
 
-In [`../js/config.js`](../js/config.js) set:
+In [`../js/config.js`](../js/config.js) fill the four values above, e.g.:
 
 ```js
-API_BASE_URL: "https://abc123.execute-api.us-east-1.amazonaws.com"
+API_BASE_URL:         "https://abc123.execute-api.us-east-1.amazonaws.com",
+COGNITO_REGION:       "us-east-1",
+COGNITO_USER_POOL_ID: "us-east-1_AbCdEf123",
+COGNITO_CLIENT_ID:    "1a2b3c4d5e6f7g8h9i0j"
 ```
 
-(Use the `ApiUrl` output, no trailing slash.) Then bump `js/config.js?v=` in
-`index.html`, commit, and push. From then on every signed-in user's progress
-reads/writes through your AWS backend instead of the Supabase table. **Sign-in
-is unchanged.** Leaving `API_BASE_URL` blank keeps the old Supabase-table path.
+Then bump `js/config.js?v=` in `index.html`, commit, and push. From that point
+sign-in uses **Cognito** and all data lives in **DynamoDB** — Supabase is no
+longer used. Leaving `COGNITO_*` blank keeps the old Supabase auth path, so you
+can deploy and flip the switch whenever you're ready.
+
+Once you've confirmed Cognito works, the Supabase SDK `<script>` in `index.html`
+and the `SUPABASE_*` keys in `config.js` can be deleted (ask me and I'll do it).
 
 ---
 
 ## Test it
 
-Grab a real access token from the browser console while signed in:
-
-```js
-// in the app's devtools console
-(await window.Cloud && (await supabase /* the SDK */)) // …or simply:
-JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => k.includes('auth-token')))).access_token
-```
-
-Then:
+After filling config and signing up in the app, grab the access token from the
+browser console and hit the API directly:
 
 ```bash
-TOKEN='<paste access token>'
+TOKEN='<paste a Cognito access token>'
 API='https://abc123.execute-api.us-east-1.amazonaws.com'
 
-curl -s "$API/progress" -H "Authorization: Bearer $TOKEN"          # -> {"ok":true,"state":null,...}
+curl -s "$API/progress" -H "Authorization: Bearer $TOKEN"            # {"ok":true,"state":null,...}
 curl -s -X PUT "$API/progress" -H "Authorization: Bearer $TOKEN" \
-     -H 'Content-Type: application/json' -d '{"state":{"hello":"world"}}'
-curl -s "$API/progress" -H "Authorization: Bearer $TOKEN"          # -> state echoes back
-curl -s "$API/progress"                                            # -> 401 unauthorized (no token)
+     -H 'Content-Type: application/json' -d '{"state":{"hi":"there"}}'
+curl -s "$API/progress" -H "Authorization: Bearer $TOKEN"            # state echoes back
+curl -s "$API/progress"                                              # 401 (no token)
 ```
 
 ---
 
 ## Notes
 
-- **Cost:** DynamoDB is on-demand (`PAY_PER_REQUEST`) and Lambda/API Gateway
-  scale to zero — a personal app sits comfortably in the always-free tier.
-- **Security:** the user id comes from the *verified* JWT `sub`, never from the
-  client, so one user can't read another's row. CORS is locked to `AllowOrigin`.
-- **Migration (optional):** existing users have data in the Supabase `progress`
-  table. The app's merge logic means anyone still signed in keeps their local
-  copy and re-uploads it to AWS on first sync, so no action is needed for active
-  users. To move everything up front, export `select user_id, state from
-  progress` from Supabase and `PutItem` each row into the `vocabflow-progress`
-  table (`userId` = `user_id`, `state` = JSON string).
-- **Teardown:** `sam delete` removes the stack (and the DynamoDB table — back it
-  up first if you care about the data).
+- **Existing Supabase accounts don't carry over.** Cognito is a separate user
+  store, so users re-register. The app re-uploads their local progress to AWS on
+  first sign-in, so nothing on the device is lost.
+- **No email code on sign-up.** A Pre-Sign-up Lambda trigger auto-confirms users
+  and marks the email verified, matching the previous "confirmation off" UX. To
+  require email verification instead, edit `src/presignup.mjs` and the pool's
+  `AutoVerifiedAttributes` in `template.yaml`.
+- **Google sign-in** isn't wired for Cognito yet (it needs a Hosted UI domain +
+  Google as a federated IdP). Email/password works without it; ask if you want it.
+- **Cost:** Cognito's first 10k monthly active users are free; DynamoDB is
+  on-demand and Lambda/API Gateway scale to zero — a personal app stays free.
+- **Security:** the user id comes from the *verified* JWT `sub` (issuer +
+  audience checked against the pool), never from the client. CORS is locked to
+  `AllowOrigin`.
+- **Teardown:** `sam delete` removes the stack, including the user pool and the
+  DynamoDB table — export anything you want to keep first.
 ```
