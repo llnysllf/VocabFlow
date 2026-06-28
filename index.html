@@ -236,7 +236,7 @@
   </div>
 </div>
 
-<!-- data + Supabase SDK (CDN; fails gracefully offline) + app
+<!-- data + app
      ?v= busts the GitHub Pages cache (~10min) so returning users get fresh data.
      Bump the version of ONLY the file you changed (avoids re-downloading 3MB words.js). -->
 <script src="words.js?v=1"></script>
@@ -246,12 +246,9 @@
 <script src="proverbs.js?v=1"></script>
 <script src="sayings.js?v=1"></script>
 <script src="sentences.js?v=17"></script>
-<script src="js/config.js?v=5"></script>
-<!-- Auth SDKs (CDN; fail gracefully offline). cloud.js picks the provider:
-     Cognito when COGNITO_* is configured, else Supabase. -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js?v=6"></script>
 <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
-<script src="js/cloud.js?v=4"></script>
+<script src="js/cloud.js?v=5"></script>
 <script src="js/app.js?v=20"></script>
 </body>
 </html>
