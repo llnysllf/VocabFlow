@@ -1476,8 +1476,8 @@ function wireEvents() {
 
   el("btnCheck").addEventListener("click", reveal);
   el("btnSkip").addEventListener("click", function () {
-    if (current != null) skipped[current] = true; // fixes: Skip now shows a *different* word
-    advance();
+    if (current == null) return;
+    applyGrade(current, "retire", { countSession: true, advance: true });
   });
 
   /* app sections */

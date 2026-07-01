@@ -305,6 +305,16 @@ button:focus-visible{
   color:#bbc5d7;
 }
 .btn.ghost:hover{color:#fff;background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14)}
+.btn.retire-now{
+  color:#dce5f2;
+  border-color:rgba(255,255,255,.13);
+  background:rgba(255,255,255,.055);
+}
+.btn.retire-now:hover{
+  color:#fff;
+  border-color:rgba(255,255,255,.24);
+  background:rgba(255,255,255,.09);
+}
 .btn.danger{color:var(--bad)}
 .btn.danger:hover{border-color:rgba(255,117,133,.3);background:rgba(255,117,133,.08)}
 .kbd{
