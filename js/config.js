@@ -1,7 +1,7 @@
 window.VOCABFLOW_CONFIG = {
   // Set ENABLE_GOOGLE: true once the Google IdP is deployed in Cognito
   // (see backend/README.md "Google sign-in").
-  ENABLE_GOOGLE: false,
+  ENABLE_GOOGLE: true,
 
   // AWS API Gateway endpoint (SAM stack output: ApiUrl).
   API_BASE_URL: "https://b82ayxojhh.execute-api.ap-southeast-2.amazonaws.com",
