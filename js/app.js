@@ -776,6 +776,16 @@ function countMastered() { var c = 0; for (var r in D().words) { if (D().words[r
 function countRetired() { var c = 0; for (var r in D().words) { if (D().words[r].retired) c++; } return c; }
 function countSeen() { var c = 0; for (var r in D().words) { if (D().words[r].seen) c++; } return c; }
 function countDue() { return dueReviews().length; }
+function countNotStarted() {
+  var c = 0;
+  var data = curData();
+  for (var i = 0; i < data.length; i++) {
+    var w = D().words[data[i].r];
+    if (!w || (!w.seen && !w.retired)) c++;
+  }
+  return c;
+}
+function countLeftToLearn() { return Math.max(0, curData().length - countRetired()); }
 
 function renderStatsScreen() {
   if (!el("statsSeen")) return;
@@ -783,11 +793,17 @@ function renderStatsScreen() {
   var mastered = countMastered();
   var retired = countRetired();
   var due = countDue();
+  var notStarted = countNotStarted();
+  var left = countLeftToLearn();
+  var total = curData().length;
   var learning = Math.max(0, seen - mastered - retired);
-  el("statsDeckName").textContent = DECK_LABELS[S.active] + " · " + curData().length.toLocaleString() + " " + DECK_NOUN[S.active];
+  el("statsDeckName").textContent = DECK_LABELS[S.active] + " · " + total.toLocaleString() + " " + DECK_NOUN[S.active];
+  el("statsLeftToLearn").textContent = left.toLocaleString();
+  el("statsLearnLine").textContent = retired.toLocaleString() + " known · " + total.toLocaleString() + " total";
   el("statsSeen").textContent = seen.toLocaleString();
   el("statsStrong").textContent = mastered.toLocaleString();
   el("statsRetired").textContent = retired.toLocaleString();
+  el("statsUnstarted").textContent = notStarted.toLocaleString();
   el("statsLearning").textContent = learning.toLocaleString();
   el("statsDue").textContent = due.toLocaleString();
   el("statsToday").textContent = (D().day.newCount + D().day.revCount).toLocaleString();
@@ -804,6 +820,8 @@ function railItemHtml(rank, note) {
 function renderSideRail() {
   if (!el("railGoalText")) return;
   el("railGoalText").textContent = dailyGoalText();
+  if (el("sLeftToLearn")) el("sLeftToLearn").textContent = countLeftToLearn().toLocaleString();
+  if (el("sKnownLine")) el("sKnownLine").textContent = countRetired().toLocaleString() + " known";
 
   var due = uniqueRanks(dueReviews()).slice(0, 5);
   var rows = due.map(function (rank) { return railItemHtml(rank, "review"); }).filter(Boolean);
