@@ -1199,10 +1199,12 @@ function renderTabs() {
       '<span class="tabcount">' + DECKS[id].length + "</span>";
     b.addEventListener("click", function () {
       if (id !== S.active) switchDeck(id);
-      if (appView !== "practice" && appView !== "today" && appView !== "library" && appView !== "tooEasy") {
-        showPractice();
-        renderTabs();
+      if (appView === "sentences") {
+        showPractice(); renderTabs();
+      } else if (appView === "stats") {
+        renderStatsScreen(); renderTabs();
       }
+      // settings, practice, today, library: stay on current screen
     });
     nav.appendChild(b);
   });
