@@ -1214,7 +1214,12 @@ function renderTabs() {
   sb.className = "tab" + (appView === "sentences" ? " active" : "");
   sb.innerHTML = '<span class="tabname">Sentences</span>' +
     '<span class="tabcount">' + SENTENCES.length + "</span>";
-  sb.addEventListener("click", showSentencesView);
+  sb.addEventListener("click", function () {
+    var prevView = appView;
+    if (prevView === "stats") { showStatsView(); }
+    else if (prevView === "settings") { /* stay */ }
+    else showSentencesView();
+  });
   nav.appendChild(sb);
 }
 
