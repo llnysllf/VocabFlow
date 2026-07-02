@@ -1198,13 +1198,15 @@ function renderTabs() {
     b.innerHTML = '<span class="tabname">' + DECK_LABELS[id] + "</span>" +
       '<span class="tabcount">' + DECKS[id].length + "</span>";
     b.addEventListener("click", function () {
+      var prevView = appView;
       if (id !== S.active) switchDeck(id);
-      if (appView === "sentences") {
-        showPractice(); renderTabs();
-      } else if (appView === "stats") {
-        renderStatsScreen(); renderTabs();
+      if (prevView === "sentences" || prevView === "practice" || prevView === "today" || prevView === "library" || prevView === "tooEasy") {
+        // switchDeck already handled navigation (or showDone navigated to practice — fine)
+      } else if (prevView === "stats") {
+        showStatsView();
+      } else if (prevView === "settings") {
+        showSettingsView();
       }
-      // settings, practice, today, library: stay on current screen
     });
     nav.appendChild(b);
   });
