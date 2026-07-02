@@ -1122,6 +1122,7 @@ function showSentencesView() {
   appView = "sentences";
   browseActive = false;
   syncAppChrome("sentences");
+  renderTabs();
   if (!sChecked) { sCurrent = pickSentence(); renderSentence(); }
   showScreen("screenSentences");
   setTimeout(function () { var t = el("sAnswer"); if (t) t.focus(); }, 30);
@@ -1193,12 +1194,24 @@ function renderTabs() {
   nav.innerHTML = "";
   DECK_IDS.forEach(function (id) {
     var b = document.createElement("button");
-    b.className = "tab" + (id === S.active ? " active" : "");
+    b.className = "tab" + (id === S.active && appView !== "sentences" ? " active" : "");
     b.innerHTML = '<span class="tabname">' + DECK_LABELS[id] + "</span>" +
       '<span class="tabcount">' + DECKS[id].length + "</span>";
-    b.addEventListener("click", function () { switchDeck(id); });
+    b.addEventListener("click", function () {
+      if (id !== S.active) switchDeck(id);
+      if (appView !== "practice" && appView !== "today" && appView !== "library" && appView !== "tooEasy") {
+        showPractice();
+        renderTabs();
+      }
+    });
     nav.appendChild(b);
   });
+  var sb = document.createElement("button");
+  sb.className = "tab" + (appView === "sentences" ? " active" : "");
+  sb.innerHTML = '<span class="tabname">Sentences</span>' +
+    '<span class="tabcount">' + SENTENCES.length + "</span>";
+  sb.addEventListener("click", showSentencesView);
+  nav.appendChild(sb);
 }
 
 function switchDeck(id) {
