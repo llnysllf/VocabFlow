@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
-<link rel="stylesheet" href="css/styles.css?v=28">
+<link rel="stylesheet" href="css/styles.css?v=29">
 </head>
 <body>
 <div class="app-shell">
@@ -38,6 +38,10 @@
         <h1 id="viewTitle">Practice</h1>
         <p id="viewSub">Answer the current card, then set how strong it feels.</p>
       </div>
+      <button class="rail-toggle" id="railToggle" type="button" aria-label="Today's stats">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V9M12 20V4M19 20v-7"/></svg>
+        Today
+      </button>
     </header>
 
     <div class="content-grid">
@@ -192,34 +196,38 @@
         </section>
       </div>
 
-      <aside class="study-rail" id="studyRail">
-        <section class="rail-card">
-          <div class="rail-title">Today</div>
-          <div class="stats">
-            <div class="stat"><div class="num" id="sNew">0</div><div class="lbl">New</div></div>
-            <div class="stat"><div class="num" id="sRev">0</div><div class="lbl">Reviews</div></div>
-            <div class="stat strikes"><div class="num" id="sStrike">0 / 7</div><div class="lbl">Strikes</div></div>
-            <div class="stat mastered"><div class="num" id="sMaster">0</div><div class="lbl">Strong</div></div>
-            <div class="stat learn-left"><div><div class="num" id="sLeftToLearn">0</div><div class="lbl">Left to learn</div></div><small id="sKnownLine">0 known</small></div>
-          </div>
-          <div class="progressbar"><div id="pbar"></div></div>
-          <p class="rail-copy" id="railGoalText"></p>
-          <button class="text-link" id="railOpenToday" type="button">Open today's list</button>
-        </section>
-
-        <section class="rail-card">
-          <div class="rail-title">Up next</div>
-          <div class="rail-list" id="railQueueList"></div>
-        </section>
-
-        <section class="rail-card">
-          <div class="rail-title">Focus</div>
-          <div class="rail-list" id="railFocusList"></div>
-          <button class="text-link" id="btnRailReviewWrong" type="button">Drill focus words</button>
-        </section>
-      </aside>
     </div>
   </main>
+  <div class="rail-backdrop" id="railBackdrop"></div>
+  <aside class="study-rail" id="studyRail">
+    <button class="rail-close" id="railClose" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <section class="rail-card">
+      <div class="rail-title">Today</div>
+      <div class="stats">
+        <div class="stat"><div class="num" id="sNew">0</div><div class="lbl">New</div></div>
+        <div class="stat"><div class="num" id="sRev">0</div><div class="lbl">Reviews</div></div>
+        <div class="stat strikes"><div class="num" id="sStrike">0 / 7</div><div class="lbl">Strikes</div></div>
+        <div class="stat mastered"><div class="num" id="sMaster">0</div><div class="lbl">Strong</div></div>
+        <div class="stat learn-left"><div><div class="num" id="sLeftToLearn">0</div><div class="lbl">Left to learn</div></div><small id="sKnownLine">0 known</small></div>
+      </div>
+      <div class="progressbar"><div id="pbar"></div></div>
+      <p class="rail-copy" id="railGoalText"></p>
+      <button class="text-link" id="railOpenToday" type="button">Open today's list</button>
+    </section>
+
+    <section class="rail-card">
+      <div class="rail-title">Up next</div>
+      <div class="rail-list" id="railQueueList"></div>
+    </section>
+
+    <section class="rail-card">
+      <div class="rail-title">Focus</div>
+      <div class="rail-list" id="railFocusList"></div>
+      <button class="text-link" id="btnRailReviewWrong" type="button">Drill focus words</button>
+    </section>
+  </aside>
 </div>
 
 <!-- AUTH MODAL -->
@@ -260,6 +268,6 @@
 <script src="js/config.js?v=7"></script>
 <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
 <script src="js/cloud.js?v=5"></script>
-<script src="js/app.js?v=25"></script>
+<script src="js/app.js?v=26"></script>
 </body>
 </html>

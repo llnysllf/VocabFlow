@@ -1582,6 +1582,23 @@ function wireEvents() {
     drillWrong();
   });
 
+  function openRail() {
+    var rail = el("studyRail"), bd = el("railBackdrop");
+    if (rail) rail.classList.add("open");
+    if (bd) bd.classList.add("open");
+  }
+  function closeRail() {
+    var rail = el("studyRail"), bd = el("railBackdrop");
+    if (rail) rail.classList.remove("open");
+    if (bd) bd.classList.remove("open");
+  }
+  el("railToggle").addEventListener("click", function () {
+    var rail = el("studyRail");
+    if (rail && rail.classList.contains("open")) closeRail(); else openRail();
+  });
+  el("railClose").addEventListener("click", closeRail);
+  el("railBackdrop").addEventListener("click", closeRail);
+
   /* browse / list view */
   el("btnBrowseBack").addEventListener("click", closeBrowse);
   document.querySelectorAll(".browseview").forEach(function (b) {
