@@ -1241,7 +1241,7 @@ function renderTabs() {
       } else if (prevView === "stats") {
         showStatsView(); renderTabs();
       } else if (prevView === "settings") {
-        showSettingsView(); renderTabs();
+        showStatsView(); renderTabs();
       }
     });
     nav.appendChild(b);
@@ -1255,7 +1255,7 @@ function renderTabs() {
     if (prevView === "stats") {
       deckNavSelected = "sentences"; showStatsView(); renderTabs();
     } else if (prevView === "settings") {
-      deckNavSelected = "sentences"; renderTabs();
+      deckNavSelected = "sentences"; showStatsView(); renderTabs();
     } else {
       deckNavSelected = null; showSentencesView();
     }
