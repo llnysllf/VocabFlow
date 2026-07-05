@@ -1239,9 +1239,9 @@ function renderTabs() {
       if (prevView === "sentences" || prevView === "practice" || prevView === "today" || prevView === "library" || prevView === "tooEasy") {
         deckNavSelected = null; // let S.active / appView drive it
       } else if (prevView === "stats") {
-        showStatsView();
+        showStatsView(); renderTabs();
       } else if (prevView === "settings") {
-        showSettingsView();
+        showSettingsView(); renderTabs();
       }
     });
     nav.appendChild(b);
