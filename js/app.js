@@ -382,6 +382,11 @@ var drillOnly = false;     // re-drilling today's misses only — don't introduc
 var skipped = {};          // ranks skipped this session (won't resurface until next session)
 var appView = "practice";
 var practiceDone = false;
+var deckNavSelected = null; // null = derive from S.active / appView
+function currentNavSelected() {
+  if (deckNavSelected !== null) return deckNavSelected;
+  return appView === "sentences" ? "sentences" : S.active;
+}
 
 function dueReviews() {
   var t = todayIndex();
@@ -789,6 +794,33 @@ function countLeftToLearn() { return Math.max(0, curData().length - countRetired
 
 function renderStatsScreen() {
   if (!el("statsSeen")) return;
+  if (currentNavSelected() === "sentences") {
+    var sp = sProg().words, t = todayIndex();
+    var seen = 0, mastered = 0, retired = 0, due = 0;
+    for (var r in sp) {
+      var w = sp[r];
+      if (w.seen) seen++;
+      if (w.seen && !w.retired && w.lvl >= 5) mastered++;
+      if (w.retired) retired++;
+      if (!w.retired && w.seen && w.due <= t) due++;
+    }
+    var learning = Math.max(0, seen - mastered - retired);
+    var total = SENTENCES.length;
+    var sd = sProg().day || {};
+    el("statsDeckName").textContent = "Sentences · " + total + " sentences";
+    el("statsLeftToLearn").textContent = Math.max(0, total - retired).toLocaleString();
+    el("statsLearnLine").textContent = retired + " known · " + total + " total";
+    el("statsSeen").textContent = seen.toLocaleString();
+    el("statsStrong").textContent = mastered.toLocaleString();
+    el("statsRetired").textContent = retired.toLocaleString();
+    el("statsUnstarted").textContent = (total - seen).toLocaleString();
+    el("statsLearning").textContent = learning.toLocaleString();
+    el("statsDue").textContent = due.toLocaleString();
+    el("statsToday").textContent = ((sd.newCount || 0) + (sd.revCount || 0)).toLocaleString();
+    el("statsTodayLine").textContent = "Today: " + (sd.newCount || 0) + " new, " +
+      (sd.revCount || 0) + " reviews, " + round1(sd.strikes || 0) + " strikes.";
+    return;
+  }
   var seen = countSeen();
   var mastered = countMastered();
   var retired = countRetired();
@@ -992,6 +1024,7 @@ function syncAppChrome(view) {
 function showPractice() {
   appView = "practice";
   browseActive = false;
+  deckNavSelected = null;
   syncAppChrome("practice");
   showScreen(practiceDone ? "screenDone" : "screenTest");
   setTimeout(function () { if (elAns && !practiceDone) elAns.focus(); }, 30);
@@ -1121,6 +1154,7 @@ function renderSentenceProgress() {
 function showSentencesView() {
   appView = "sentences";
   browseActive = false;
+  deckNavSelected = null;
   syncAppChrome("sentences");
   renderTabs();
   if (!sChecked) { sCurrent = pickSentence(); renderSentence(); }
@@ -1192,16 +1226,18 @@ function renderTabs() {
   var nav = el("tabs");
   if (!nav) return;
   nav.innerHTML = "";
+  var sel = currentNavSelected();
   DECK_IDS.forEach(function (id) {
     var b = document.createElement("button");
-    b.className = "tab" + (id === S.active && appView !== "sentences" ? " active" : "");
+    b.className = "tab" + (id === sel ? " active" : "");
     b.innerHTML = '<span class="tabname">' + DECK_LABELS[id] + "</span>" +
       '<span class="tabcount">' + DECKS[id].length + "</span>";
     b.addEventListener("click", function () {
       var prevView = appView;
+      deckNavSelected = id;
       if (id !== S.active) switchDeck(id);
       if (prevView === "sentences" || prevView === "practice" || prevView === "today" || prevView === "library" || prevView === "tooEasy") {
-        // switchDeck already handled navigation (or showDone navigated to practice — fine)
+        deckNavSelected = null; // let S.active / appView drive it
       } else if (prevView === "stats") {
         showStatsView();
       } else if (prevView === "settings") {
@@ -1211,14 +1247,18 @@ function renderTabs() {
     nav.appendChild(b);
   });
   var sb = document.createElement("button");
-  sb.className = "tab" + (appView === "sentences" ? " active" : "");
+  sb.className = "tab" + (sel === "sentences" ? " active" : "");
   sb.innerHTML = '<span class="tabname">Sentences</span>' +
     '<span class="tabcount">' + SENTENCES.length + "</span>";
   sb.addEventListener("click", function () {
     var prevView = appView;
-    if (prevView === "stats") { showStatsView(); }
-    else if (prevView === "settings") { /* stay */ }
-    else showSentencesView();
+    if (prevView === "stats") {
+      deckNavSelected = "sentences"; showStatsView(); renderTabs();
+    } else if (prevView === "settings") {
+      deckNavSelected = "sentences"; renderTabs();
+    } else {
+      deckNavSelected = null; showSentencesView();
+    }
   });
   nav.appendChild(sb);
 }
