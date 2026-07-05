@@ -1017,8 +1017,8 @@ function syncAppChrome(view) {
   document.querySelectorAll(".appnav-item").forEach(function (b) {
     b.classList.toggle("active", b.getAttribute("data-appview") === navView);
   });
-  // sentence mode hides the deck tabs + study rail (word-deck specific)
   document.body.classList.toggle("sentences-mode", view === "sentences");
+  document.body.classList.toggle("settings-mode", view === "settings");
 }
 
 function showPractice() {

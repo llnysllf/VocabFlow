@@ -1100,6 +1100,7 @@ textarea#answer{border-radius:13px;background:rgba(8,12,18,.55)}
 
 /* ===== sentence translation mode ===== */
 body.sentences-mode #studyRail{display:none}
+body.settings-mode .deck-nav{display:none}
 body.sentences-mode .content-grid{grid-template-columns:minmax(0,1fr)}
 .sentence-card{max-width:780px}
 .s-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
