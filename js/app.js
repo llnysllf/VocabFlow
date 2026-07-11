@@ -849,8 +849,47 @@ function railItemHtml(rank, note) {
   return '<div class="rail-item"><span>' + escapeHtml(d.w) + "</span><small>" + escapeHtml(note) + "</small></div>";
 }
 
+function sentenceRailItemHtml(rank, note) {
+  var s = SENTENCES.filter(function (x) { return x.r === rank; })[0];
+  if (!s) return "";
+  return '<div class="rail-item"><span>' + escapeHtml(s.zh) + "</span><small>" + escapeHtml(note) + "</small></div>";
+}
+
 function renderSideRail() {
   if (!el("railGoalText")) return;
+
+  if (appView === "sentences") {
+    var t = todayIndex();
+    if (!sProg().day || sProg().day.idx !== t) sProg().day = blankDay();
+    var sd = sProg().day, sp = sProg().words;
+    if (el("sNew")) el("sNew").textContent = sd.newCount || 0;
+    if (el("sRev")) el("sRev").textContent = sd.revCount || 0;
+    if (el("sStrike")) el("sStrike").textContent = "—";
+    var smastered = 0;
+    for (var rr in sp) { if (sp[rr].seen && !sp[rr].retired && sp[rr].lvl >= MAX_LEVEL) smastered++; }
+    if (el("sMaster")) el("sMaster").textContent = smastered;
+    var sretired = 0;
+    for (var rr2 in sp) { if (sp[rr2].retired) sretired++; }
+    var sleft = Math.max(0, SENTENCES.length - sretired);
+    if (el("sLeftToLearn")) el("sLeftToLearn").textContent = sleft.toLocaleString();
+    if (el("sKnownLine")) el("sKnownLine").textContent = sretired + " known";
+    if (el("pbar")) el("pbar").style.width = "0%";
+    var dueS = [];
+    for (var i = 0; i < SENTENCES.length; i++) {
+      var s = SENTENCES[i], sw = sp[s.r];
+      if (sw && sw.seen && !sw.retired && sw.due <= t) dueS.push(s);
+    }
+    el("railGoalText").textContent = dueS.length ? dueS.length + " sentences due for review." : "No sentences due — keep going!";
+    var nextS = pickSentence();
+    var upRows = nextS ? [sentenceRailItemHtml(nextS.r, sStatus(nextS.r) === "new" ? "new" : "review")] : [];
+    el("railQueueList").innerHTML = upRows.length ? upRows.join("") : '<div class="rail-empty">Nothing queued right now.</div>';
+    var sWrong = (sd.wrongToday || []).slice(0, 5);
+    var focusRows = sWrong.map(function (it) { return sentenceRailItemHtml(it.r, "focus"); }).filter(Boolean);
+    el("railFocusList").innerHTML = focusRows.length ? focusRows.join("") : '<div class="rail-empty">No focus sentences yet.</div>';
+    if (el("btnRailReviewWrong")) el("btnRailReviewWrong").disabled = true;
+    return;
+  }
+
   el("railGoalText").textContent = dailyGoalText();
   if (el("sLeftToLearn")) el("sLeftToLearn").textContent = countLeftToLearn().toLocaleString();
   if (el("sKnownLine")) el("sKnownLine").textContent = countRetired().toLocaleString() + " known";
@@ -1126,16 +1165,23 @@ function pickSentence() {
 }
 
 function recordSentenceResult(sent, correct) {
-  var w = sWord(sent.r), t = todayIndex(), wasNew = !w.seen;
+  var t = todayIndex();
+  if (!sProg().day || sProg().day.idx !== t) sProg().day = blankDay();
+  var sd = sProg().day;
+  var w = sWord(sent.r), wasNew = !w.seen;
   w.seen = true; w.lastSeen = t;
   if (correct) {
     w.lvl = Math.min(MAX_LEVEL, wasNew ? 1 : w.lvl + 1);
     w.right = (w.right || 0) + 1; w.streak = (w.streak || 0) + 1; w.lastGrade = "good";
     w.due = t + (INTERVALS[w.lvl] != null ? INTERVALS[w.lvl] : 1);
+    if (wasNew) sd.newCount++; else sd.revCount++;
+    sd.wrongToday = (sd.wrongToday || []).filter(function (it) { return it.r !== sent.r; });
   } else {
     w.lvl = 0; w.wrong = (w.wrong || 0) + 1; w.streak = 0;
     w.lapses = (w.lapses || 0) + 1; w.lastGrade = "again";
     w.due = t + (INTERVALS[0] != null ? INTERVALS[0] : 0);
+    var wt = sd.wrongToday = sd.wrongToday || [];
+    if (!wt.some(function (it) { return it.r === sent.r; })) wt.push({ r: sent.r, kind: "wrong" });
   }
   if (wasNew) sProg().totals.everSeen = (sProg().totals.everSeen || 0) + 1;
   persist();
@@ -1157,6 +1203,7 @@ function showSentencesView() {
   deckNavSelected = null;
   syncAppChrome("sentences");
   renderTabs();
+  refreshStats();
   if (!sChecked) { sCurrent = pickSentence(); renderSentence(); }
   showScreen("screenSentences");
   setTimeout(function () { var t = el("sAnswer"); if (t) t.focus(); }, 30);
@@ -1190,6 +1237,7 @@ function checkSentence() {
   sChecked = true;
   recordSentenceResult(sent, res.correct);
   renderSentenceProgress();
+  refreshStats();
   var html = "";
   if (res.correct) {
     fb.className = "s-feedback ok";
@@ -1234,14 +1282,19 @@ function renderTabs() {
       '<span class="tabcount">' + DECKS[id].length + "</span>";
     b.addEventListener("click", function () {
       var prevView = appView;
-      deckNavSelected = id;
-      if (id !== S.active) switchDeck(id);
-      if (prevView === "sentences" || prevView === "practice" || prevView === "today" || prevView === "library" || prevView === "tooEasy") {
-        deckNavSelected = null; // let S.active / appView drive it
-      } else if (prevView === "stats") {
+      if (prevView === "stats") {
+        deckNavSelected = id;
+        if (id !== S.active) switchDeck(id);
         showStatsView(); renderTabs();
       } else if (prevView === "settings") {
+        deckNavSelected = id;
+        if (id !== S.active) switchDeck(id);
         showStatsView(); renderTabs();
+      } else {
+        deckNavSelected = null;
+        appView = "practice";
+        syncAppChrome("practice");
+        if (id !== S.active) { switchDeck(id); } else { showScreen(practiceDone ? "screenDone" : "screenTest"); }
       }
     });
     nav.appendChild(b);
