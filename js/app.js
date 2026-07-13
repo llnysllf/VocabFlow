@@ -1051,8 +1051,9 @@ function syncAppChrome(view) {
   var title = el("viewTitle"), sub = el("viewSub");
   if (title) title.textContent = copy.title;
   if (sub) sub.textContent = copy.sub;
-  // "Too Easy" is reached through the Library now, so keep Library lit for it
-  var navView = (view === "tooEasy") ? "library" : view;
+  // "Too Easy" is reached through the Library now, so keep Library lit for it.
+  // Sentences is a practice sub-mode, so keep Practice lit while translating.
+  var navView = (view === "tooEasy") ? "library" : (view === "sentences") ? "practice" : view;
   document.querySelectorAll(".appnav-item").forEach(function (b) {
     b.classList.toggle("active", b.getAttribute("data-appview") === navView);
   });
@@ -1066,6 +1067,7 @@ function showPractice() {
   deckNavSelected = null;
   syncAppChrome("practice");
   showScreen(practiceDone ? "screenDone" : "screenTest");
+  renderTabs();
   setTimeout(function () { if (elAns && !practiceDone) elAns.focus(); }, 30);
 }
 
@@ -1077,19 +1079,23 @@ function syncSettingsFields() {
 }
 
 function showStatsView() {
+  if (appView === "sentences") deckNavSelected = "sentences";
   appView = "stats";
   browseActive = false;
   syncAppChrome("stats");
   renderStatsScreen();
   showScreen("screenStats");
+  renderTabs();
 }
 
 function showSettingsView() {
+  if (appView === "sentences") deckNavSelected = "sentences";
   appView = "settings";
   browseActive = false;
   syncAppChrome("settings");
   syncSettingsFields();
   showScreen("screenSettings");
+  renderTabs();
 }
 
 /* ---------------- sentence translation mode ---------------- */
@@ -1294,7 +1300,10 @@ function renderTabs() {
         deckNavSelected = null;
         appView = "practice";
         syncAppChrome("practice");
-        if (id !== S.active) { switchDeck(id); } else { showScreen(practiceDone ? "screenDone" : "screenTest"); }
+        if (id !== S.active) { switchDeck(id); } else {
+          showScreen(practiceDone ? "screenDone" : "screenTest");
+          renderTabs();
+        }
       }
     });
     nav.appendChild(b);
@@ -1488,11 +1497,13 @@ function setBrowseView(view) {
 
 function openBrowse(view) {
   if (view) browseView = view;
+  if (appView === "sentences") deckNavSelected = "sentences";
   browseActive = true;
   appView = appViewForBrowse(browseView);
   syncAppChrome(appView);
   showScreen("screenBrowse");
   setBrowseView(browseView || "today");
+  renderTabs();
 }
 
 function closeBrowse() {
