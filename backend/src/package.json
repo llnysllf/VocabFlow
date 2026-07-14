@@ -2,7 +2,7 @@
   "name": "vocabflow-backend",
   "version": "1.0.0",
   "type": "module",
-  "description": "VocabFlow progress-sync API (Lambda + DynamoDB), authenticated by Supabase JWT.",
+  "description": "VocabFlow progress-sync API (Lambda + DynamoDB), authenticated by Cognito JWT.",
   "private": true,
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.620.0"
