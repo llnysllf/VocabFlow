@@ -1416,6 +1416,7 @@ function uniqueRanks(ranks) {
 
 function renderBrowse() {
   rollDayIfNeeded();
+  if (currentNavSelected() === "sentences") { renderSentenceBrowse(); return; }
   var q = (el("browseSearch").value || "").trim().toLowerCase();
   var data = curData();
   var parts = [], matches = 0, i, d, w;
@@ -1483,6 +1484,96 @@ function renderBrowse() {
   el("browseCount").textContent = label;
 }
 
+/* ---------------- sentence browse (Today / Library for the Sentences deck) ---------------- */
+function sentenceMatches(sent, q) {
+  if (!q) return true;
+  if (String(sent.zh || "").toLowerCase().indexOf(q) !== -1) return true;
+  return (sent.en || []).some(function (e) { return String(e).toLowerCase().indexOf(q) !== -1; });
+}
+
+/* sStatus() -> the shared .bstat colour class used by word rows */
+var S_STATUS_CLASS = { new: "new", learning: "learning", due: "due", strong: "mastered" };
+
+function sentenceItemHtml(sent) {
+  var w = sProg().words[sent.r];
+  var status = sStatus(sent.r);
+  var due = w && w.seen && !w.retired ? dueLabel(w.due) : "not started";
+  return '<div class="browseitem rich">' +
+    '<div class="bmain"><span class="bw">' + escapeHtml(sent.zh) + "</span>" +
+    '<span class="bc">' + escapeHtml(sent.en[0] || "") + "</span></div>" +
+    '<div class="bmeta"><span class="bstat ' + (S_STATUS_CLASS[status] || "new") + '">' +
+    escapeHtml(strengthLabel(w)) + "</span>" +
+    '<span class="bdue">' + escapeHtml(due) + "</span></div>" +
+    "</div>";
+}
+
+function sentenceDailyGoalText() {
+  var t = todayIndex(), prog = sProg().words, due = 0, unseen = 0;
+  SENTENCES.forEach(function (s) {
+    var w = prog[s.r];
+    if (!w || !w.seen) unseen++;
+    else if (!w.retired && w.due <= t) due++;
+  });
+  var sday = (sProg().day && sProg().day.idx === t) ? sProg().day : null;
+  var focus = sday ? sanitizeFocus(sday.wrongToday).length : 0;
+  if (!due && !focus && !unseen) return "You've reviewed every sentence available.";
+  return due + " review" + (due === 1 ? "" : "s") + " due · " +
+    focus + " focus item" + (focus === 1 ? "" : "s") + " · " +
+    unseen + " new sentence" + (unseen === 1 ? "" : "s") + " available";
+}
+
+function renderSentenceBrowse() {
+  var q = (el("browseSearch").value || "").trim().toLowerCase();
+  var t = todayIndex(), prog = sProg().words;
+  var sday = (sProg().day && sProg().day.idx === t) ? sProg().day : null;
+  var parts = [], matches = 0;
+  var CAP = browseView === "all" ? 2000 : 400;
+  var visible = SENTENCES.filter(function (s) { return sentenceMatches(s, q); });
+
+  if (browseView === "today") {
+    var focusRanks = uniqueRanks((sday ? sanitizeFocus(sday.wrongToday) : []).map(function (x) { return x.r; }));
+    var focusRows = focusRanks.map(function (r) { return SENT_BY_RANK[r]; })
+      .filter(function (s) { return s && sentenceMatches(s, q); }).map(sentenceItemHtml);
+    var dueRows = visible.filter(function (s) { return sStatus(s.r) === "due"; }).map(sentenceItemHtml);
+    var newRows = visible.filter(function (s) { var w = prog[s.r]; return !w || !w.seen; }).slice(0, 10).map(sentenceItemHtml);
+    parts.push('<div class="daily-card">' + escapeHtml(sentenceDailyGoalText()) + "</div>");
+    parts.push(renderBrowseSection("Focus today", focusRows, "No missed sentences yet today."));
+    parts.push(renderBrowseSection("Due now", dueRows, "No sentences due for review right now."));
+    parts.push(renderBrowseSection("New available", newRows, "No new sentences left to start."));
+    matches = focusRows.length + dueRows.length + newRows.length;
+  } else if (browseView === "answered") {
+    visible.forEach(function (s) {
+      var w = prog[s.r];
+      if (!w || !w.seen || w.lastSeen !== t) return;
+      matches++;
+      if (parts.length < CAP) parts.push(sentenceItemHtml(s));
+    });
+  } else if (browseView === "upcoming") {
+    var up = visible.filter(function (s) { var w = prog[s.r]; return w && w.seen && !w.retired && w.due > t; });
+    up.sort(function (a, b) { return (prog[a.r].due - prog[b.r].due) || (a.r - b.r); });
+    up.forEach(function (s) { matches++; if (parts.length < CAP) parts.push(sentenceItemHtml(s)); });
+  } else if (browseView === "retired") {
+    // Sentences don't retire; surface the ones you've mastered instead (tab is relabelled "Mastered").
+    visible.forEach(function (s) { if (sStatus(s.r) === "strong") { matches++; if (parts.length < CAP) parts.push(sentenceItemHtml(s)); } });
+  } else {
+    visible.forEach(function (s) { matches++; if (parts.length < CAP) parts.push(sentenceItemHtml(s)); });
+  }
+
+  el("browseList").innerHTML = parts.length ? parts.join("") : '<div class="browseempty">No matches.</div>';
+  var label = q ? matches.toLocaleString() + " match" + (matches === 1 ? "" : "es") : "Sentences · " + browseView;
+  if (matches > CAP) label += " · showing first " + CAP.toLocaleString() + ", search to narrow";
+  el("browseCount").textContent = label;
+}
+
+/* keep the filter tab + search copy honest for whichever deck is being browsed */
+function syncBrowseMode() {
+  var isSent = currentNavSelected() === "sentences";
+  var retiredBtn = document.querySelector('.browseview[data-view="retired"]');
+  if (retiredBtn) retiredBtn.textContent = isSent ? "Mastered" : "Too Easy";
+  var search = el("browseSearch");
+  if (search) search.placeholder = isSent ? "Search sentences..." : "Search this deck...";
+}
+
 function setBrowseView(view) {
   browseView = view || "today";
   if (browseActive) {
@@ -1499,6 +1590,7 @@ function openBrowse(view) {
   if (view) browseView = view;
   if (appView === "sentences") deckNavSelected = "sentences";
   browseActive = true;
+  syncBrowseMode();
   appView = appViewForBrowse(browseView);
   syncAppChrome(appView);
   showScreen("screenBrowse");
@@ -1507,6 +1599,7 @@ function openBrowse(view) {
 }
 
 function closeBrowse() {
+  if (currentNavSelected() === "sentences") { showSentencesView(); return; }
   showPractice();
 }
 
