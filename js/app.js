@@ -1625,7 +1625,13 @@ function wireEvents() {
   });
 
   /* app sections */
-  el("btnPractice").addEventListener("click", showPractice);
+  el("btnPractice").addEventListener("click", function () {
+    // Sentences is a practice sub-mode, so the Practice nav stays lit while
+    // translating. Re-clicking it should keep you on the current sentence,
+    // not jump to the word-card deck.
+    if (appView === "sentences") return;
+    showPractice();
+  });
   el("btnToday").addEventListener("click", function () { openBrowse("today"); });
   el("btnBrowse").addEventListener("click", function () { openBrowse("all"); });
   el("btnStats").addEventListener("click", showStatsView);
