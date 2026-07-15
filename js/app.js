@@ -1727,10 +1727,10 @@ function wireEvents() {
 
   /* app sections */
   el("btnPractice").addEventListener("click", function () {
-    // Sentences is a practice sub-mode, so the Practice nav stays lit while
-    // translating. Re-clicking it should keep you on the current sentence,
-    // not jump to the word-card deck.
+    // Already translating: stay on the current sentence, don't repick or jump to words.
     if (appView === "sentences") return;
+    // In a Today/Library view for the Sentences deck: return to sentence practice, not words.
+    if (currentNavSelected() === "sentences") { showSentencesView(); return; }
     showPractice();
   });
   el("btnToday").addEventListener("click", function () { openBrowse("today"); });
