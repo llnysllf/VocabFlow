@@ -1296,6 +1296,11 @@ function renderTabs() {
         deckNavSelected = id;
         if (id !== S.active) switchDeck(id);
         showStatsView(); renderTabs();
+      } else if (browseActive) {
+        // Switching decks from a Today/Library view stays in that view for the new deck.
+        deckNavSelected = null;
+        if (id !== S.active) switchDeck(id);   // switchDeck re-opens browse for the new deck
+        else openBrowse(browseView);           // already the active deck: re-render its browse
       } else {
         deckNavSelected = null;
         appView = "practice";
@@ -1318,6 +1323,9 @@ function renderTabs() {
       deckNavSelected = "sentences"; showStatsView(); renderTabs();
     } else if (prevView === "settings") {
       deckNavSelected = "sentences"; showStatsView(); renderTabs();
+    } else if (browseActive) {
+      // Stay in the Today/Library view, now showing sentences.
+      deckNavSelected = "sentences"; openBrowse(browseView);
     } else {
       deckNavSelected = null; showSentencesView();
     }
