@@ -149,13 +149,16 @@ css/styles.css        All styling
 js/config.js          AWS API + Cognito config for cloud sync
 js/cloud.js           Cognito auth + DynamoDB sync, with offline fallback
 js/app.js             The trainer: scheduling, grading, sentence grader, UI
+js/pron.js            Phonetics + audio playback for the current card
 words.js              15,000-word data set (window.VOCAB)
+ipa.js                Phonetic spellings for every headword (window.IPA)
 idioms.js             1,000 idioms (window.IDIOMS)
 phrasal.js            1,000 phrasal verbs (window.PHRASAL)
 slang.js              slang & colloquialisms (window.SLANG)
 proverbs.js           proverbs (window.PROVERBS)
 sayings.js            sayings & expressions (window.SAYINGS)
 sentences.js          Chinese → English translation bank (window.SENTENCES)
+tools/build-ipa.py    Regenerates ipa.js from the CMU Pronouncing Dictionary
 backend/              AWS SAM stack: Cognito + API Gateway + Lambda + DynamoDB
 ```
 
@@ -181,6 +184,13 @@ Lambda + DynamoDB, defined as one SAM template) for accounts and sync.
 - **Slang** is drawn from ECDICT's register-tagged (俚/口) slang and colloquial entries.
 - **Sentences** are hand-built to cover a broad spread of English grammar points.
 - The most common entries in each deck are hand-curated at the top.
+- **Phonetic spellings** (`ipa.js`) are converted from the
+  [**CMU Pronouncing Dictionary**](https://github.com/cmusphinx/cmudict) — General American,
+  BSD-licensed, © 1993–2015 Carnegie Mellon University. Regenerate with `tools/build-ipa.py`.
+- **Pronunciation audio** is fetched on demand from
+  [**Wiktionary**](https://en.wiktionary.org) / Wikimedia Commons (volunteer recordings,
+  CC BY-SA), cached in the browser, and falls back to the browser's speech voice
+  for words with no recording.
 
 ## Contributing
 
