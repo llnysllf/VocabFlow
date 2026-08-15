@@ -7,7 +7,7 @@ var INTERVALS = { 0: 0, 1: 1, 2: 2, 3: 4, 4: 10, 5: 30, 6: 90 }; // days to next
 var MAX_LEVEL = 6;                           // level 6 = very strong, still reviewed rarely
 var RETIRED_DUE = 999999;                    // "too easy" items stay out of review
 
-var DEFAULTS = { strikeLimit: 7, newPerDay: 50, partWeight: 0.5 };
+var DEFAULTS = { strikeLimit: 7, newPerDay: 50, partWeight: 0.5, autoSpeak: true };
 
 var GRADE_IDS = ["again", "hard", "shaky", "good", "easy", "retire"];
 var STUDY_GRADE_IDS = ["again", "hard", "shaky", "good", "easy"];
@@ -585,7 +585,22 @@ function addStrike(n) {
 }
 
 /* ---------------- rendering ---------------- */
-var elWord, elRank, elQ, elAns, elReveal, elYour, elCn, elEn;
+var elWord, elRank, elQ, elAns, elReveal, elYour, elCn, elEn, elPhon;
+
+/* The phonetic table ships with the app, so this needs no network and can't
+   arrive late on the wrong card. Blank for acronyms cmudict doesn't cover. */
+function renderPron(text) {
+  if (!elPhon) return;
+  var ipa = window.Pron ? Pron.phonetic(text) : "";
+  elPhon.textContent = ipa ? "/" + ipa + "/" : "";
+}
+
+/* Say the current prompt out loud. Auto-play is silent until the page has had
+   a click — browsers block audio before that — so the first card may not speak. */
+function speakCurrent() {
+  var d = curIndex()[current];
+  if (d && window.Pron) Pron.speak(d.w);
+}
 
 function renderCard(rank) {
   var d = curIndex()[rank];
@@ -594,6 +609,11 @@ function renderCard(rank) {
   elReveal.classList.remove("show");
   elAns.value = "";
   elWord.textContent = d.w;
+  renderPron(d.w);
+  if (window.Pron) {
+    if (S.cfg.autoSpeak) Pron.speak(d.w);
+    else Pron.prefetch(d.w);   // have the recording ready before the play button is pressed
+  }
   elRank.textContent = "#" + d.r;
   elQ.textContent = (isNew(rank) ? "NEW " + DECK_ITEM[S.active].toUpperCase() : "REVIEW") + " — what does it mean?";
   setTimeout(function () { elAns.focus(); }, 30);
@@ -1076,6 +1096,7 @@ function syncSettingsFields() {
   el("setStrikes").value = S.cfg.strikeLimit;
   el("setNew").value = S.cfg.newPerDay;
   el("setPart").value = String(S.cfg.partWeight);
+  el("setSpeak").value = S.cfg.autoSpeak ? "1" : "0";
 }
 
 function showStatsView() {
@@ -1393,12 +1414,27 @@ function gradePickerHtml(rank) {
   }).join("") + "</div>";
 }
 
+var SPEAK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3l4.5-3.5v13L7 15H4z"/>' +
+  '<path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18.2 6.5a7.8 7.8 0 0 1 0 11"/></svg>';
+
+function speakBtnHtml(text) {
+  if (!window.Pron || !Pron.available()) return "";
+  return '<button type="button" class="speak-btn mini" data-action="speak" aria-label="Hear it" title="Hear it" data-text="' +
+    escapeHtml(String(text)) + '">' + SPEAK_ICON + "</button>";
+}
+
+function phoneticHtml(text) {
+  var ipa = window.Pron ? Pron.phonetic(text) : "";
+  return ipa ? '<span class="phonetic mini">/' + escapeHtml(ipa) + "/</span>" : "";
+}
+
 function browseItemHtml(d, opts) {
   opts = opts || {};
   var w = D().words[d.r];
   var due = w && w.seen && !w.retired ? dueLabel(w.due) : (w && w.retired ? "retired" : "not started");
   return '<div class="browseitem rich" data-rank="' + d.r + '">' +
-    '<div class="bmain"><span class="bw">' + escapeHtml(d.w) + "</span>" +
+    '<div class="bmain"><div class="bline"><span class="bw">' + escapeHtml(d.w) + "</span>" +
+    speakBtnHtml(d.w) + phoneticHtml(d.w) + "</div>" +
     '<span class="bc">' + escapeHtml(String(d.c || "").replace(/\n/g, " / ")) + "</span></div>" +
     '<div class="bmeta">' + browseStat(d.r) + '<span class="bdue">' + escapeHtml(due) + "</span></div>" +
     (opts.edit ? gradePickerHtml(d.r) : "") +
@@ -1508,7 +1544,8 @@ function sentenceItemHtml(sent) {
   var due = w && w.seen && !w.retired ? dueLabel(w.due) : "not started";
   return '<div class="browseitem rich">' +
     '<div class="bmain"><span class="bw">' + escapeHtml(sent.zh) + "</span>" +
-    '<span class="bc">' + escapeHtml(sent.en[0] || "") + "</span></div>" +
+    '<div class="bline"><span class="bc">' + escapeHtml(sent.en[0] || "") + "</span>" +
+    speakBtnHtml(sent.en[0] || "") + "</div></div>" +
     '<div class="bmeta"><span class="bstat ' + (S_STATUS_CLASS[status] || "new") + '">' +
     escapeHtml(strengthLabel(w)) + "</span>" +
     '<span class="bdue">' + escapeHtml(due) + "</span></div>" +
@@ -1717,7 +1754,15 @@ function onAuthChanged() {
 function wireEvents() {
   elWord = el("word"); elRank = el("rankPill"); elQ = el("qlabel");
   elAns = el("answer"); elReveal = el("reveal"); elYour = el("yourtry");
-  elCn = el("ansCn"); elEn = el("ansEn");
+  elCn = el("ansCn"); elEn = el("ansEn"); elPhon = el("phonetic");
+
+  if (window.Pron && Pron.available()) {
+    el("btnSpeak").addEventListener("click", speakCurrent);
+    elWord.addEventListener("click", speakCurrent);   // tapping the word replays it too
+  } else {
+    el("btnSpeak").classList.add("hidden");           // no speech engine: keep the phonetic, drop the button
+    elWord.style.cursor = "default";
+  }
 
   el("btnCheck").addEventListener("click", reveal);
   el("btnSkip").addEventListener("click", function () {
@@ -1787,7 +1832,9 @@ function wireEvents() {
     }
     var action = e.target.closest ? e.target.closest("[data-action]") : null;
     if (!action) return;
-    if (action.getAttribute("data-action") === "restore") {
+    if (action.getAttribute("data-action") === "speak") {
+      if (window.Pron) Pron.speak(action.getAttribute("data-text"));
+    } else if (action.getAttribute("data-action") === "restore") {
       restoreWord(parseInt(action.getAttribute("data-rank"), 10));
     } else if (action.getAttribute("data-action") === "drill-focus") {
       closeBrowse();
@@ -1830,6 +1877,7 @@ function wireEvents() {
     if (st > 0) S.cfg.strikeLimit = st;
     if (nw >= 0) S.cfg.newPerDay = nw;
     if (!isNaN(pw)) S.cfg.partWeight = pw;
+    S.cfg.autoSpeak = el("setSpeak").value === "1";
     save();
     refreshStats();
     el("settingsSaved").textContent = "Saved. Your new goal will be used for this deck from now on.";

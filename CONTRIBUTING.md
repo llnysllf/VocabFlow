@@ -11,8 +11,11 @@ css/styles.css      All styling
 js/config.js        AWS API + Cognito config for cloud sync
 js/cloud.js         Cognito auth + DynamoDB sync, with offline fallback
 js/app.js           The trainer: scheduling, grading, UI wiring
+js/pron.js          Phonetics + audio playback for the current card
 words.js            The 15,000-word data set (window.VOCAB)
+ipa.js              Phonetic spellings for every headword (window.IPA)
 sentences.js        Chinese → English translation bank (window.SENTENCES)
+tools/build-ipa.py  Regenerates ipa.js from the CMU Pronouncing Dictionary
 backend/            AWS SAM stack: Cognito + API Gateway + Lambda + DynamoDB
 ```
 
@@ -44,6 +47,14 @@ backend is covered in [`backend/README.md`](backend/README.md).
 `words.js` is `window.VOCAB = [{ r, w, c, e }, …]` where `r` is frequency rank,
 `w` the English word, `c` the Chinese meaning, `e` an optional English gloss.
 Ranks must stay unique and contiguous from 1.
+
+`ipa.js` is generated, not hand-edited. After adding or renaming headwords in any
+deck, rebuild it:
+
+```bash
+curl -sLO https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict
+python3 tools/build-ipa.py
+```
 
 ## Pull requests
 

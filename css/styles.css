@@ -1267,6 +1267,53 @@ body.settings-mode .deck-nav{display:none}
   .focusitem .fc{text-align:left}
 }
 
+/* ===== pronunciation ===== */
+/* the prompt word doubles as a play button, so make that discoverable */
+.word{cursor:pointer}
+.pron{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  margin:-32px 0 40px;
+  min-height:34px;
+}
+.speak-btn{
+  display:inline-grid;
+  place-items:center;
+  flex:none;
+  width:34px;
+  height:34px;
+  border:1px solid var(--line-soft);
+  border-radius:999px;
+  background:rgba(255,255,255,.045);
+  color:#aeb8ca;
+  transition:color .16s ease,border-color .16s ease,background .16s ease,transform .08s ease;
+}
+.speak-btn svg{
+  width:17px;
+  height:17px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.9;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.speak-btn:hover{color:var(--accent);border-color:rgba(69,214,163,.4);background:rgba(69,214,163,.1)}
+.speak-btn:active{transform:scale(.94)}
+.speak-btn.mini{width:26px;height:26px}
+.speak-btn.mini svg{width:13px;height:13px}
+.phonetic{
+  color:#8d9bae;
+  font-size:16px;
+  font-weight:650;
+  letter-spacing:.3px;
+  overflow-wrap:anywhere;
+}
+.phonetic.mini{font-size:12px;font-weight:600;white-space:nowrap}
+.bline{display:flex;align-items:center;gap:8px;min-width:0}
+.bline .bw,.bline .bc{min-width:0}
+
 @media (max-width:520px){
   .stats,.metric-grid,.settings-grid{grid-template-columns:1fr}
   .learn-summary{align-items:flex-start;flex-direction:column}
@@ -1274,6 +1321,7 @@ body.settings-mode .deck-nav{display:none}
   .row{display:grid;grid-template-columns:1fr}
   .btn{width:100%}
   .word{font-size:38px}
+  .pron{margin:-24px 0 30px}
   .meaning-row{grid-template-columns:1fr}
   .meaning-pos{width:max-content}
   .scaleedit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}

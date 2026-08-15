@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
-<link rel="stylesheet" href="css/styles.css?v=31">
+<link rel="stylesheet" href="css/styles.css?v=33">
 </head>
 <body>
 <div class="app-shell">
@@ -52,6 +52,12 @@
             <div class="rankpill" id="rankPill">#1</div>
             <div class="qlabel" id="qlabel">What does this word mean?</div>
             <div class="word" id="word">-</div>
+            <div class="pron" id="pronRow">
+              <button class="speak-btn" id="btnSpeak" type="button" aria-label="Hear the pronunciation" title="Hear it again">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3l4.5-3.5v13L7 15H4z"/><path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18.2 6.5a7.8 7.8 0 0 1 0 11"/></svg>
+              </button>
+              <span class="phonetic" id="phonetic"></span>
+            </div>
             <label class="answer-label" for="answer">Your answer in Chinese</label>
             <textarea id="answer" placeholder="输入中文意思..." autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
             <div class="row action-row">
@@ -160,6 +166,10 @@
                 <span>Hard grade weight</span>
                 <select id="setPart"><option value="0.5">half strike</option><option value="0">no strike</option><option value="1">full strike</option></select>
               </label>
+              <label class="setting-field" for="setSpeak">
+                <span>Say the word aloud</span>
+                <select id="setSpeak"><option value="1">automatically</option><option value="0">only when I press play</option></select>
+              </label>
             </div>
             <div class="row">
               <button class="btn ghost" id="btnExport">Export backup</button>
@@ -170,7 +180,7 @@
               <button class="btn primary" id="closeSettings">Save settings</button>
             </div>
             <input type="file" id="importFile" accept="application/json" class="hidden">
-            <p class="screen-note" id="settingsSaved">When signed in, progress syncs to your account. As a guest it is saved in this browser only.</p>
+            <p class="screen-note" id="settingsSaved">When signed in, progress syncs to your account. As a guest it is saved in this browser only. Phonetic spellings ship with the app and work offline. Playback uses a real human recording from Wiktionary where one exists, and your browser's speech voice otherwise — on macOS, System Settings → Accessibility → Spoken Content → System Voice lets you download an Enhanced or Premium voice, which sounds much better than the default.</p>
           </div>
         </section>
 
@@ -265,9 +275,11 @@
 <script src="proverbs.js?v=1"></script>
 <script src="sayings.js?v=1"></script>
 <script src="sentences.js?v=17"></script>
+<script src="ipa.js?v=1"></script>
 <script src="js/config.js?v=7"></script>
 <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
 <script src="js/cloud.js?v=5"></script>
-<script src="js/app.js?v=33"></script>
+<script src="js/pron.js?v=7"></script>
+<script src="js/app.js?v=37"></script>
 </body>
 </html>
