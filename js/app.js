@@ -65,11 +65,23 @@ var DECK_LABELS = { vocab: "Vocabulary", idioms: "Idioms", phrasal: "Phrasal Ver
 var DECK_NOUN = { vocab: "words", idioms: "idioms", phrasal: "phrasal verbs", slang: "slang terms", proverbs: "proverbs", sayings: "sayings" };
 var DECK_ITEM = { vocab: "word", idioms: "idiom", phrasal: "phrasal verb", slang: "slang term", proverbs: "proverb", sayings: "saying" };
 
+/* `r` is identity — progress, cloud records and exported backups are all keyed
+   on it, so it never moves. Frequency order lives in the array order instead,
+   and `f` is the 1-based position derived from it: what the card displays and
+   what "most common first" sorts on. */
 var BY_RANK = {};   // BY_RANK[deckId][rank] -> entry
 DECK_IDS.forEach(function (id) {
   BY_RANK[id] = {};
-  DECKS[id].forEach(function (o) { BY_RANK[id][o.r] = o; });
+  DECKS[id].forEach(function (o, i) {
+    o.f = i + 1;
+    BY_RANK[id][o.r] = o;
+  });
 });
+
+function freqOf(rank) {
+  var d = curIndex()[rank];
+  return d ? d.f : Infinity;
+}
 
 function curData() { return DECKS[S.active] || []; }     // active deck's word list
 function curIndex() { return BY_RANK[S.active] || {}; }  // active deck's rank->entry
@@ -414,7 +426,7 @@ function dueReviews() {
   out.sort(function (a, b) {                  // most overdue first, then most common
     var da = D().words[a].due, db = D().words[b].due;
     if (da !== db) return da - db;
-    return a - b;
+    return freqOf(a) - freqOf(b);
   });
   return out;
 }
@@ -632,7 +644,7 @@ function renderCard(rank) {
     if (S.cfg.autoSpeak) Pron.speak(d.w);
     else Pron.prefetch(d.w);   // have the recording ready before the play button is pressed
   }
-  elRank.textContent = "#" + d.r;
+  elRank.textContent = "#" + d.f;
   syncPosNote();   // boot draws the first card without going through syncAppChrome
   elQ.textContent = (isNew(rank) ? "NEW " + DECK_ITEM[S.active].toUpperCase() : "REVIEW") + " — what does it mean?";
   setTimeout(function () { elAns.focus(); }, 30);
@@ -1596,7 +1608,7 @@ function renderBrowse() {
       if (!d || !w.seen || w.retired || w.due <= todayIndex() || !entryMatches(d, q)) continue;
       upcoming.push({ d: d, due: w.due });
     }
-    upcoming.sort(function (a, b) { return a.due - b.due || a.d.r - b.d.r; });
+    upcoming.sort(function (a, b) { return a.due - b.due || a.d.f - b.d.f; });
     upcoming.forEach(function (it) {
       matches++;
       if (parts.length < CAP) parts.push(browseItemHtml(it.d, { edit: true }));

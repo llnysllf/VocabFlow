@@ -46,7 +46,19 @@ backend is covered in [`backend/README.md`](backend/README.md).
 
 `words.js` is `window.VOCAB = [{ r, w, c, e }, …]` where `r` is frequency rank,
 `w` the English word, `c` the Chinese meaning, `e` an optional English gloss.
-Ranks must stay unique and contiguous from 1.
+`r` is **identity, not order**. Progress records, cloud rows and exported backups
+are all keyed on it, so an entry's `r` must never be reassigned to a different
+word — that would silently move every scheduled review onto the wrong card. Ranks
+must stay unique and contiguous from 1, but they need not be in frequency order.
+
+Teaching order is **array order**: the app introduces new words front to back and
+derives the displayed rank (`f`) from position at load. To re-sort the deck,
+reorder the array and leave every `r` attached to its own word:
+
+```bash
+pip install wordfreq
+python3 tools/rerank-words.py
+```
 
 `ipa.js` is generated, not hand-edited. After adding or renaming headwords in any
 deck, rebuild it:
