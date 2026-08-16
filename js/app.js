@@ -1335,21 +1335,39 @@ function wordForms(token) {
   return out;
 }
 
+/* How well `token` matches, as the length of what it matched — 0 for no match.
+   Length is what lets a more specific pattern outrank a looser one in
+   gradePoints; anywhere a yes/no answer is enough, just test for truthiness.
+
+   Phrases match on word boundaries, not as raw substrings. Without that,
+   "how much does this cost" is found inside "how much does this costs", and
+   "most students" inside "almost students" — so the very errors a point lists
+   as wrong sail through it. */
 function hasTok(norm, token, fuzzy, banned) {
   token = normEn(token);
-  if (!token) return false;
-  if (token.indexOf(" ") >= 0) return norm.indexOf(token) >= 0;          // phrase
+  if (!token) return 0;
   var pad = " " + norm + " ";
-  if (pad.indexOf(" " + token + " ") >= 0) return true;                  // whole word
-  if (!fuzzy) return false;
+  if (token.indexOf(" ") >= 0) {                                          // phrase
+    return pad.indexOf(" " + token + " ") >= 0 ? token.length : 0;
+  }
+  if (pad.indexOf(" " + token + " ") >= 0) return token.length;           // whole word
+  if (!fuzzy) return 0;
   // A form the point explicitly lists as wrong must not be rescued by fuzzing:
   // those are the verb-form errors the sentence is there to teach.
   var forms = wordForms(token);
   for (var i = 0; i < forms.length; i++) {
     if (banned && banned.indexOf(forms[i]) >= 0) continue;
-    if (pad.indexOf(" " + forms[i] + " ") >= 0) return true;
+    if (pad.indexOf(" " + forms[i] + " ") >= 0) return token.length;
   }
-  return false;
+  return 0;
+}
+
+function bestMatch(list, norm, fuzzy, banned) {
+  var best = 0;
+  for (var i = 0; i < (list || []).length; i++) {
+    best = Math.max(best, hasTok(norm, list[i], fuzzy, banned));
+  }
+  return best;
 }
 
 /* Forms that are everywhere in real speech but that a grammar book marks wrong.
@@ -1418,8 +1436,12 @@ function gradePoints(sent, answer) {
   var exact = sent.en.map(normEn).indexOf(n) >= 0;
   var points = (sent.points || []).map(function (p) {
     var banned = (p.wrong || []).map(normEn);
-    var ok = (p.need || []).some(function (t) { return hasTok(n, t, true, banned); });
-    var wrong = !ok && (p.wrong || []).some(function (t) { return hasTok(n, t, false); });
+    // The longer pattern describes what was typed more precisely, so it wins.
+    // "close the window" is in the needed list, but "you close the window" is
+    // listed as wrong and matches more of the answer — so the answer is wrong.
+    var need = bestMatch(p.need, n, true, banned);
+    var wrong = bestMatch(p.wrong, n, false);
+    var ok = need > 0 && wrong <= need;
     return { p: p, status: ok ? "ok" : (wrong ? "wrong" : "missing") };
   });
   var failed = points.filter(function (x) { return x.status !== "ok"; });

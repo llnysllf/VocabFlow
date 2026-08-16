@@ -51,26 +51,38 @@ def word_forms(token):
 
 
 def has_token(text, token, fuzzy, banned=()):
+    """Length of what `token` matched, or 0. Phrases match on word boundaries."""
     token = norm(token)
     if not token:
-        return False
-    if " " in token:
-        return token in text
+        return 0
     padded = " " + text + " "
+    if " " in token:
+        return len(token) if " " + token + " " in padded else 0
     if " " + token + " " in padded:
-        return True
+        return len(token)
     if not fuzzy:
-        return False
-    return any(" " + f + " " in padded for f in word_forms(token) if f not in banned)
+        return 0
+    for form in word_forms(token):
+        if form in banned:
+            continue
+        if " " + form + " " in padded:
+            return len(token)
+    return 0
+
+
+def best_match(candidates, text, fuzzy, banned=()):
+    return max([has_token(text, t, fuzzy, banned) for t in (candidates or [])] or [0])
 
 
 def grades_correct(sentence, answer):
     text = norm(answer)
-    if norm_any(sentence) and text in norm_any(sentence):
+    if text in norm_any(sentence):
         return True
     for point in sentence.get("points", []):
         banned = [norm(w) for w in point.get("wrong", [])]
-        if not any(has_token(text, t, True, banned) for t in point.get("need", [])):
+        need = best_match(point.get("need"), text, True, banned)
+        wrong = best_match(point.get("wrong"), text, False)
+        if not (need > 0 and wrong <= need):     # the longer pattern wins
             return False
     return True
 
