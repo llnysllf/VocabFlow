@@ -31,7 +31,7 @@ without sign-in it works fully offline as a guest, saving progress in your brows
 
 ## Features
 
-- 🗂️ **Two decks plus Sentences** — Vocabulary and Expressions (idioms, phrasal verbs, slang, proverbs, sayings), each tracked separately. Vocabulary splits into Nouns / Verbs / Adjectives / Adverbs / Other in the sidebar.
+- 🗂️ **Two decks plus Sentences** — Vocabulary and Expressions, each tracked separately. Vocabulary splits by word type; Expressions splits by kind, and its Slang splits again by country.
 - ✍️ **Sentences mode** — translate Chinese sentences into English; a built-in grader accepts multiple phrasings and points out what's off (no AI, fully offline). Natural spoken forms like *"there's three books"* or *"gonna"* are accepted, with a note on what the written form would be.
 - 🔎 **Library view** — search a deck and filter by status: today, answered, upcoming, too easy, or all.
 - 🧠 **Spaced repetition** — expanding review intervals (same-day → 1 → 2 → 4 → 10 → 30 → 90 days).
@@ -85,11 +85,27 @@ Words carrying several senses (`in` is a preposition, adverb, adjective *and* no
 under each of their types. *Other* covers prepositions, pronouns, abbreviations and the
 ~2,000 entries whose meaning has no part-of-speech marker, so nothing is unreachable.
 Idioms, phrasal verbs, proverbs and sayings carry no markers, so they get no word-type
-sub-entries. **Expressions** has its own split instead: **American · British · Australian ·
-General**, which narrows the deck to that country's slang. Words like `arvo` and
-`knackered` are missing from the CMU dictionary (it is American), so they show no phonetic
-— but Wiktionary has recordings by native speakers of the right accent, so the play button
-still gives you `En-au-arvo.ogg` rather than an American approximation.
+sub-entries. **Expressions** splits by kind instead — **Idioms · Phrasal Verbs · Slang ·
+Proverbs · Sayings** — and **Slang** splits again by country, since slang is the only kind
+tied to one:
+
+```
+Expressions        3,241
+   Idioms          1,000
+   Phrasal Verbs   1,000
+   Slang             150
+      American        40
+      British         40
+      Australian      35
+      General         35
+   Proverbs          491
+   Sayings           600
+```
+
+The nations only unfold once Slang is selected. Words like `arvo` and `knackered` are
+missing from the CMU dictionary (it is American), so they show no phonetic — but Wiktionary
+has recordings by native speakers of the right accent, so the play button still gives you
+`En-au-arvo.ogg` rather than an American approximation.
 
 ## Spoken English in the sentence grader
 
