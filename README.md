@@ -84,7 +84,12 @@ adjectives alone. A pill on the practice card shows when the deck is narrowed.
 Words carrying several senses (`in` is a preposition, adverb, adjective *and* noun) appear
 under each of their types. *Other* covers prepositions, pronouns, abbreviations and the
 ~2,000 entries whose meaning has no part-of-speech marker, so nothing is unreachable.
-Expressions are phrases and carry no markers, so no sub-entries appear under that deck.
+Idioms, phrasal verbs, proverbs and sayings carry no markers, so they get no word-type
+sub-entries. **Expressions** has its own split instead: **American · British · Australian ·
+General**, which narrows the deck to that country's slang. Words like `arvo` and
+`knackered` are missing from the CMU dictionary (it is American), so they show no phonetic
+— but Wiktionary has recordings by native speakers of the right accent, so the play button
+still gives you `En-au-arvo.ogg` rather than an American approximation.
 
 ## Spoken English in the sentence grader
 
@@ -219,7 +224,11 @@ Lambda + DynamoDB, defined as one SAM template) for accounts and sync.
   a verified idiom knowledge base (each entry with a Chinese and English meaning).
 - **Proverbs** come from [**LLMProverbMT**](https://github.com/yuriak/LLMProverbMT) (human-verified
   English→Chinese proverbs) plus IdiomKB.
-- **Slang** is drawn from ECDICT's register-tagged (俚/口) slang and colloquial entries.
+- **Slang** is hand-curated for this project and tagged by where it is used —
+  American, British, Australian, or General. It replaced ECDICT's register-tagged (俚/口)
+  entries, which were unreliable (`molly` glossed as "coward" but defined as an aquarium
+  fish, `becky` as "上挂钩"). Vulgar terms, slurs, and words whose meaning flips between
+  countries are deliberately excluded.
 - **Sentences** are hand-built to cover a broad spread of English grammar points.
 - The most common entries in each deck are hand-curated at the top.
 - **Phonetic spellings** (`ipa.js`) are converted from the

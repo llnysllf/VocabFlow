@@ -7,7 +7,7 @@ var INTERVALS = { 0: 0, 1: 1, 2: 2, 3: 4, 4: 10, 5: 30, 6: 90 }; // days to next
 var MAX_LEVEL = 6;                           // level 6 = very strong, still reviewed rarely
 var RETIRED_DUE = 999999;                    // "too easy" items stay out of review
 
-var DEFAULTS = { strikeLimit: 7, newPerDay: 50, partWeight: 0.5, autoSpeak: true, pos: "all" };
+var DEFAULTS = { strikeLimit: 7, newPerDay: 50, partWeight: 0.5, autoSpeak: true, pos: "all", nat: "all" };
 
 /* Part-of-speech filter. "other" is everything the four main classes miss —
    prepositions, pronouns, abbreviations, and the ~8% of entries whose meaning
@@ -23,6 +23,20 @@ var POS_FILTERS = [
 ];
 function posFilterValid(id) {
   return POS_FILTERS.some(function (f) { return f.id === id; }) ? id : "all";
+}
+
+/* Slang is the only part of Expressions tied to a country, so picking a nation
+   narrows the deck to that country's slang rather than filtering the idioms and
+   proverbs — which belong to no one in particular. */
+var NAT_FILTERS = [
+  { id: "all", label: "All" },
+  { id: "American", label: "American" },
+  { id: "British", label: "British" },
+  { id: "Australian", label: "Australian" },
+  { id: "General", label: "General" }
+];
+function natFilterValid(id) {
+  return NAT_FILTERS.some(function (f) { return f.id === id; }) ? id : "all";
 }
 
 var GRADE_IDS = ["again", "hard", "shaky", "good", "easy", "retire"];
@@ -69,7 +83,7 @@ function buildExpressions() {
   EXPRESSION_PARTS.forEach(function (part) {
     EXPRESSION_OFFSET[part.id] = offset;
     part.data.forEach(function (e) {
-      out.push({ r: offset + e.r, w: e.w, c: e.c, e: e.e, src: part.id });
+      out.push({ r: offset + e.r, w: e.w, c: e.c, e: e.e, src: part.id, nat: e.nat || "" });
     });
     offset += part.data.length;
   });
@@ -495,7 +509,7 @@ function nextNewRank() {
   for (var i = 0; i < data.length; i++) {
     var r = data[i].r;
     if (skipped[r]) continue;
-    if (!posMatches(data[i])) continue;
+    if (!inScope(data[i])) continue;
     if (!D().words[r] || (!D().words[r].seen && !D().words[r].retired)) return r;
   }
   return null;
@@ -505,7 +519,7 @@ function nextUnseenRank() {
   var data = curData();
   for (var i = 0; i < data.length; i++) {
     var r = data[i].r;
-    if (!posMatches(data[i])) continue;
+    if (!inScope(data[i])) continue;
     if (!D().words[r] || (!D().words[r].seen && !D().words[r].retired)) return r;
   }
   return null;
@@ -895,16 +909,16 @@ function countRetired() { var c = 0; for (var r in D().words) { if (D().words[r]
 function countSeen() { var c = 0; for (var r in D().words) { if (D().words[r].seen && posMatchesRank(parseInt(r, 10))) c++; } return c; }
 function countDue() { return dueReviews().length; }
 function countInScope() {
-  if (posFilter() === "all") return curData().length;
+  if (posFilter() === "all" && natFilter() === "all") return curData().length;
   var c = 0, data = curData();
-  for (var i = 0; i < data.length; i++) { if (posMatches(data[i])) c++; }
+  for (var i = 0; i < data.length; i++) { if (inScope(data[i])) c++; }
   return c;
 }
 function countNotStarted() {
   var c = 0;
   var data = curData();
   for (var i = 0; i < data.length; i++) {
-    if (!posMatches(data[i])) continue;
+    if (!inScope(data[i])) continue;
     var w = D().words[data[i].r];
     if (!w || (!w.seen && !w.retired)) c++;
   }
@@ -950,7 +964,7 @@ function renderStatsScreen() {
   var total = countInScope();
   var learning = Math.max(0, seen - mastered - retired);
   el("statsDeckName").textContent = DECK_LABELS[S.active] +
-    (posFilter() === "all" ? "" : " · " + posLabelFor(posFilter())) +
+    (scopeLabel() ? " · " + scopeLabel() : "") +
     " · " + total.toLocaleString() + " " + DECK_NOUN[S.active];
   el("statsLeftToLearn").textContent = left.toLocaleString();
   el("statsLearnLine").textContent = retired.toLocaleString() + " known · " + total.toLocaleString() + " total";
@@ -1185,12 +1199,20 @@ function syncAppChrome(view) {
 }
 
 /* A narrowed deck has to say so, or a short queue looks like a bug. */
+/* The label for whatever narrowing is in force, or "" when the whole deck is
+   in play. Used by the practice pill, the list header and the stats heading. */
+function scopeLabel() {
+  if (posFilter() !== "all") return posLabelFor(posFilter());
+  if (natFilter() !== "all") return natLabelFor(natFilter()) + " slang";
+  return "";
+}
+
 function syncPosNote() {
   var note = el("posNote");
   if (!note) return;
-  var active = posFilter() !== "all";
-  note.classList.toggle("hidden", !active);
-  if (active) note.textContent = posLabelFor(posFilter()) + " only";
+  var label = scopeLabel();
+  note.classList.toggle("hidden", !label);
+  if (label) note.textContent = label + " only";
 }
 
 function showPractice() {
@@ -1518,28 +1540,34 @@ function skipSentence() { nextSentence(); }   // move on without recording a res
 
 /* ---------------- deck tabs ---------------- */
 
-/* Selecting a deck keeps you in whatever view you were already in. */
-function selectDeck(id, pos) {
+/* Selecting a deck keeps you in whatever view you were already in. `scope` is
+   the sub-entry that was clicked: a word type on Vocabulary, a nation on
+   Expressions, or undefined for the deck's own row. */
+function selectDeck(id, scope) {
   var prevView = appView;
-  var posChanged = pos !== undefined && posFilterValid(pos) !== S.cfg.pos;
-  if (posChanged) { S.cfg.pos = posFilterValid(pos); save(); }
+  var changed = false;
+  if (scope !== undefined) {
+    var key = id === "expressions" ? "nat" : "pos";
+    var next = id === "expressions" ? natFilterValid(scope) : posFilterValid(scope);
+    if (S.cfg[key] !== next) { S.cfg[key] = next; changed = true; save(); }
+  }
 
   if (prevView === "stats" || prevView === "settings") {
     deckNavSelected = id;
     if (id !== S.active) switchDeck(id);
-    else if (posChanged) startSession();
+    else if (changed) startSession();
     showStatsView(); renderTabs();
   } else if (browseActive) {
     deckNavSelected = null;
     if (id !== S.active) switchDeck(id);     // switchDeck re-opens browse for the new deck
-    else { if (posChanged) startSession(); openBrowse(browseView); }
+    else { if (changed) startSession(); openBrowse(browseView); }
   } else {
     deckNavSelected = null;
     appView = "practice";
     syncAppChrome("practice");
     if (id !== S.active) switchDeck(id);
     else {
-      if (posChanged) startSession();
+      if (changed) startSession();
       showScreen(practiceDone ? "screenDone" : "screenTest");
       renderTabs();
     }
@@ -1571,6 +1599,14 @@ function posCount(deckId, id) {
   return (posCountCache[key] = n);
 }
 
+var natCountCache = {};
+function natCount(id) {
+  if (natCountCache[id] !== undefined) return natCountCache[id];
+  var data = DECKS.expressions || [], n = 0;
+  for (var i = 0; i < data.length; i++) { if (natMatchesWith(data[i], id)) n++; }
+  return (natCountCache[id] = n);
+}
+
 function renderTabs() {
   var nav = el("tabs");
   if (!nav) return;
@@ -1578,18 +1614,26 @@ function renderTabs() {
   var sel = currentNavSelected();
 
   DECK_IDS.forEach(function (id) {
-    var active = id === sel && !(id === "vocab" && posFilter() !== "all");
-    nav.appendChild(tabButton(DECK_LABELS[id], DECKS[id].length, active, function () {
-      selectDeck(id, id === "vocab" ? "all" : undefined);
+    var narrowed = id === "vocab" ? posFilter() !== "all" : natFilter() !== "all";
+    nav.appendChild(tabButton(DECK_LABELS[id], DECKS[id].length, id === sel && !narrowed, function () {
+      selectDeck(id, "all");
     }));
-    // Word types hang off Vocabulary as sub-entries; they are views over the
-    // same deck and the same progress, not decks of their own.
+    // Sub-entries are views over the same deck and the same progress, not decks
+    // of their own: word types on Vocabulary, slang by nation on Expressions.
     if (id === "vocab" && deckHasPosFor("vocab")) {
       POS_FILTERS.forEach(function (f) {
         if (f.id === "all") return;
         nav.appendChild(tabButton(f.label, posCount("vocab", f.id),
           sel === "vocab" && posFilter() === f.id,
           function () { selectDeck("vocab", f.id); }, "subtab"));
+      });
+    }
+    if (id === "expressions" && deckHasNatFor("expressions")) {
+      NAT_FILTERS.forEach(function (f) {
+        if (f.id === "all") return;
+        nav.appendChild(tabButton(f.label, natCount(f.id),
+          sel === "expressions" && natFilter() === f.id,
+          function () { selectDeck("expressions", f.id); }, "subtab"));
       });
     }
   });
@@ -1685,9 +1729,31 @@ function posFilter() {
 
 function posMatches(d) { return posMatchesWith(d, posFilter(), S.active); }
 
+/* Only meaningful on Expressions, and only slang carries a nation. */
+function deckHasNatFor(deckId) {
+  return (DECKS[deckId] || []).some(function (d) { return !!d.nat; });
+}
+function natFilter() {
+  return (S.active === "expressions" && deckHasNatFor("expressions")) ? natFilterValid(S.cfg.nat) : "all";
+}
+function natMatchesWith(d, want) {
+  return want === "all" || d.nat === want;
+}
+function natMatches(d) { return natMatchesWith(d, natFilter()); }
+
+function natLabelFor(id) {
+  for (var i = 0; i < NAT_FILTERS.length; i++) {
+    if (NAT_FILTERS[i].id === id) return NAT_FILTERS[i].label;
+  }
+  return "All";
+}
+
+/* The one predicate every list and queue goes through. */
+function inScope(d) { return posMatches(d) && natMatches(d); }
+
 function posMatchesRank(rank) {
   var d = curIndex()[rank];
-  return !d || posMatches(d);
+  return !d || inScope(d);
 }
 
 function posLabelFor(id) {
@@ -1698,7 +1764,7 @@ function posLabelFor(id) {
 }
 
 function entryMatches(d, q) {
-  if (!posMatches(d)) return false;
+  if (!inScope(d)) return false;
   if (!q) return true;
   return d.w.toLowerCase().indexOf(q) !== -1 ||
     String(d.c || "").toLowerCase().indexOf(q) !== -1;
@@ -1841,7 +1907,7 @@ function renderBrowse() {
   }
 
   el("browseList").innerHTML = parts.length ? parts.join("") : '<div class="browseempty">No matches.</div>';
-  var scope = posFilter() === "all" ? "" : " · " + posLabelFor(posFilter());
+  var scope = scopeLabel() ? " · " + scopeLabel() : "";
   var label = q ? matches.toLocaleString() + " match" + (matches === 1 ? "" : "es") + scope :
     DECK_LABELS[S.active] + " · " + browseView + scope;
   if (matches > CAP) label += " · showing first " + CAP.toLocaleString() + ", search to narrow";
