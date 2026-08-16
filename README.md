@@ -32,7 +32,7 @@ without sign-in it works fully offline as a guest, saving progress in your brows
 ## Features
 
 - 🗂️ **Two decks plus Sentences** — Vocabulary and Expressions (idioms, phrasal verbs, slang, proverbs, sayings), each tracked separately. Vocabulary splits into Nouns / Verbs / Adjectives / Adverbs / Other in the sidebar.
-- ✍️ **Sentences mode** — translate Chinese sentences into English; a built-in grader accepts multiple phrasings and points out what's off (no AI, fully offline).
+- ✍️ **Sentences mode** — translate Chinese sentences into English; a built-in grader accepts multiple phrasings and points out what's off (no AI, fully offline). Natural spoken forms like *"there's three books"* or *"gonna"* are accepted, with a note on what the written form would be.
 - 🔎 **Library view** — search a deck and filter by status: today, answered, upcoming, too easy, or all.
 - 🧠 **Spaced repetition** — expanding review intervals (same-day → 1 → 2 → 4 → 10 → 30 → 90 days).
 - 📊 **Frequency-ordered** — learn the highest-value words first, 15,000 in total.
@@ -84,7 +84,32 @@ adjectives alone. A pill on the practice card shows when the deck is narrowed.
 Words carrying several senses (`in` is a preposition, adverb, adjective *and* noun) appear
 under each of their types. *Other* covers prepositions, pronouns, abbreviations and the
 ~2,000 entries whose meaning has no part-of-speech marker, so nothing is unreachable.
-Expressions are phrases and carry no markers, so no sub-entries appear under that deck.
+Idioms, phrasal verbs, proverbs and sayings carry no markers, so they get no word-type
+sub-entries. **Expressions** has its own split instead: **American · British · Australian ·
+General**, which narrows the deck to that country's slang. Words like `arvo` and
+`knackered` are missing from the CMU dictionary (it is American), so they show no phonetic
+— but Wiktionary has recordings by native speakers of the right accent, so the play button
+still gives you `En-au-arvo.ogg` rather than an American approximation.
+
+## Spoken English in the sentence grader
+
+Plenty of English is universal in speech but marked wrong in a grammar book. The grader
+accepts those instead of failing you, and says what the written form would be:
+
+| You type | Accepted, with a note |
+|---|---|
+| There**'s** three books on the table. | *"there's" before a plural is what almost everyone says — the textbook form is "there are".* |
+| I'm **gonna** go to Beijing tomorrow. | *"gonna" is how "going to" is said — normal in speech, but write "going to".* |
+| There's **less** tourists this year. | *"less" with countable things is everywhere in speech — writing prefers "fewer".* |
+| **Me and** my friend watched a movie. | *"me and …" as the subject is extremely common in speech — writing wants "… and I".* |
+| I could **of** helped you. | *"could of" sounds exactly like "could've", which is why it is so common — but in writing it is "could have".* |
+
+Also covered: *wanna · gotta · kinda · gimme · lemme · cuz · there was + plural ·
+if I was · than me/him/her/them · doing good · different than*.
+
+Genuinely stigmatised forms are deliberately **not** accepted — `ain't` and double
+negatives would hurt a learner more than help. Nor are the real errors each sentence is
+built to teach: wrong tense, wrong verb form, missing article, singular for plural.
 
 ## Run it locally
 
@@ -199,7 +224,11 @@ Lambda + DynamoDB, defined as one SAM template) for accounts and sync.
   a verified idiom knowledge base (each entry with a Chinese and English meaning).
 - **Proverbs** come from [**LLMProverbMT**](https://github.com/yuriak/LLMProverbMT) (human-verified
   English→Chinese proverbs) plus IdiomKB.
-- **Slang** is drawn from ECDICT's register-tagged (俚/口) slang and colloquial entries.
+- **Slang** is hand-curated for this project and tagged by where it is used —
+  American, British, Australian, or General. It replaced ECDICT's register-tagged (俚/口)
+  entries, which were unreliable (`molly` glossed as "coward" but defined as an aquarium
+  fish, `becky` as "上挂钩"). Vulgar terms, slurs, and words whose meaning flips between
+  countries are deliberately excluded.
 - **Sentences** are hand-built to cover a broad spread of English grammar points.
 - The most common entries in each deck are hand-curated at the top.
 - **Phonetic spellings** (`ipa.js`) are converted from the

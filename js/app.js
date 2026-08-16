@@ -7,7 +7,7 @@ var INTERVALS = { 0: 0, 1: 1, 2: 2, 3: 4, 4: 10, 5: 30, 6: 90 }; // days to next
 var MAX_LEVEL = 6;                           // level 6 = very strong, still reviewed rarely
 var RETIRED_DUE = 999999;                    // "too easy" items stay out of review
 
-var DEFAULTS = { strikeLimit: 7, newPerDay: 50, partWeight: 0.5, autoSpeak: true, pos: "all" };
+var DEFAULTS = { strikeLimit: 7, newPerDay: 50, partWeight: 0.5, autoSpeak: true, pos: "all", nat: "all" };
 
 /* Part-of-speech filter. "other" is everything the four main classes miss —
    prepositions, pronouns, abbreviations, and the ~8% of entries whose meaning
@@ -23,6 +23,20 @@ var POS_FILTERS = [
 ];
 function posFilterValid(id) {
   return POS_FILTERS.some(function (f) { return f.id === id; }) ? id : "all";
+}
+
+/* Slang is the only part of Expressions tied to a country, so picking a nation
+   narrows the deck to that country's slang rather than filtering the idioms and
+   proverbs — which belong to no one in particular. */
+var NAT_FILTERS = [
+  { id: "all", label: "All" },
+  { id: "American", label: "American" },
+  { id: "British", label: "British" },
+  { id: "Australian", label: "Australian" },
+  { id: "General", label: "General" }
+];
+function natFilterValid(id) {
+  return NAT_FILTERS.some(function (f) { return f.id === id; }) ? id : "all";
 }
 
 var GRADE_IDS = ["again", "hard", "shaky", "good", "easy", "retire"];
@@ -69,7 +83,7 @@ function buildExpressions() {
   EXPRESSION_PARTS.forEach(function (part) {
     EXPRESSION_OFFSET[part.id] = offset;
     part.data.forEach(function (e) {
-      out.push({ r: offset + e.r, w: e.w, c: e.c, e: e.e, src: part.id });
+      out.push({ r: offset + e.r, w: e.w, c: e.c, e: e.e, src: part.id, nat: e.nat || "" });
     });
     offset += part.data.length;
   });
@@ -495,7 +509,7 @@ function nextNewRank() {
   for (var i = 0; i < data.length; i++) {
     var r = data[i].r;
     if (skipped[r]) continue;
-    if (!posMatches(data[i])) continue;
+    if (!inScope(data[i])) continue;
     if (!D().words[r] || (!D().words[r].seen && !D().words[r].retired)) return r;
   }
   return null;
@@ -505,7 +519,7 @@ function nextUnseenRank() {
   var data = curData();
   for (var i = 0; i < data.length; i++) {
     var r = data[i].r;
-    if (!posMatches(data[i])) continue;
+    if (!inScope(data[i])) continue;
     if (!D().words[r] || (!D().words[r].seen && !D().words[r].retired)) return r;
   }
   return null;
@@ -895,16 +909,16 @@ function countRetired() { var c = 0; for (var r in D().words) { if (D().words[r]
 function countSeen() { var c = 0; for (var r in D().words) { if (D().words[r].seen && posMatchesRank(parseInt(r, 10))) c++; } return c; }
 function countDue() { return dueReviews().length; }
 function countInScope() {
-  if (posFilter() === "all") return curData().length;
+  if (posFilter() === "all" && natFilter() === "all") return curData().length;
   var c = 0, data = curData();
-  for (var i = 0; i < data.length; i++) { if (posMatches(data[i])) c++; }
+  for (var i = 0; i < data.length; i++) { if (inScope(data[i])) c++; }
   return c;
 }
 function countNotStarted() {
   var c = 0;
   var data = curData();
   for (var i = 0; i < data.length; i++) {
-    if (!posMatches(data[i])) continue;
+    if (!inScope(data[i])) continue;
     var w = D().words[data[i].r];
     if (!w || (!w.seen && !w.retired)) c++;
   }
@@ -950,7 +964,7 @@ function renderStatsScreen() {
   var total = countInScope();
   var learning = Math.max(0, seen - mastered - retired);
   el("statsDeckName").textContent = DECK_LABELS[S.active] +
-    (posFilter() === "all" ? "" : " · " + posLabelFor(posFilter())) +
+    (scopeLabel() ? " · " + scopeLabel() : "") +
     " · " + total.toLocaleString() + " " + DECK_NOUN[S.active];
   el("statsLeftToLearn").textContent = left.toLocaleString();
   el("statsLearnLine").textContent = retired.toLocaleString() + " known · " + total.toLocaleString() + " total";
@@ -1185,12 +1199,20 @@ function syncAppChrome(view) {
 }
 
 /* A narrowed deck has to say so, or a short queue looks like a bug. */
+/* The label for whatever narrowing is in force, or "" when the whole deck is
+   in play. Used by the practice pill, the list header and the stats heading. */
+function scopeLabel() {
+  if (posFilter() !== "all") return posLabelFor(posFilter());
+  if (natFilter() !== "all") return natLabelFor(natFilter()) + " slang";
+  return "";
+}
+
 function syncPosNote() {
   var note = el("posNote");
   if (!note) return;
-  var active = posFilter() !== "all";
-  note.classList.toggle("hidden", !active);
-  if (active) note.textContent = posLabelFor(posFilter()) + " only";
+  var label = scopeLabel();
+  note.classList.toggle("hidden", !label);
+  if (label) note.textContent = label + " only";
 }
 
 function showPractice() {
@@ -1247,27 +1269,129 @@ function normEn(s) {
   s = s.replace(/[.,!?;:"“”()]/g, " ");
   return s.replace(/\s+/g, " ").trim();
 }
-function hasTok(norm, token, fuzzy) {
+/* A point that needs "tall" should be satisfied by "taller", one that needs
+   "graduate" by "graduated". Without this, valid paraphrases of the deck's own
+   sample answers get marked wrong. Applied only to the "needed" side. */
+var SUFFIXES = ["s", "es", "'s", "d", "ed", "r", "er", "st", "est", "ing", "ies", "ied"];
+function wordForms(token) {
+  var out = [], i, suf;
+  var doubles = token.length > 2 &&
+    "aeiouwxy".indexOf(token.charAt(token.length - 1)) < 0 &&
+    "aeiou".indexOf(token.charAt(token.length - 2)) >= 0 &&
+    "aeiou".indexOf(token.charAt(token.length - 3)) < 0;
+  for (i = 0; i < SUFFIXES.length; i++) {
+    suf = SUFFIXES[i];
+    out.push(token + suf);
+    if (token.slice(-1) === "e") out.push(token.slice(0, -1) + suf);
+    if (token.slice(-1) === "y") out.push(token.slice(0, -1) + "i" + suf);
+    if (doubles) out.push(token + token.slice(-1) + suf);   // stop -> stopped
+  }
+  return out;
+}
+
+function hasTok(norm, token, fuzzy, banned) {
   token = normEn(token);
   if (!token) return false;
   if (token.indexOf(" ") >= 0) return norm.indexOf(token) >= 0;          // phrase
   var pad = " " + norm + " ";
   if (pad.indexOf(" " + token + " ") >= 0) return true;                  // whole word
-  // simple-plural tolerance, only for the "needed" words (not the wrong-form list)
-  return !!fuzzy && (pad.indexOf(" " + token + "s ") >= 0 || pad.indexOf(" " + token + "es ") >= 0);
+  if (!fuzzy) return false;
+  // A form the point explicitly lists as wrong must not be rescued by fuzzing:
+  // those are the verb-form errors the sentence is there to teach.
+  var forms = wordForms(token);
+  for (var i = 0; i < forms.length; i++) {
+    if (banned && banned.indexOf(forms[i]) >= 0) continue;
+    if (pad.indexOf(" " + forms[i] + " ") >= 0) return true;
+  }
+  return false;
 }
-/* Accept several phrasings; otherwise diagnose each tested point. */
-function gradeSentence(sent, answer) {
+
+/* Forms that are everywhere in real speech but that a grammar book marks wrong.
+   The learner's answer is rewritten to the textbook form and re-graded; if that
+   passes, the answer is accepted and the note explains what was informal. */
+var SPOKEN_FORMS = [
+  { re: /\bgonna\b/gi,  to: "going to",
+    note: "“gonna” is how “going to” is said — normal in speech, but write “going to”." },
+  { re: /\bwanna\b/gi,  to: "want to",
+    note: "“wanna” is how “want to” is said — normal in speech, but write “want to”." },
+  { re: /\bgotta\b/gi,  to: "have got to",
+    note: "“gotta” is how “got to” is said — normal in speech, but write “have got to”." },
+  { re: /\bkinda\b/gi,  to: "kind of",
+    note: "“kinda” is how “kind of” is said — normal in speech, but write “kind of”." },
+  { re: /\bgimme\b/gi,  to: "give me",
+    note: "“gimme” is how “give me” is said — normal in speech, but write “give me”." },
+  { re: /\blemme\b/gi,  to: "let me",
+    note: "“lemme” is how “let me” is said — normal in speech, but write “let me”." },
+  { re: /\b(?:cuz|coz|'cause)\b/gi, to: "because",
+    note: "“cuz” for “because” — fine in speech and texting, not in writing." },
+  { re: /\b(could|would|should|must|might) of\b/gi, to: "$1 have",
+    note: "“$1 of” sounds exactly like “$1’ve”, which is why it is so common — but in writing it is “$1 have”." },
+  { re: /\bthere(?:'s| is)\b(?=[^,.;?!]*\b(?:two|three|four|five|six|seven|eight|nine|ten|many|several|some|lots|a lot|\w+s)\b)/gi,
+    to: "there are",
+    note: "“there’s” before a plural is what almost everyone says — the textbook form is “there are”." },
+  { re: /\bthere was\b(?=[^,.;?!]*\b(?:two|three|four|five|six|seven|eight|nine|ten|many|several|\w+s)\b)/gi,
+    to: "there were",
+    note: "“there was” before a plural is very common in speech — the textbook form is “there were”." },
+  { re: /\bless\b(?=\s+\w+s\b)/gi, to: "fewer",
+    note: "“less” with countable things is everywhere in speech — writing prefers “fewer”." },
+  { re: /\bif (i|he|she|it) was\b/gi, to: "if $1 were",
+    note: "“if $1 was” is normal in speech; the subjunctive “if $1 were” is the textbook form." },
+  { re: /\bthan me\b/gi,   to: "than I",   note: "“than me” is what people say; strict grammar wants “than I”." },
+  { re: /\bthan him\b/gi,  to: "than he",  note: "“than him” is what people say; strict grammar wants “than he”." },
+  { re: /\bthan her\b/gi,  to: "than she", note: "“than her” is what people say; strict grammar wants “than she”." },
+  { re: /\bthan them\b/gi, to: "than they",note: "“than them” is what people say; strict grammar wants “than they”." },
+  { re: /\bme and (\w+)\b/gi, to: "$1 and I",
+    note: "“me and …” as the subject is extremely common in speech — writing wants “… and I”." },
+  { re: /\b(doing|feeling) good\b/gi, to: "$1 well",
+    note: "“$1 good” is standard in American speech; the textbook form is “$1 well”." },
+  { re: /\bdifferent than\b/gi, to: "different from",
+    note: "“different than” is normal in American English; “different from” is the safer written form." }
+];
+
+/* Rewrite spoken forms to their textbook equivalents. */
+function toTextbook(answer) {
+  var text = String(answer || ""), notes = [];
+  SPOKEN_FORMS.forEach(function (rule) {
+    rule.re.lastIndex = 0;
+    if (!rule.re.test(text)) return;
+    rule.re.lastIndex = 0;
+    var note = rule.note;
+    text = text.replace(rule.re, function () {
+      var args = arguments;
+      note = note.replace(/\$(\d)/g, function (_, i) { return args[i] || ""; });
+      return rule.to.replace(/\$(\d)/g, function (_, i) { return args[i] || ""; });
+    });
+    notes.push(note);
+  });
+  return { text: text, notes: notes };
+}
+
+function gradePoints(sent, answer) {
   var n = normEn(answer);
   if (!n) return { empty: true };
   var exact = sent.en.map(normEn).indexOf(n) >= 0;
   var points = (sent.points || []).map(function (p) {
-    var ok = (p.need || []).some(function (t) { return hasTok(n, t, true); });
+    var banned = (p.wrong || []).map(normEn);
+    var ok = (p.need || []).some(function (t) { return hasTok(n, t, true, banned); });
     var wrong = !ok && (p.wrong || []).some(function (t) { return hasTok(n, t, false); });
     return { p: p, status: ok ? "ok" : (wrong ? "wrong" : "missing") };
   });
   var failed = points.filter(function (x) { return x.status !== "ok"; });
   return { correct: exact || failed.length === 0, exact: exact, points: points, failed: failed };
+}
+
+/* Accept several phrasings; accept natural spoken ones with a note; otherwise
+   diagnose each tested point. */
+function gradeSentence(sent, answer) {
+  var res = gradePoints(sent, answer);
+  if (res.empty || res.correct) return res;
+  var spoken = toTextbook(answer);
+  if (!spoken.notes.length) return res;
+  var alt = gradePoints(sent, spoken.text);
+  if (!alt.correct) return res;
+  alt.spoken = spoken.notes;      // right in real life, worth a word about why
+  alt.exact = false;
+  return alt;
 }
 
 function sProg() { return S.sentences; }
@@ -1378,7 +1502,13 @@ function checkSentence() {
   renderSentenceProgress();
   refreshStats();
   var html = "";
-  if (res.correct) {
+  if (res.correct && res.spoken) {
+    fb.className = "s-feedback ok spoken";
+    html += '<div class="s-head">✓ Accepted — that is how people really say it</div>';
+    html += '<ul class="s-issues">';
+    res.spoken.forEach(function (note) { html += "<li>" + escapeHtml(note) + "</li>"; });
+    html += "</ul>";
+  } else if (res.correct) {
     fb.className = "s-feedback ok";
     html += '<div class="s-head">✓ ' + (res.exact ? "Correct!" : "Looks right!") + "</div>";
   } else {
@@ -1410,28 +1540,34 @@ function skipSentence() { nextSentence(); }   // move on without recording a res
 
 /* ---------------- deck tabs ---------------- */
 
-/* Selecting a deck keeps you in whatever view you were already in. */
-function selectDeck(id, pos) {
+/* Selecting a deck keeps you in whatever view you were already in. `scope` is
+   the sub-entry that was clicked: a word type on Vocabulary, a nation on
+   Expressions, or undefined for the deck's own row. */
+function selectDeck(id, scope) {
   var prevView = appView;
-  var posChanged = pos !== undefined && posFilterValid(pos) !== S.cfg.pos;
-  if (posChanged) { S.cfg.pos = posFilterValid(pos); save(); }
+  var changed = false;
+  if (scope !== undefined) {
+    var key = id === "expressions" ? "nat" : "pos";
+    var next = id === "expressions" ? natFilterValid(scope) : posFilterValid(scope);
+    if (S.cfg[key] !== next) { S.cfg[key] = next; changed = true; save(); }
+  }
 
   if (prevView === "stats" || prevView === "settings") {
     deckNavSelected = id;
     if (id !== S.active) switchDeck(id);
-    else if (posChanged) startSession();
+    else if (changed) startSession();
     showStatsView(); renderTabs();
   } else if (browseActive) {
     deckNavSelected = null;
     if (id !== S.active) switchDeck(id);     // switchDeck re-opens browse for the new deck
-    else { if (posChanged) startSession(); openBrowse(browseView); }
+    else { if (changed) startSession(); openBrowse(browseView); }
   } else {
     deckNavSelected = null;
     appView = "practice";
     syncAppChrome("practice");
     if (id !== S.active) switchDeck(id);
     else {
-      if (posChanged) startSession();
+      if (changed) startSession();
       showScreen(practiceDone ? "screenDone" : "screenTest");
       renderTabs();
     }
@@ -1463,6 +1599,14 @@ function posCount(deckId, id) {
   return (posCountCache[key] = n);
 }
 
+var natCountCache = {};
+function natCount(id) {
+  if (natCountCache[id] !== undefined) return natCountCache[id];
+  var data = DECKS.expressions || [], n = 0;
+  for (var i = 0; i < data.length; i++) { if (natMatchesWith(data[i], id)) n++; }
+  return (natCountCache[id] = n);
+}
+
 function renderTabs() {
   var nav = el("tabs");
   if (!nav) return;
@@ -1470,18 +1614,26 @@ function renderTabs() {
   var sel = currentNavSelected();
 
   DECK_IDS.forEach(function (id) {
-    var active = id === sel && !(id === "vocab" && posFilter() !== "all");
-    nav.appendChild(tabButton(DECK_LABELS[id], DECKS[id].length, active, function () {
-      selectDeck(id, id === "vocab" ? "all" : undefined);
+    var narrowed = id === "vocab" ? posFilter() !== "all" : natFilter() !== "all";
+    nav.appendChild(tabButton(DECK_LABELS[id], DECKS[id].length, id === sel && !narrowed, function () {
+      selectDeck(id, "all");
     }));
-    // Word types hang off Vocabulary as sub-entries; they are views over the
-    // same deck and the same progress, not decks of their own.
+    // Sub-entries are views over the same deck and the same progress, not decks
+    // of their own: word types on Vocabulary, slang by nation on Expressions.
     if (id === "vocab" && deckHasPosFor("vocab")) {
       POS_FILTERS.forEach(function (f) {
         if (f.id === "all") return;
         nav.appendChild(tabButton(f.label, posCount("vocab", f.id),
           sel === "vocab" && posFilter() === f.id,
           function () { selectDeck("vocab", f.id); }, "subtab"));
+      });
+    }
+    if (id === "expressions" && deckHasNatFor("expressions")) {
+      NAT_FILTERS.forEach(function (f) {
+        if (f.id === "all") return;
+        nav.appendChild(tabButton(f.label, natCount(f.id),
+          sel === "expressions" && natFilter() === f.id,
+          function () { selectDeck("expressions", f.id); }, "subtab"));
       });
     }
   });
@@ -1577,9 +1729,31 @@ function posFilter() {
 
 function posMatches(d) { return posMatchesWith(d, posFilter(), S.active); }
 
+/* Only meaningful on Expressions, and only slang carries a nation. */
+function deckHasNatFor(deckId) {
+  return (DECKS[deckId] || []).some(function (d) { return !!d.nat; });
+}
+function natFilter() {
+  return (S.active === "expressions" && deckHasNatFor("expressions")) ? natFilterValid(S.cfg.nat) : "all";
+}
+function natMatchesWith(d, want) {
+  return want === "all" || d.nat === want;
+}
+function natMatches(d) { return natMatchesWith(d, natFilter()); }
+
+function natLabelFor(id) {
+  for (var i = 0; i < NAT_FILTERS.length; i++) {
+    if (NAT_FILTERS[i].id === id) return NAT_FILTERS[i].label;
+  }
+  return "All";
+}
+
+/* The one predicate every list and queue goes through. */
+function inScope(d) { return posMatches(d) && natMatches(d); }
+
 function posMatchesRank(rank) {
   var d = curIndex()[rank];
-  return !d || posMatches(d);
+  return !d || inScope(d);
 }
 
 function posLabelFor(id) {
@@ -1590,7 +1764,7 @@ function posLabelFor(id) {
 }
 
 function entryMatches(d, q) {
-  if (!posMatches(d)) return false;
+  if (!inScope(d)) return false;
   if (!q) return true;
   return d.w.toLowerCase().indexOf(q) !== -1 ||
     String(d.c || "").toLowerCase().indexOf(q) !== -1;
@@ -1733,7 +1907,7 @@ function renderBrowse() {
   }
 
   el("browseList").innerHTML = parts.length ? parts.join("") : '<div class="browseempty">No matches.</div>';
-  var scope = posFilter() === "all" ? "" : " · " + posLabelFor(posFilter());
+  var scope = scopeLabel() ? " · " + scopeLabel() : "";
   var label = q ? matches.toLocaleString() + " match" + (matches === 1 ? "" : "es") + scope :
     DECK_LABELS[S.active] + " · " + browseView + scope;
   if (matches > CAP) label += " · showing first " + CAP.toLocaleString() + ", search to narrow";
