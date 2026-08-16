@@ -7,7 +7,23 @@ var INTERVALS = { 0: 0, 1: 1, 2: 2, 3: 4, 4: 10, 5: 30, 6: 90 }; // days to next
 var MAX_LEVEL = 6;                           // level 6 = very strong, still reviewed rarely
 var RETIRED_DUE = 999999;                    // "too easy" items stay out of review
 
-var DEFAULTS = { strikeLimit: 7, newPerDay: 50, partWeight: 0.5, autoSpeak: true };
+var DEFAULTS = { strikeLimit: 7, newPerDay: 50, partWeight: 0.5, autoSpeak: true, pos: "all" };
+
+/* Part-of-speech filter. "other" is everything the four main classes miss —
+   prepositions, pronouns, abbreviations, and the ~8% of entries whose meaning
+   carries no part-of-speech marker at all — so no word is unreachable. */
+var POS_MAIN = ["n.", "v.", "adj.", "adv."];
+var POS_FILTERS = [
+  { id: "all", label: "All" },
+  { id: "n.", label: "Nouns" },
+  { id: "v.", label: "Verbs" },
+  { id: "adj.", label: "Adjectives" },
+  { id: "adv.", label: "Adverbs" },
+  { id: "other", label: "Other" }
+];
+function posFilterValid(id) {
+  return POS_FILTERS.some(function (f) { return f.id === id; }) ? id : "all";
+}
 
 var GRADE_IDS = ["again", "hard", "shaky", "good", "easy", "retire"];
 var STUDY_GRADE_IDS = ["again", "hard", "shaky", "good", "easy"];
@@ -393,7 +409,7 @@ function dueReviews() {
   var out = [];
   for (var rank in D().words) {
     var w = D().words[rank];
-    if (w.seen && !w.retired && w.due <= t) out.push(parseInt(rank, 10));
+    if (w.seen && !w.retired && w.due <= t && posMatchesRank(parseInt(rank, 10))) out.push(parseInt(rank, 10));
   }
   out.sort(function (a, b) {                  // most overdue first, then most common
     var da = D().words[a].due, db = D().words[b].due;
@@ -408,6 +424,7 @@ function nextNewRank() {
   for (var i = 0; i < data.length; i++) {
     var r = data[i].r;
     if (skipped[r]) continue;
+    if (!posMatches(data[i])) continue;
     if (!D().words[r] || (!D().words[r].seen && !D().words[r].retired)) return r;
   }
   return null;
@@ -417,6 +434,7 @@ function nextUnseenRank() {
   var data = curData();
   for (var i = 0; i < data.length; i++) {
     var r = data[i].r;
+    if (!posMatches(data[i])) continue;
     if (!D().words[r] || (!D().words[r].seen && !D().words[r].retired)) return r;
   }
   return null;
@@ -438,7 +456,7 @@ function pickNext() {
   // 1) any queued review still pending and not skipped?
   while (queue.length) {
     var r = queue.shift();
-    if (skipped[r]) continue;
+    if (skipped[r] || !posMatchesRank(r)) continue;
     var w = D().words[r];
     if (w && w.seen && !w.retired && w.due <= todayIndex()) return r;
   }
@@ -615,6 +633,7 @@ function renderCard(rank) {
     else Pron.prefetch(d.w);   // have the recording ready before the play button is pressed
   }
   elRank.textContent = "#" + d.r;
+  syncPosNote();   // boot draws the first card without going through syncAppChrome
   elQ.textContent = (isNew(rank) ? "NEW " + DECK_ITEM[S.active].toUpperCase() : "REVIEW") + " — what does it mean?";
   setTimeout(function () { elAns.focus(); }, 30);
 }
@@ -797,20 +816,29 @@ function refreshStats() {
   if (appView === "stats") renderStatsScreen();
 }
 function round1(n) { return Math.round(n * 10) / 10; }
-function countMastered() { var c = 0; for (var r in D().words) { if (D().words[r].seen && !D().words[r].retired && D().words[r].lvl >= 5) c++; } return c; }
-function countRetired() { var c = 0; for (var r in D().words) { if (D().words[r].retired) c++; } return c; }
-function countSeen() { var c = 0; for (var r in D().words) { if (D().words[r].seen) c++; } return c; }
+/* Every count is scoped to the active part-of-speech filter, so the whole
+   Statistics screen describes the same set of words the trainer is serving. */
+function countMastered() { var c = 0; for (var r in D().words) { if (D().words[r].seen && !D().words[r].retired && D().words[r].lvl >= 5 && posMatchesRank(parseInt(r, 10))) c++; } return c; }
+function countRetired() { var c = 0; for (var r in D().words) { if (D().words[r].retired && posMatchesRank(parseInt(r, 10))) c++; } return c; }
+function countSeen() { var c = 0; for (var r in D().words) { if (D().words[r].seen && posMatchesRank(parseInt(r, 10))) c++; } return c; }
 function countDue() { return dueReviews().length; }
+function countInScope() {
+  if (posFilter() === "all") return curData().length;
+  var c = 0, data = curData();
+  for (var i = 0; i < data.length; i++) { if (posMatches(data[i])) c++; }
+  return c;
+}
 function countNotStarted() {
   var c = 0;
   var data = curData();
   for (var i = 0; i < data.length; i++) {
+    if (!posMatches(data[i])) continue;
     var w = D().words[data[i].r];
     if (!w || (!w.seen && !w.retired)) c++;
   }
   return c;
 }
-function countLeftToLearn() { return Math.max(0, curData().length - countRetired()); }
+function countLeftToLearn() { return Math.max(0, countInScope() - countRetired()); }
 
 function renderStatsScreen() {
   if (!el("statsSeen")) return;
@@ -847,9 +875,11 @@ function renderStatsScreen() {
   var due = countDue();
   var notStarted = countNotStarted();
   var left = countLeftToLearn();
-  var total = curData().length;
+  var total = countInScope();
   var learning = Math.max(0, seen - mastered - retired);
-  el("statsDeckName").textContent = DECK_LABELS[S.active] + " · " + total.toLocaleString() + " " + DECK_NOUN[S.active];
+  el("statsDeckName").textContent = DECK_LABELS[S.active] +
+    (posFilter() === "all" ? "" : " · " + posLabelFor(posFilter())) +
+    " · " + total.toLocaleString() + " " + DECK_NOUN[S.active];
   el("statsLeftToLearn").textContent = left.toLocaleString();
   el("statsLearnLine").textContent = retired.toLocaleString() + " known · " + total.toLocaleString() + " total";
   el("statsSeen").textContent = seen.toLocaleString();
@@ -1079,6 +1109,16 @@ function syncAppChrome(view) {
   });
   document.body.classList.toggle("sentences-mode", view === "sentences");
   document.body.classList.toggle("settings-mode", view === "settings");
+  syncPosNote();
+}
+
+/* A narrowed deck has to say so, or a short queue looks like a bug. */
+function syncPosNote() {
+  var note = el("posNote");
+  if (!note) return;
+  var active = posFilter() !== "all";
+  note.classList.toggle("hidden", !active);
+  if (active) note.textContent = posLabelFor(posFilter()) + " only";
 }
 
 function showPractice() {
@@ -1361,6 +1401,7 @@ function switchDeck(id) {
   S.active = id;
   persist();             // saves the whole store (all decks) + queues a cloud sync
   renderTabs();
+  syncPosNote();         // the filter is inert on decks without tags
   startSession();        // builds today's session for the newly active deck
   if (wasBrowsing) openBrowse(previousBrowseView);   // stay in browse, now showing the new deck
 }
@@ -1379,7 +1420,62 @@ function itemStatus(rank) {
   return "learning";
 }
 
+/* ---------------- part-of-speech filter ---------------- */
+
+/* Tags are parsed out of the Chinese meaning ("n. 水, 海水" -> ["n."]), which
+   only the Vocabulary deck carries; phrases have none. Cached per deck since
+   splitMeaning() runs a regex over every sense. */
+var posCache = {};      // deckId -> { rank: ["n.", "v."] }
+var deckPos = {};       // deckId -> does this deck carry tags at all
+
+function posTags(d) {
+  var cache = posCache[S.active] || (posCache[S.active] = {});
+  if (cache[d.r]) return cache[d.r];
+  var tags = [];
+  splitMeaning(d.c).forEach(function (part) {
+    if (part.label && tags.indexOf(part.label) === -1) tags.push(part.label);
+  });
+  return (cache[d.r] = tags);
+}
+
+function deckHasPos() {
+  if (deckPos[S.active] === undefined) {
+    var data = curData();
+    deckPos[S.active] = data.slice(0, 200).some(function (d) { return posTags(d).length > 0; });
+  }
+  return deckPos[S.active];
+}
+
+/* The filter only bites on decks that have tags, so choosing "Adjectives" and
+   then switching to Idioms shows idioms rather than an empty deck. */
+function posFilter() {
+  return deckHasPos() ? posFilterValid(S.cfg.pos) : "all";
+}
+
+function posMatches(d) {
+  var want = posFilter();
+  if (want === "all") return true;
+  var tags = posTags(d);
+  if (want === "other") {
+    return !tags.some(function (t) { return POS_MAIN.indexOf(t) !== -1; });
+  }
+  return tags.indexOf(want) !== -1;
+}
+
+function posMatchesRank(rank) {
+  var d = curIndex()[rank];
+  return !d || posMatches(d);
+}
+
+function posLabelFor(id) {
+  for (var i = 0; i < POS_FILTERS.length; i++) {
+    if (POS_FILTERS[i].id === id) return POS_FILTERS[i].label;
+  }
+  return "All";
+}
+
 function entryMatches(d, q) {
+  if (!posMatches(d)) return false;
   if (!q) return true;
   return d.w.toLowerCase().indexOf(q) !== -1 ||
     String(d.c || "").toLowerCase().indexOf(q) !== -1;
@@ -1522,8 +1618,9 @@ function renderBrowse() {
   }
 
   el("browseList").innerHTML = parts.length ? parts.join("") : '<div class="browseempty">No matches.</div>';
-  var label = q ? matches.toLocaleString() + " match" + (matches === 1 ? "" : "es") :
-    DECK_LABELS[S.active] + " · " + browseView;
+  var scope = posFilter() === "all" ? "" : " · " + posLabelFor(posFilter());
+  var label = q ? matches.toLocaleString() + " match" + (matches === 1 ? "" : "es") + scope :
+    DECK_LABELS[S.active] + " · " + browseView + scope;
   if (matches > CAP) label += " · showing first " + CAP.toLocaleString() + ", search to narrow";
   el("browseCount").textContent = label;
 }
@@ -1617,6 +1714,31 @@ function syncBrowseMode() {
   if (retiredBtn) retiredBtn.textContent = isSent ? "Mastered" : "Too Easy";
   var search = el("browseSearch");
   if (search) search.placeholder = isSent ? "Search sentences..." : "Search this deck...";
+  renderPosViews();
+}
+
+/* The part-of-speech chips only exist for decks that carry tags. */
+function renderPosViews() {
+  var wrap = el("posViews");
+  if (!wrap) return;
+  var show = currentNavSelected() !== "sentences" && deckHasPos();
+  wrap.classList.toggle("hidden", !show);
+  if (!show) { wrap.innerHTML = ""; return; }
+  var active = posFilter();
+  wrap.innerHTML = POS_FILTERS.map(function (f) {
+    return '<button type="button" class="posview' + (f.id === active ? " active" : "") +
+      '" data-pos="' + escapeHtml(f.id) + '">' + escapeHtml(f.label) + "</button>";
+  }).join("");
+}
+
+function setPosFilter(id) {
+  S.cfg.pos = posFilterValid(id);
+  save();
+  renderPosViews();
+  syncPosNote();
+  renderBrowse();
+  startSession();      // the practice queue is scoped by this too, so rebuild it
+  refreshStats();
 }
 
 function setBrowseView(view) {
@@ -1819,6 +1941,10 @@ function wireEvents() {
   el("btnBrowseBack").addEventListener("click", closeBrowse);
   document.querySelectorAll(".browseview").forEach(function (b) {
     b.addEventListener("click", function () { setBrowseView(b.getAttribute("data-view")); });
+  });
+  el("posViews").addEventListener("click", function (e) {
+    var chip = e.target.closest ? e.target.closest(".posview") : null;
+    if (chip) setPosFilter(chip.getAttribute("data-pos"));
   });
   el("browseList").addEventListener("click", function (e) {
     var scale = e.target.closest ? e.target.closest(".scalebtn") : null;

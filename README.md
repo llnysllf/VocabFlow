@@ -73,6 +73,18 @@ After each card you pick one of six grades:
 A session stops at **7 strikes** (Again = 1, Hard = ½) or after **50 new words** — both
 adjustable under **Goal & Data**.
 
+## Studying one part of speech
+
+The Vocabulary deck can be narrowed to **Nouns · Verbs · Adjectives · Adverbs · Other**
+from the chips in Today/Library. The choice scopes the Library list, the practice queue,
+and the Statistics counts, and sticks until you change it — so you can spend a session on
+adjectives alone. A pill on the practice card shows when the deck is narrowed.
+
+Words carrying several senses (`in` is a preposition, adverb, adjective *and* noun) appear
+under each of their types. *Other* covers prepositions, pronouns, abbreviations and the
+~2,000 entries whose meaning has no part-of-speech marker, so nothing is unreachable.
+The other decks are phrases and carry no markers, so the chips don't appear for them.
+
 ## Run it locally
 
 No build, no dependencies. Two ways:
