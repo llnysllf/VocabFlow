@@ -114,8 +114,9 @@ An expression that appears in several source lists is shown once, under the most
 label: *ask out* and *come on* are phrasal verbs before they are idioms, and *hit the road*
 is an idiom before it is slang. That removes 42 duplicates.
 
-The nations only unfold once Slang is selected, and each deck remembers whether its list
-was open, reopening on the group you were last studying. Words like `arvo` and `knackered` are
+Every group with children folds — Vocabulary, Expressions and Slang each carry a chevron,
+and click to open or shut. The app reopens on the group you were last studying rather than
+collapsing everything. Words like `arvo` and `knackered` are
 missing from the CMU dictionary (it is American), so they show no phonetic — but Wiktionary
 has recordings by native speakers of the right accent, so the play button still gives you
 `En-au-arvo.ogg` rather than an American approximation.

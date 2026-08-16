@@ -1663,9 +1663,12 @@ function tabButton(label, count, active, onClick, cls, open) {
 var navOpen = null;
 function initNavOpen() {
   if (navOpen) return;
+  var src = srcFilterValid(S.cfg.src);
   navOpen = {
     vocab: posFilterValid(S.cfg.pos) !== "all",
-    expressions: srcFilterValid(S.cfg.src) !== "all"
+    expressions: src !== "all",
+    // Slang folds on its own; a saved nation means it was open.
+    slang: src === "slang" && natFilterValid(S.cfg.nat) !== "all"
   };
 }
 function toggleNav(id) { initNavOpen(); navOpen[id] = !navOpen[id]; }
@@ -1729,11 +1732,16 @@ function renderTabs() {
       SRC_FILTERS.forEach(function (f) {
         if (f.id === "all") return;
         var chosen = sel === "expressions" && srcFilter() === f.id;
+        // Slang folds too — nations belong to it alone.
+        var splits = f.id === "slang" && exprCount("slang") > 0;
+        var open = splits && navIsOpen("slang");
         nav.appendChild(tabButton(f.label, exprCount(f.id),
           chosen && natFilter() === "all",
-          function () { selectDeck("expressions", { src: f.id, nat: "all" }); }, "subtab"));
-        // Nations belong to slang alone, and only unfold once slang is chosen.
-        if (f.id === "slang" && chosen) {
+          function () {
+            if (splits) toggleNav("slang");
+            selectDeck("expressions", { src: f.id, nat: "all" });
+          }, "subtab", splits ? open : undefined));
+        if (open) {
           NAT_FILTERS.forEach(function (nf) {
             if (nf.id === "all") return;
             nav.appendChild(tabButton(nf.label, exprCount("slang", nf.id),
