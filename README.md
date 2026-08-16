@@ -23,7 +23,7 @@ long-term memory.
 It has **two decks you switch between in the sidebar** — **Vocabulary** (15,000 words,
 splittable by word type) and **Expressions** (3,173 idioms, phrasal verbs, slang and
 proverbs) — each with its own independent progress. There's also a separate
-**Sentences** mode that drills full Chinese → English translation with an offline grader.
+**Sentences** mode — 423 Chinese → English translations with an offline grader.
 
 It's a single static site — no framework, no build step. Open it and study. Optionally
 **sign in** (accounts powered by AWS) so your progress syncs across all your devices;
@@ -258,7 +258,10 @@ Lambda + DynamoDB, defined as one SAM template) for accounts and sync.
   entries, which were unreliable (`molly` glossed as "coward" but defined as an aquarium
   fish, `becky` as "上挂钩"). Vulgar terms, slurs, and words whose meaning flips between
   countries are deliberately excluded.
-- **Sentences** are hand-built to cover a broad spread of English grammar points.
+- **Sentences** are hand-built to cover everyday English grammar: 423 sentences testing 622
+  grammar points across tenses, articles, quantifiers, prepositions, modals, conditionals,
+  passives, reported speech, relative clauses, question forms, verb patterns and comparison,
+  plus everyday functions (time, money, directions, appointments, health, apologising).
 - The most common entries in each deck are hand-curated at the top.
 - **Phonetic spellings** (`ipa.js`) are converted from the
   [**CMU Pronouncing Dictionary**](https://github.com/cmusphinx/cmudict) — General American,
