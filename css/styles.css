@@ -1267,32 +1267,20 @@ body.settings-mode .deck-nav{display:none}
   .focusitem .fc{text-align:left}
 }
 
-/* ===== part-of-speech filter ===== */
-/* Secondary to the Today/Answered/… row above it, so: outlined, not filled. */
-.posviews{
-  display:flex;
-  gap:7px;
-  margin:-4px 0 12px;
-  overflow-x:auto;
-  padding-bottom:2px;
-}
-.posview{
-  flex:0 0 auto;
-  padding:5px 11px;
-  border:1px solid var(--line-soft);
-  border-radius:999px;
-  background:transparent;
+/* ===== part-of-speech sub-decks ===== */
+/* Indented under Vocabulary and visually lighter, because they are views over
+   that deck rather than decks of their own. */
+.tab.subtab{
+  margin-left:14px;
+  padding-top:6px;
+  padding-bottom:6px;
+  font-size:13px;
+  font-weight:600;
   color:#8d9bae;
-  font-size:12px;
-  font-weight:750;
-  transition:color .16s ease,border-color .16s ease,background .16s ease;
 }
-.posview:hover{color:#e6ecf6;border-color:rgba(255,255,255,.18)}
-.posview.active{
-  color:var(--accent);
-  border-color:rgba(69,214,163,.45);
-  background:rgba(69,214,163,.1);
-}
+.tab.subtab .tabcount{font-size:10px;opacity:.75}
+.tab.subtab:hover{color:#e6ecf6}
+.tab.subtab.active{color:var(--accent);font-weight:750}
 /* Practice card: says why the queue is narrowed. */
 .posnote{
   position:absolute;

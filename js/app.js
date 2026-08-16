@@ -51,19 +51,41 @@ function gradeStrike(g) {
   return g && GRADE_META[g] ? GRADE_META[g].strike : 0;
 }
 
-/* Three independent decks, each with its own data set and progress. */
+/* Idioms, phrasal verbs, slang, proverbs and sayings are all fixed expressions
+   you learn whole, so they share one deck. Each source keeps its own file and
+   its own 1..N numbering; merging shifts each by a fixed offset, which makes
+   the old rank -> new rank migration pure arithmetic (see migrateExpressions). */
+var EXPRESSION_PARTS = [
+  { id: "idioms",   data: window.IDIOMS   || [] },
+  { id: "phrasal",  data: window.PHRASAL  || [] },
+  { id: "slang",    data: window.SLANG    || [] },
+  { id: "proverbs", data: window.PROVERBS || [] },
+  { id: "sayings",  data: window.SAYINGS  || [] }
+];
+var EXPRESSION_OFFSET = {};   // old deck id -> rank offset in the merged deck
+
+function buildExpressions() {
+  var out = [], offset = 0;
+  EXPRESSION_PARTS.forEach(function (part) {
+    EXPRESSION_OFFSET[part.id] = offset;
+    part.data.forEach(function (e) {
+      out.push({ r: offset + e.r, w: e.w, c: e.c, e: e.e, src: part.id });
+    });
+    offset += part.data.length;
+  });
+  return out;
+}
+
 var DECKS = {
-  vocab:    window.VOCAB || [],
-  idioms:   window.IDIOMS || [],
-  phrasal:  window.PHRASAL || [],
-  slang:    window.SLANG || [],
-  proverbs: window.PROVERBS || [],
-  sayings:  window.SAYINGS || []
+  vocab:       window.VOCAB || [],
+  expressions: buildExpressions()
 };
-var DECK_IDS = ["vocab", "idioms", "phrasal", "slang", "proverbs", "sayings"];
-var DECK_LABELS = { vocab: "Vocabulary", idioms: "Idioms", phrasal: "Phrasal Verbs", slang: "Slang", proverbs: "Proverbs", sayings: "Sayings" };
-var DECK_NOUN = { vocab: "words", idioms: "idioms", phrasal: "phrasal verbs", slang: "slang terms", proverbs: "proverbs", sayings: "sayings" };
-var DECK_ITEM = { vocab: "word", idioms: "idiom", phrasal: "phrasal verb", slang: "slang term", proverbs: "proverb", sayings: "saying" };
+var DECK_IDS = ["vocab", "expressions"];
+var DECK_LABELS = { vocab: "Vocabulary", expressions: "Expressions" };
+var DECK_NOUN = { vocab: "words", expressions: "expressions" };
+var DECK_ITEM = { vocab: "word", expressions: "expression" };
+/* What each merged entry actually is, for the card's prompt. */
+var SRC_ITEM = { idioms: "idiom", phrasal: "phrasal verb", slang: "slang term", proverbs: "proverb", sayings: "saying" };
 
 /* `r` is identity — progress, cloud records and exported backups are all keyed
    on it, so it never moves. Frequency order lives in the array order instead,
@@ -100,10 +122,10 @@ function blankDeck() {
 }
 function blankStore() {
   return {
-    schema: 3,
+    schema: 4,          // 4 merged the five phrase decks into one "expressions" deck
     cfg: Object.assign({}, DEFAULTS),
     active: "vocab",
-    decks: { vocab: blankDeck(), idioms: blankDeck(), phrasal: blankDeck(), slang: blankDeck(), proverbs: blankDeck(), sayings: blankDeck() },
+    decks: { vocab: blankDeck(), expressions: blankDeck() },
     sentences: blankDeck(),  // spaced-repetition progress for the sentence-translation mode
     mtime: 0            // last-modified (ms) — used to resolve local vs cloud copies
   };
@@ -177,16 +199,53 @@ function sanitizeDeck(d) {
   return out;
 }
 
+/* v3 kept idioms/phrasal/slang/proverbs/sayings as five decks. Fold any such
+   progress into the merged "expressions" deck, shifting each rank by the same
+   offset used to build the deck, so every record lands back on its own entry.
+   Old backups and other devices still carry the v3 shape, so this has to keep
+   working rather than being a one-off. */
+function migrateExpressions(decks) {
+  var out = blankDeck(), t = todayIndex(), sameDay = false;
+  EXPRESSION_PARTS.forEach(function (part) {
+    var old = decks[part.id];
+    if (!old || typeof old !== "object") return;
+    old = sanitizeDeck(old);
+    var offset = EXPRESSION_OFFSET[part.id];
+    Object.keys(old.words).forEach(function (r) {
+      out.words[offset + parseInt(r, 10)] = old.words[r];
+    });
+    out.totals.everSeen += old.totals.everSeen || 0;
+    if (old.day && old.day.idx === t) {                 // only today's tallies carry over
+      sameDay = true;
+      out.day.newCount += old.day.newCount || 0;
+      out.day.revCount += old.day.revCount || 0;
+      out.day.strikes += old.day.strikes || 0;
+      out.day.wrongToday = out.day.wrongToday.concat(sanitizeFocus(old.day.wrongToday).map(function (it) {
+        return { r: offset + it.r, kind: it.kind };
+      }));
+      out.day.answeredToday = out.day.answeredToday.concat(sanitizeAnswered(old.day.answeredToday).map(function (it) {
+        return { r: offset + it.r, grade: it.grade, ts: it.ts };
+      }));
+    }
+  });
+  if (!sameDay) out.day = blankDay();
+  return out;
+}
+
 /* Make any loaded object safe, and migrate the old single-deck (v1) shape. */
 function sanitizeStore(s) {
   if (!s || typeof s !== "object") return blankStore();
   var out = blankStore();
   if (s.cfg) out.cfg = Object.assign({}, DEFAULTS, s.cfg);
   if (typeof s.mtime === "number") out.mtime = s.mtime;
-  if (s.decks && typeof s.decks === "object") {           // v2
-    DECK_IDS.forEach(function (id) { out.decks[id] = sanitizeDeck(s.decks[id]); });
+  if (s.decks && typeof s.decks === "object") {           // v2+
+    out.decks.vocab = sanitizeDeck(s.decks.vocab);
+    out.decks.expressions = s.decks.expressions
+      ? sanitizeDeck(s.decks.expressions)
+      : migrateExpressions(s.decks);                      // v3 shape
     out.sentences = sanitizeDeck(s.sentences);
     if (DECK_IDS.indexOf(s.active) >= 0) out.active = s.active;
+    else if (EXPRESSION_OFFSET[s.active] !== undefined) out.active = "expressions";
   } else if (s.words && typeof s.words === "object") {    // v1 -> migrate into vocab
     out.decks.vocab = sanitizeDeck({ words: s.words, day: s.day, totals: s.totals });
   }
@@ -646,7 +705,8 @@ function renderCard(rank) {
   }
   elRank.textContent = "#" + d.f;
   syncPosNote();   // boot draws the first card without going through syncAppChrome
-  elQ.textContent = (isNew(rank) ? "NEW " + DECK_ITEM[S.active].toUpperCase() : "REVIEW") + " — what does it mean?";
+  var kind = SRC_ITEM[d.src] || DECK_ITEM[S.active];   // "idiom"/"proverb"/… inside Expressions
+  elQ.textContent = (isNew(rank) ? "NEW " + kind.toUpperCase() : "REVIEW") + " — what does it mean?";
   setTimeout(function () { elAns.focus(); }, 30);
 }
 
@@ -1349,42 +1409,81 @@ function nextSentence() {
 function skipSentence() { nextSentence(); }   // move on without recording a result
 
 /* ---------------- deck tabs ---------------- */
+
+/* Selecting a deck keeps you in whatever view you were already in. */
+function selectDeck(id, pos) {
+  var prevView = appView;
+  var posChanged = pos !== undefined && posFilterValid(pos) !== S.cfg.pos;
+  if (posChanged) { S.cfg.pos = posFilterValid(pos); save(); }
+
+  if (prevView === "stats" || prevView === "settings") {
+    deckNavSelected = id;
+    if (id !== S.active) switchDeck(id);
+    else if (posChanged) startSession();
+    showStatsView(); renderTabs();
+  } else if (browseActive) {
+    deckNavSelected = null;
+    if (id !== S.active) switchDeck(id);     // switchDeck re-opens browse for the new deck
+    else { if (posChanged) startSession(); openBrowse(browseView); }
+  } else {
+    deckNavSelected = null;
+    appView = "practice";
+    syncAppChrome("practice");
+    if (id !== S.active) switchDeck(id);
+    else {
+      if (posChanged) startSession();
+      showScreen(practiceDone ? "screenDone" : "screenTest");
+      renderTabs();
+    }
+  }
+}
+
+function tabButton(label, count, active, onClick, cls) {
+  var b = document.createElement("button");
+  b.className = "tab" + (cls ? " " + cls : "") + (active ? " active" : "");
+  b.innerHTML = '<span class="tabname">' + escapeHtml(label) + "</span>" +
+    '<span class="tabcount">' + count.toLocaleString() + "</span>";
+  b.addEventListener("click", onClick);
+  return b;
+}
+
+/* How many entries the given part-of-speech filter would leave. Counting walks
+   15,000 meanings, so cache it — the answer only depends on the data. */
+var posCountCache = {};
+function posCount(deckId, id) {
+  var key = deckId + "|" + id;
+  if (posCountCache[key] !== undefined) return posCountCache[key];
+  var data = DECKS[deckId] || [], n = 0;
+  if (id === "all") n = data.length;
+  else {
+    for (var i = 0; i < data.length; i++) {
+      if (posMatchesWith(data[i], id, deckId)) n++;
+    }
+  }
+  return (posCountCache[key] = n);
+}
+
 function renderTabs() {
   var nav = el("tabs");
   if (!nav) return;
   nav.innerHTML = "";
   var sel = currentNavSelected();
+
   DECK_IDS.forEach(function (id) {
-    var b = document.createElement("button");
-    b.className = "tab" + (id === sel ? " active" : "");
-    b.innerHTML = '<span class="tabname">' + DECK_LABELS[id] + "</span>" +
-      '<span class="tabcount">' + DECKS[id].length + "</span>";
-    b.addEventListener("click", function () {
-      var prevView = appView;
-      if (prevView === "stats") {
-        deckNavSelected = id;
-        if (id !== S.active) switchDeck(id);
-        showStatsView(); renderTabs();
-      } else if (prevView === "settings") {
-        deckNavSelected = id;
-        if (id !== S.active) switchDeck(id);
-        showStatsView(); renderTabs();
-      } else if (browseActive) {
-        // Switching decks from a Today/Library view stays in that view for the new deck.
-        deckNavSelected = null;
-        if (id !== S.active) switchDeck(id);   // switchDeck re-opens browse for the new deck
-        else openBrowse(browseView);           // already the active deck: re-render its browse
-      } else {
-        deckNavSelected = null;
-        appView = "practice";
-        syncAppChrome("practice");
-        if (id !== S.active) { switchDeck(id); } else {
-          showScreen(practiceDone ? "screenDone" : "screenTest");
-          renderTabs();
-        }
-      }
-    });
-    nav.appendChild(b);
+    var active = id === sel && !(id === "vocab" && posFilter() !== "all");
+    nav.appendChild(tabButton(DECK_LABELS[id], DECKS[id].length, active, function () {
+      selectDeck(id, id === "vocab" ? "all" : undefined);
+    }));
+    // Word types hang off Vocabulary as sub-entries; they are views over the
+    // same deck and the same progress, not decks of their own.
+    if (id === "vocab" && deckHasPosFor("vocab")) {
+      POS_FILTERS.forEach(function (f) {
+        if (f.id === "all") return;
+        nav.appendChild(tabButton(f.label, posCount("vocab", f.id),
+          sel === "vocab" && posFilter() === f.id,
+          function () { selectDeck("vocab", f.id); }, "subtab"));
+      });
+    }
   });
   var sb = document.createElement("button");
   sb.className = "tab" + (sel === "sentences" ? " active" : "");
@@ -1440,8 +1539,8 @@ function itemStatus(rank) {
 var posCache = {};      // deckId -> { rank: ["n.", "v."] }
 var deckPos = {};       // deckId -> does this deck carry tags at all
 
-function posTags(d) {
-  var cache = posCache[S.active] || (posCache[S.active] = {});
+function posTagsFor(d, deckId) {
+  var cache = posCache[deckId] || (posCache[deckId] = {});
   if (cache[d.r]) return cache[d.r];
   var tags = [];
   splitMeaning(d.c).forEach(function (part) {
@@ -1450,29 +1549,33 @@ function posTags(d) {
   return (cache[d.r] = tags);
 }
 
-function deckHasPos() {
-  if (deckPos[S.active] === undefined) {
-    var data = curData();
-    deckPos[S.active] = data.slice(0, 200).some(function (d) { return posTags(d).length > 0; });
+function deckHasPosFor(deckId) {
+  if (deckPos[deckId] === undefined) {
+    var data = DECKS[deckId] || [];
+    deckPos[deckId] = data.slice(0, 200).some(function (d) { return posTagsFor(d, deckId).length > 0; });
   }
-  return deckPos[S.active];
+  return deckPos[deckId];
 }
 
-/* The filter only bites on decks that have tags, so choosing "Adjectives" and
-   then switching to Idioms shows idioms rather than an empty deck. */
-function posFilter() {
-  return deckHasPos() ? posFilterValid(S.cfg.pos) : "all";
-}
-
-function posMatches(d) {
-  var want = posFilter();
+function posMatchesWith(d, want, deckId) {
   if (want === "all") return true;
-  var tags = posTags(d);
+  var tags = posTagsFor(d, deckId);
   if (want === "other") {
     return !tags.some(function (t) { return POS_MAIN.indexOf(t) !== -1; });
   }
   return tags.indexOf(want) !== -1;
 }
+
+function posTags(d) { return posTagsFor(d, S.active); }
+function deckHasPos() { return deckHasPosFor(S.active); }
+
+/* The filter only bites on decks that have tags, so choosing "Adjectives" and
+   then switching to Expressions shows expressions rather than an empty deck. */
+function posFilter() {
+  return deckHasPos() ? posFilterValid(S.cfg.pos) : "all";
+}
+
+function posMatches(d) { return posMatchesWith(d, posFilter(), S.active); }
 
 function posMatchesRank(rank) {
   var d = curIndex()[rank];
@@ -1726,31 +1829,6 @@ function syncBrowseMode() {
   if (retiredBtn) retiredBtn.textContent = isSent ? "Mastered" : "Too Easy";
   var search = el("browseSearch");
   if (search) search.placeholder = isSent ? "Search sentences..." : "Search this deck...";
-  renderPosViews();
-}
-
-/* The part-of-speech chips only exist for decks that carry tags. */
-function renderPosViews() {
-  var wrap = el("posViews");
-  if (!wrap) return;
-  var show = currentNavSelected() !== "sentences" && deckHasPos();
-  wrap.classList.toggle("hidden", !show);
-  if (!show) { wrap.innerHTML = ""; return; }
-  var active = posFilter();
-  wrap.innerHTML = POS_FILTERS.map(function (f) {
-    return '<button type="button" class="posview' + (f.id === active ? " active" : "") +
-      '" data-pos="' + escapeHtml(f.id) + '">' + escapeHtml(f.label) + "</button>";
-  }).join("");
-}
-
-function setPosFilter(id) {
-  S.cfg.pos = posFilterValid(id);
-  save();
-  renderPosViews();
-  syncPosNote();
-  renderBrowse();
-  startSession();      // the practice queue is scoped by this too, so rebuild it
-  refreshStats();
 }
 
 function setBrowseView(view) {
@@ -1953,10 +2031,6 @@ function wireEvents() {
   el("btnBrowseBack").addEventListener("click", closeBrowse);
   document.querySelectorAll(".browseview").forEach(function (b) {
     b.addEventListener("click", function () { setBrowseView(b.getAttribute("data-view")); });
-  });
-  el("posViews").addEventListener("click", function (e) {
-    var chip = e.target.closest ? e.target.closest(".posview") : null;
-    if (chip) setPosFilter(chip.getAttribute("data-pos"));
   });
   el("browseList").addEventListener("click", function (e) {
     var scale = e.target.closest ? e.target.closest(".scalebtn") : null;

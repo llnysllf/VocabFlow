@@ -12,6 +12,9 @@ js/config.js        AWS API + Cognito config for cloud sync
 js/cloud.js         Cognito auth + DynamoDB sync, with offline fallback
 js/app.js           The trainer: scheduling, grading, UI wiring
 js/pron.js          Phonetics + audio playback for the current card
+idioms/phrasal/     Five separate files, merged at load into one Expressions
+slang/proverbs/     deck. Each keeps its own 1..N ranks; the merge shifts each
+sayings.js          by a fixed offset (see EXPRESSION_PARTS in js/app.js).
 words.js            The 15,000-word data set (window.VOCAB)
 ipa.js              Phonetic spellings for every headword (window.IPA)
 sentences.js        Chinese → English translation bank (window.SENTENCES)

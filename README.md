@@ -20,10 +20,10 @@ type the Chinese meaning, rate how well you knew it, and a **Leitner / SM-2-styl
 repetition** engine schedules each word for the right day so it actually moves into
 long-term memory.
 
-It has **six decks you switch between with tabs** — **Vocabulary** (15,000 words),
-**Idioms** (1,000), **Phrasal Verbs** (1,000), **Slang**, **Proverbs**, and **Sayings** —
-each with its own independent progress. There's also a separate **Sentences** mode that
-drills full Chinese → English translation with an offline grader.
+It has **two decks you switch between in the sidebar** — **Vocabulary** (15,000 words,
+splittable by word type) and **Expressions** (3,172 idioms, phrasal verbs, slang,
+proverbs and sayings) — each with its own independent progress. There's also a separate
+**Sentences** mode that drills full Chinese → English translation with an offline grader.
 
 It's a single static site — no framework, no build step. Open it and study. Optionally
 **sign in** (accounts powered by AWS) so your progress syncs across all your devices;
@@ -31,7 +31,7 @@ without sign-in it works fully offline as a guest, saving progress in your brows
 
 ## Features
 
-- 🗂️ **Six decks, tabbed** — Vocabulary, Idioms, Phrasal Verbs, Slang, Proverbs, Sayings, each tracked separately.
+- 🗂️ **Two decks plus Sentences** — Vocabulary and Expressions (idioms, phrasal verbs, slang, proverbs, sayings), each tracked separately. Vocabulary splits into Nouns / Verbs / Adjectives / Adverbs / Other in the sidebar.
 - ✍️ **Sentences mode** — translate Chinese sentences into English; a built-in grader accepts multiple phrasings and points out what's off (no AI, fully offline).
 - 🔎 **Library view** — search a deck and filter by status: today, answered, upcoming, too easy, or all.
 - 🧠 **Spaced repetition** — expanding review intervals (same-day → 1 → 2 → 4 → 10 → 30 → 90 days).
@@ -75,15 +75,16 @@ adjustable under **Goal & Data**.
 
 ## Studying one part of speech
 
-The Vocabulary deck can be narrowed to **Nouns · Verbs · Adjectives · Adverbs · Other**
-from the chips in Today/Library. The choice scopes the Library list, the practice queue,
-and the Statistics counts, and sticks until you change it — so you can spend a session on
+**Nouns · Verbs · Adjectives · Adverbs · Other** sit indented under Vocabulary in the
+sidebar. They are views over that one deck, sharing its progress — grading a word under
+Nouns counts everywhere. Picking one scopes the Library list, the practice queue and the
+Statistics counts, and sticks until you change it, so you can spend a session on
 adjectives alone. A pill on the practice card shows when the deck is narrowed.
 
 Words carrying several senses (`in` is a preposition, adverb, adjective *and* noun) appear
 under each of their types. *Other* covers prepositions, pronouns, abbreviations and the
 ~2,000 entries whose meaning has no part-of-speech marker, so nothing is unreachable.
-The other decks are phrases and carry no markers, so the chips don't appear for them.
+Expressions are phrases and carry no markers, so no sub-entries appear under that deck.
 
 ## Run it locally
 
@@ -164,11 +165,11 @@ js/app.js             The trainer: scheduling, grading, sentence grader, UI
 js/pron.js            Phonetics + audio playback for the current card
 words.js              15,000-word data set (window.VOCAB)
 ipa.js                Phonetic spellings for every headword (window.IPA)
-idioms.js             1,000 idioms (window.IDIOMS)
-phrasal.js            1,000 phrasal verbs (window.PHRASAL)
-slang.js              slang & colloquialisms (window.SLANG)
-proverbs.js           proverbs (window.PROVERBS)
-sayings.js            sayings & expressions (window.SAYINGS)
+idioms.js             1,000 idioms (window.IDIOMS)          ┐
+phrasal.js            1,000 phrasal verbs (window.PHRASAL)  │ merged at load
+slang.js              slang & colloquialisms (window.SLANG) │ into the one
+proverbs.js           491 proverbs (window.PROVERBS)        │ Expressions deck
+sayings.js            600 sayings (window.SAYINGS)          ┘
 sentences.js          Chinese → English translation bank (window.SENTENCES)
 tools/build-ipa.py    Regenerates ipa.js from the CMU Pronouncing Dictionary
 tools/rerank-words.py Re-sorts words.js by wordfreq corpus frequency
