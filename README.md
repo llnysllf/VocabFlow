@@ -121,6 +121,30 @@ missing from the CMU dictionary (it is American), so they show no phonetic — b
 has recordings by native speakers of the right accent, so the play button still gives you
 `En-au-arvo.ogg` rather than an American approximation.
 
+## Example sentences
+
+Checking an answer, or opening a word in the Library, reveals an **Examples** panel:
+real sentences with Chinese translations, each with its own play button.
+
+Where a word has several meanings the examples are labelled with the one they show, so
+the senses separate visibly instead of sitting in a comma-separated list:
+
+| | |
+|---|---|
+| **n. 休息** | The break is over. — 休息结束了！ |
+| **vt. 打断** | We didn't break in. — 我们没有打断。 |
+| **vt. 打破** | I sometimes break the rules. — 我有时候打破规矩。 |
+| **vt. 弄坏** | Did Tom break something again? — 汤姆又弄坏了什么东西吗？ |
+
+Tatoeba's sentences are not sense-tagged, so the label is inferred: if the Chinese
+translation contains one of the word's own listed meanings, the example is filed under it.
+That covers **3,605** words, of which **836** show two or more distinct senses. The rest
+still get examples, just unlabelled.
+
+Coverage follows frequency, which is the right shape — 99% of the top 1,000 words have
+examples, 92% of 1,000–3,000, falling to 9% by rank 15,000. In the Library the panel is a
+stub until opened, so 2,000 rows do not each build four sentences up front.
+
 ## Spoken English in the sentence grader
 
 Plenty of English is universal in speech but marked wrong in a grammar book. The grader
@@ -226,7 +250,9 @@ slang.js              slang & colloquialisms (window.SLANG) │ into the one
 proverbs.js           491 proverbs (window.PROVERBS)        │ Expressions deck
 sayings.js            600 sayings (window.SAYINGS)          ┘
 sentences.js          Chinese → English translation bank (window.SENTENCES)
+examples.js           Example sentences per headword (window.EXAMPLES)
 tools/build-ipa.py    Regenerates ipa.js from the CMU Pronouncing Dictionary
+tools/build-examples.py  Regenerates examples.js from Tatoeba
 tools/rerank-words.py Re-sorts words.js by wordfreq corpus frequency
 backend/              AWS SAM stack: Cognito + API Gateway + Lambda + DynamoDB
 ```
@@ -260,6 +286,8 @@ Lambda + DynamoDB, defined as one SAM template) for accounts and sync.
   entries, which were unreliable (`molly` glossed as "coward" but defined as an aquarium
   fish, `becky` as "上挂钩"). Vulgar terms, slurs, and words whose meaning flips between
   countries are deliberately excluded.
+- **Example sentences** (`examples.js`) come from [**Tatoeba**](https://tatoeba.org) —
+  aligned English–Chinese pairs, CC BY 2.0 FR. Regenerate with `tools/build-examples.py`.
 - **Sentences** are hand-built to cover everyday English grammar: 575 sentences across tenses,
   articles, quantifiers, prepositions, modals, conditionals, passives, reported speech,
   relative clauses, question forms, verb patterns and comparison, plus everyday functions

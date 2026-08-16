@@ -774,6 +774,7 @@ function reveal() {
   var typed = elAns.value.trim();
   elYour.innerHTML = typed ? ("You typed: <b>" + escapeHtml(typed) + "</b>") : "<i>(no answer typed)</i>";
   renderMeaning(d.c);
+  renderExamples(d.w, el("examples"));
   renderGloss(d.e);
   elReveal.classList.add("show");
   requestAnimationFrame(function () {
@@ -893,6 +894,45 @@ function joinGlossLines(text) {
     out.push(seg);
   });
   return out;
+}
+
+/* Example sentences, grouped by the sense each one shows. For a word like
+   "run" this is where the meanings separate visibly — 奔跑 in one sentence,
+   运行 in another — which a list of comma-separated glosses cannot convey. */
+function examplesFor(word) {
+  var table = window.EXAMPLES;
+  return (table && table[String(word || "").trim().toLowerCase()]) || [];
+}
+
+function renderExamples(word, host) {
+  if (!host) return;
+  host.innerHTML = "";
+  var list = examplesFor(word);
+  if (!list.length) return;
+
+  var details = document.createElement("details");
+  details.className = "ex-details";
+  var summary = document.createElement("summary");
+  var senses = 0, seen = {};
+  list.forEach(function (x) { if (x.s && !seen[x.s]) { seen[x.s] = 1; senses++; } });
+  summary.textContent = "Examples (" + list.length + ")" +
+    (senses > 1 ? " · " + senses + " different meanings" : "");
+  details.appendChild(summary);
+
+  var body = document.createElement("div");
+  body.className = "ex-body";
+  list.forEach(function (x) {
+    var row = document.createElement("div");
+    row.className = "ex-row";
+    row.innerHTML =
+      (x.s ? '<span class="ex-sense">' + escapeHtml(x.s) + "</span>" : "") +
+      '<div class="ex-line"><span class="ex-en">' + escapeHtml(x.en) + "</span>" +
+      speakBtnHtml(x.en) + "</div>" +
+      '<div class="ex-zh">' + escapeHtml(x.zh) + "</div>";
+    body.appendChild(row);
+  });
+  details.appendChild(body);
+  host.appendChild(details);
 }
 
 function renderGloss(text) {
@@ -1928,6 +1968,17 @@ function speakBtnHtml(text) {
     escapeHtml(String(text)) + '">' + SPEAK_ICON + "</button>";
 }
 
+/* Collapsed placeholder; the sentences are built on first open. */
+function exampleStubHtml(word) {
+  var list = examplesFor(word);
+  if (!list.length) return "";
+  var senses = {}, n = 0;
+  list.forEach(function (x) { if (x.s && !senses[x.s]) { senses[x.s] = 1; n++; } });
+  return '<details class="ex-details row-ex" data-ex="' + escapeHtml(String(word)) + '">' +
+    "<summary>Examples (" + list.length + ")" +
+    (n > 1 ? " · " + n + " different meanings" : "") + "</summary></details>";
+}
+
 function phoneticHtml(text) {
   var ipa = window.Pron ? Pron.phonetic(text) : "";
   return ipa ? '<span class="phonetic mini">/' + escapeHtml(ipa) + "/</span>" : "";
@@ -1941,6 +1992,7 @@ function browseItemHtml(d, opts) {
     '<div class="bmain"><div class="bline"><span class="bw">' + escapeHtml(d.w) + "</span>" +
     speakBtnHtml(d.w) + phoneticHtml(d.w) + "</div>" +
     '<span class="bc">' + escapeHtml(String(d.c || "").replace(/\n/g, " / ")) + "</span></div>" +
+    exampleStubHtml(d.w) +
     '<div class="bmeta">' + browseStat(d.r) + '<span class="bdue">' + escapeHtml(due) + "</span></div>" +
     (opts.edit ? gradePickerHtml(d.r) : "") +
     (opts.restore ? '<button type="button" class="mini-action" data-action="restore" data-rank="' + d.r + '">Restore</button>' : "") +
@@ -2326,7 +2378,28 @@ function wireEvents() {
   document.querySelectorAll(".browseview").forEach(function (b) {
     b.addEventListener("click", function () { setBrowseView(b.getAttribute("data-view")); });
   });
+  // Example sentences sit inside the reveal too, and their play buttons need
+  // the same handler the list rows get.
+  elReveal.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest('[data-action="speak"]') : null;
+    if (b && window.Pron) Pron.speak(b.getAttribute("data-text"));
+  });
+
   el("browseList").addEventListener("click", function (e) {
+    // Library rows carry only a stub; fill it the first time it is opened,
+    // so 2,000 rows do not each build four example sentences up front.
+    var sum = e.target.closest ? e.target.closest(".ex-details > summary") : null;
+    if (sum) {
+      var det = sum.parentNode;
+      if (!det.getAttribute("data-filled")) {
+        det.setAttribute("data-filled", "1");
+        var host = document.createElement("div");
+        renderExamples(det.getAttribute("data-ex"), host);
+        var inner = host.querySelector(".ex-body");
+        if (inner) det.appendChild(inner);
+      }
+      return;
+    }
     var scale = e.target.closest ? e.target.closest(".scalebtn") : null;
     if (scale) {
       var holder = scale.closest(".scaleedit");

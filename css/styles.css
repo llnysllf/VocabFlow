@@ -1272,6 +1272,48 @@ body.settings-mode .deck-nav{display:none}
   .focusitem .fc{text-align:left}
 }
 
+/* ===== example sentences ===== */
+.examples{margin-top:14px}
+.ex-details summary{
+  width:max-content;
+  cursor:pointer;
+  color:#b8c3d5;
+  font-size:12px;
+  font-weight:850;
+  letter-spacing:.55px;
+  text-transform:uppercase;
+}
+.ex-details summary::marker{color:#6c788c}
+.ex-details[open] summary{margin-bottom:10px}
+.ex-body{display:grid;gap:8px}
+.ex-row{
+  padding:10px 12px;
+  border:1px solid var(--line-soft);
+  border-radius:var(--radius);
+  background:rgba(255,255,255,.035);
+}
+/* the sense this sentence shows — what makes two examples of "run" differ */
+.ex-sense{
+  display:inline-block;
+  margin-bottom:6px;
+  padding:2px 8px;
+  border:1px solid rgba(123,140,255,.3);
+  border-radius:999px;
+  background:rgba(123,140,255,.12);
+  color:#aab7ff;
+  font-size:11px;
+  font-weight:800;
+}
+.ex-line{display:flex;align-items:flex-start;gap:8px}
+.ex-en{color:#eef3f8;font-size:15px;line-height:1.45;flex:1;min-width:0}
+.ex-line .speak-btn{margin-top:1px}
+.ex-zh{margin-top:5px;color:#a7b2c5;font-size:13.5px;line-height:1.5}
+/* inside a Library row the block is secondary to the word itself */
+.browseitem .ex-details{grid-column:1/-1;margin-top:2px}
+.browseitem .ex-details summary{font-size:11px;letter-spacing:.4px;color:#8d9bae}
+.browseitem .ex-en{font-size:14px}
+.browseitem .ex-zh{font-size:13px}
+
 /* ===== collapsible deck groups ===== */
 .tab .tabname{display:flex;align-items:center;gap:6px;min-width:0}
 .tab.parent .chev{
