@@ -775,7 +775,7 @@ function reveal() {
   elYour.innerHTML = typed ? ("You typed: <b>" + escapeHtml(typed) + "</b>") : "<i>(no answer typed)</i>";
   renderMeaning(d.c);
   renderExamples(d.w, el("examples"));
-  renderGloss(d.e);
+  renderGloss(d.e, d.w);
   elReveal.classList.add("show");
   requestAnimationFrame(function () {
     var grades = document.querySelector(".grades");
@@ -802,15 +802,34 @@ function posLabel(token) {
 var POS_TOKENS = "n|vt|vi|v|adj|adv|ad|a|s|r|prep|conj|pron|art|num|interj|int|aux|pl|abbr|imp|p";
 var POS_LEAD_RE = new RegExp("^((?:(?:" + POS_TOKENS + ")\\.\\s*&?\\s*){1,3})(.+)$", "i");
 
+/* ECDICT marks field-specific senses with a bracketed tag. Left raw they read
+   as noise, and they crowd out the everyday meaning: "for" lists a DOS batch
+   command beside "为, 因为". Name the field, and sort those senses last. */
+var DOMAIN_LABEL = {
+  "计": "computing", "医": "medicine", "化": "chemistry", "经": "economics",
+  "法": "law", "机": "mechanics", "电": "electrical", "建": "construction",
+  "俚": "slang", "物": "physics", "口": "colloquial", "古": "archaic",
+  "体": "sport", "地名": "place name", "军": "military", "农": "agriculture"
+};
+
 function splitMeaning(text) {
-  return String(text || "").split(/\s*\/\s*/).filter(Boolean).map(function (part) {
+  var parts = String(text || "").split(/\s*\/\s*/).filter(Boolean).map(function (part) {
+    var domain = "";
+    part = part.replace(/\[([^\]]{1,4})\]\s*/, function (_, tag) {
+      domain = DOMAIN_LABEL[tag] || tag;
+      return "";
+    }).trim();
     var m = part.match(POS_LEAD_RE);
     if (m) {
       var label = posLabel(m[1].split(/\s+/)[0]); // normalise just the first token
-      if (label) return { label: label, text: m[2] };
+      if (label) return { label: label, text: m[2], domain: domain };
     }
-    return { label: "", text: part };
-  });
+    return { label: "", text: part, domain: domain };
+  }).filter(function (p) { return p.text; });
+
+  // Everyday senses first; a stable sort keeps each group's original order.
+  var plain = parts.filter(function (p) { return !p.domain; });
+  return plain.concat(parts.filter(function (p) { return p.domain; }));
 }
 
 function splitMeaningTerms(text) {
@@ -826,6 +845,7 @@ function renderMeaning(text) {
     var row = document.createElement("div");
     row.className = "meaning-row" +
       (part.label ? "" : " plain") +
+      (part.domain ? " domain" : "") +
       (termList.length > 4 ? " wide" : "");
 
     if (part.label) {
@@ -834,9 +854,15 @@ function renderMeaning(text) {
       label.textContent = part.label;
       row.appendChild(label);
     }
-
     var terms = document.createElement("span");
     terms.className = "meaning-terms";
+    // Sits with the terms, not as its own grid cell — the row is a 2-column grid.
+    if (part.domain) {
+      var dom = document.createElement("span");
+      dom.className = "meaning-domain";
+      dom.textContent = part.domain;
+      terms.appendChild(dom);
+    }
     termList.forEach(function (term) {
       var chip = document.createElement("span");
       chip.className = "meaning-term";
@@ -873,6 +899,15 @@ function isCrossRef(text) {
   var t = String(text || "").trim();
   return /^See\s+[A-Z][A-Za-z'’\- ]{0,18}\.?$/.test(t) ||
          /^Alt\.\s+of\s+/i.test(t);
+}
+
+/* WordNet resolves a short word to the ABBREVIATION that shares its spelling,
+   so "who" is glossed as a UN agency, "me" as the state of Maine, "am" as
+   americium. Only ever a problem for two- and three-letter words: "washington"
+   really is a state and "star" really is a celestial body. */
+var ABBREV_GLOSS = /a state in\b|United Nations agency|an associate degree|unit of surface area|radioactive transuranic|a airport|international airport/i;
+function isAbbrevGloss(word, text) {
+  return String(word || "").length <= 3 && ABBREV_GLOSS.test(String(text || ""));
 }
 
 /* The data uses " / " both to separate senses AND to mark mid-sentence line
@@ -956,12 +991,13 @@ function renderExamples(word, host) {
   });
 }
 
-function renderGloss(text) {
+function renderGloss(text, word) {
   elEn.innerHTML = "";
   var lines = [];
   joinGlossLines(text).forEach(function (raw) {
     var g = parseGloss(raw);
     if (isCrossRef(g.text)) return;                 // skip useless cross-references
+    if (isAbbrevGloss(word, g.text)) return;        // ...and the abbreviation mix-ups
     lines.push(g);
   });
   if (!lines.length) return;
@@ -1989,6 +2025,16 @@ function speakBtnHtml(text) {
     escapeHtml(String(text)) + '">' + SPEAK_ICON + "</button>";
 }
 
+/* One-line meaning for a list row: same ordering and domain naming the card
+   uses, so "for" leads with 为, 因为 rather than a DOS batch command. */
+function meaningSummaryHtml(text) {
+  return splitMeaning(text).map(function (p) {
+    return (p.label ? '<span class="bc-pos">' + escapeHtml(p.label) + "</span> " : "") +
+      (p.domain ? '<span class="meaning-domain">' + escapeHtml(p.domain) + "</span> " : "") +
+      escapeHtml(p.text);
+  }).join(' <span class="bc-sep">/</span> ');
+}
+
 /* Collapsed placeholders, one per word type; sentences built on first open. */
 function exampleStubHtml(word) {
   var groups = examplesFor(word);
@@ -2016,7 +2062,7 @@ function browseItemHtml(d, opts) {
   return '<div class="browseitem rich" data-rank="' + d.r + '">' +
     '<div class="bmain"><div class="bline"><span class="bw">' + escapeHtml(d.w) + "</span>" +
     speakBtnHtml(d.w) + phoneticHtml(d.w) + "</div>" +
-    '<span class="bc">' + escapeHtml(String(d.c || "").replace(/\n/g, " / ")) + "</span></div>" +
+    '<span class="bc">' + meaningSummaryHtml(d.c) + "</span></div>" +
     exampleStubHtml(d.w) +
     '<div class="bmeta">' + browseStat(d.r) + '<span class="bdue">' + escapeHtml(due) + "</span></div>" +
     (opts.edit ? gradePickerHtml(d.r) : "") +

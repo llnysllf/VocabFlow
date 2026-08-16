@@ -1272,6 +1272,25 @@ body.settings-mode .deck-nav{display:none}
   .focusitem .fc{text-align:left}
 }
 
+/* ===== field-specific meanings ===== */
+/* Named rather than left as a bare [计], and dimmed, because a DOS command is
+   not what someone looking up "for" needs first. */
+.meaning-domain{
+  flex:none;
+  align-self:flex-start;
+  padding:1px 7px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:999px;
+  background:rgba(255,255,255,.05);
+  color:#8d9bae;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.3px;
+  white-space:nowrap;
+}
+.meaning-row.domain{opacity:.72}
+.meaning-row.domain .meaning-term{color:#a7b2c5}
+
 /* ===== example sentences ===== */
 .examples{margin-top:14px;display:grid;gap:8px}
 .ex-stubs{grid-column:1/-1;display:grid;gap:6px;margin-top:4px}
@@ -1446,3 +1465,8 @@ body.settings-mode .deck-nav{display:none}
   .meaning-pos{width:max-content}
   .scaleedit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* list-row meaning: part of speech and separators kept quieter than the words */
+.bc-pos{color:#8d9bae;font-weight:800}
+.bc-sep{color:#5d6879;padding:0 1px}
+.browseitem .meaning-domain{margin-right:2px}

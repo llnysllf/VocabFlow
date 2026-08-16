@@ -148,6 +148,21 @@ Coverage follows frequency, which is the right shape — 99% of the top 1,000 wo
 examples, 92% of 1,000–3,000, falling to 9% by rank 15,000. In the Library the panel is a
 stub until opened, so 2,000 rows do not each build four sentences up front.
 
+## Meanings
+
+ECDICT marks field-specific senses with a bracketed tag — `[计]` computing, `[医]` medicine,
+`[化]` chemistry, `[经]` economics, `[法]` law. Left as-is they crowd out the everyday
+meaning: `for` led with a DOS batch command, and 819 words showed nothing else at all.
+Those senses are now **named and sorted last**, so `for` reads
+*prep. 为, 因为, 至于 / conj. 因为 / <sub>computing</sub> DOS批处理命令…*
+
+WordNet also resolves some short words to the **abbreviation** that shares their spelling,
+so `who` was glossed as a UN agency, `me` as the state of Maine, `am` as americium. Those
+English hints are dropped for words of three letters or fewer — `washington`, `california`
+and `star` are longer and keep theirs, because for them the definition is real.
+
+Both are display fixes; `words.js` is untouched.
+
 ## Spoken English in the sentence grader
 
 Plenty of English is universal in speech but marked wrong in a grammar book. The grader
