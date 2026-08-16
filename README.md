@@ -21,7 +21,7 @@ repetition** engine schedules each word for the right day so it actually moves i
 long-term memory.
 
 It has **two decks you switch between in the sidebar** — **Vocabulary** (15,000 words,
-splittable by word type) and **Expressions** (3,199 idioms, phrasal verbs, slang and
+splittable by word type) and **Expressions** (3,173 idioms, phrasal verbs, slang and
 proverbs) — each with its own independent progress. There's also a separate
 **Sentences** mode that drills full Chinese → English translation with an offline grader.
 
@@ -86,18 +86,17 @@ under each of their types. *Other* covers prepositions, pronouns, abbreviations 
 ~2,000 entries whose meaning has no part-of-speech marker, so nothing is unreachable.
 Idioms, phrasal verbs, proverbs and sayings carry no markers, so they get no word-type
 sub-entries. **Expressions** splits by kind instead — **Idioms · Phrasal Verbs · Slang ·
-Proverbs · Sayings** — and **Slang** splits again by country, since slang is the only kind
-tied to one:
+Proverbs** — and **Slang** splits again by country, since slang is the only kind tied to
+one:
 
 ```
-Expressions        3,199
+Expressions        3,173
    Idioms          1,568
    Phrasal Verbs   1,000
-   Slang             140
+   Slang             114
       American        39
       British         40
       Australian      35
-      General         26
    Proverbs          491
 ```
 
@@ -254,7 +253,8 @@ Lambda + DynamoDB, defined as one SAM template) for accounts and sync.
 - **Proverbs** come from [**LLMProverbMT**](https://github.com/yuriak/LLMProverbMT) (human-verified
   English→Chinese proverbs) plus IdiomKB.
 - **Slang** is hand-curated for this project and tagged by where it is used —
-  American, British, Australian, or General. It replaced ECDICT's register-tagged (俚/口)
+  American, British or Australian, and kept only where the slang sense differs from the
+  everyday word (`nick` is a notch but also to steal). It replaced ECDICT's register-tagged (俚/口)
   entries, which were unreliable (`molly` glossed as "coward" but defined as an aquarium
   fish, `becky` as "上挂钩"). Vulgar terms, slurs, and words whose meaning flips between
   countries are deliberately excluded.

@@ -1,9 +1,16 @@
 /* English slang, hand-curated and tagged by where it is actually used.
-   { r, w, c:Chinese, e:English meaning, nat:American|British|Australian|General }
+   { r, w, c:Chinese, e:English meaning, nat:American|British|Australian }
 
-   "General" means current across the main English-speaking countries. The rest
-   are strongly associated with one of them — a British speaker understands
-   "bail" and an American understands "knackered", but neither would say it.
+   Each entry is tied to one country — a British speaker understands "bail" and
+   an American understands "knackered", but neither would say it — and its slang
+   sense differs from the everyday word: "nick" is a notch but also to steal,
+   "barbie" is a doll but also a barbecue.
+
+   The nat:"General" entries below are RETIRED and not shown. They were ordinary
+   informal English (awesome, cool, cash, stuff, weird), all of which already sit
+   in the Vocabulary deck with the same meaning — not slang at all. They stay
+   here only so that the surviving entries keep the ranks progress is stored
+   against; delete them at the next schema migration.
 
    Deliberately excluded: vulgar terms, slurs, and words whose meaning flips
    between countries in a way that would embarrass a learner. */

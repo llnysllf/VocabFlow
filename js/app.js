@@ -39,12 +39,17 @@ function srcFilterValid(id) {
   return SRC_FILTERS.some(function (f) { return f.id === id; }) ? id : "all";
 }
 
+/* Slang is vocabulary marked by where it is used. "General" was a mistake: its
+   entries — awesome, cool, cash, stuff, weird — are ordinary informal English,
+   and every one of them already sits in the Vocabulary deck with the same
+   meaning. What makes nick, bail and barbie worth a slang deck is that the
+   slang sense differs from the everyday word; awesome has no second sense. */
+var HIDDEN_NATIONS = ["General"];
 var NAT_FILTERS = [
   { id: "all", label: "All" },
   { id: "American", label: "American" },
   { id: "British", label: "British" },
-  { id: "Australian", label: "Australian" },
-  { id: "General", label: "General" }
+  { id: "Australian", label: "Australian" }
 ];
 function natFilterValid(id) {
   return NAT_FILTERS.some(function (f) { return f.id === id; }) ? id : "all";
@@ -118,8 +123,10 @@ function buildExpressions() {
   EXPRESSION_PARTS.forEach(function (part) {
     EXPRESSION_OFFSET[part.id] = offset;
     part.data.forEach(function (e) {
-      // Skipping a duplicate must not shift anything: the offset still advances
-      // by the whole file, so every surviving rank keeps its value.
+      // Skipping an entry must not shift anything: the offset still advances by
+      // the whole file, so every surviving rank keeps its value. That is why
+      // retired entries stay in their source file rather than being deleted.
+      if (e.nat && HIDDEN_NATIONS.indexOf(e.nat) >= 0) return;
       if (owner[String(e.w || "").trim().toLowerCase()] !== part.id) return;
       out.push({ r: offset + e.r, w: e.w, c: e.c, e: e.e, src: part.kind, nat: e.nat || "" });
     });
