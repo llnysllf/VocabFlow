@@ -63,6 +63,16 @@ pip install wordfreq
 python3 tools/rerank-words.py
 ```
 
+After editing `sentences.js`, check the answer keys still hold together:
+
+```bash
+python3 tools/check-sentences.py
+```
+
+It fails if any sample answer is rejected by its own sentence's points, and reports
+two softer problems: wrong-forms the points accept anyway, and wrong-forms that can
+never fire because they contain their own `need` phrase.
+
 `ipa.js` is generated, not hand-edited. After adding or renaming headwords in any
 deck, rebuild it:
 
