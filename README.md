@@ -21,8 +21,8 @@ repetition** engine schedules each word for the right day so it actually moves i
 long-term memory.
 
 It has **two decks you switch between in the sidebar** — **Vocabulary** (15,000 words,
-splittable by word type) and **Expressions** (3,172 idioms, phrasal verbs, slang,
-proverbs and sayings) — each with its own independent progress. There's also a separate
+splittable by word type) and **Expressions** (3,199 idioms, phrasal verbs, slang and
+proverbs) — each with its own independent progress. There's also a separate
 **Sentences** mode that drills full Chinese → English translation with an offline grader.
 
 It's a single static site — no framework, no build step. Open it and study. Optionally
@@ -90,17 +90,30 @@ Proverbs · Sayings** — and **Slang** splits again by country, since slang is 
 tied to one:
 
 ```
-Expressions        3,241
-   Idioms          1,000
+Expressions        3,199
+   Idioms          1,568
    Phrasal Verbs   1,000
-   Slang             150
-      American        40
+   Slang             140
+      American        39
       British         40
       Australian      35
-      General         35
+      General         26
    Proverbs          491
-   Sayings           600
 ```
+
+The three kinds are told apart by grammar, not by feel:
+
+- a **phrasal verb** is a verb — you conjugate it (*give up → gave up*);
+- an **idiom** is a fragment you build a sentence around (*"we broke the ice"*);
+- a **proverb** is a whole sentence that stands alone (*"you get what you pay for"*).
+
+`sayings.js` is still a separate file, but its entries are shown as **idioms** — *white as
+a sheet* and *go in one ear and out the other* are idioms by any normal definition, and the
+two lists are separate only because IdiomKB shipped them that way.
+
+An expression that appears in several source lists is shown once, under the most specific
+label: *ask out* and *come on* are phrasal verbs before they are idioms, and *hit the road*
+is an idiom before it is slang. That removes 42 duplicates.
 
 The nations only unfold once Slang is selected. Words like `arvo` and `knackered` are
 missing from the CMU dictionary (it is American), so they show no phonetic — but Wiktionary

@@ -33,8 +33,7 @@ var SRC_FILTERS = [
   { id: "idioms", label: "Idioms" },
   { id: "phrasal", label: "Phrasal Verbs" },
   { id: "slang", label: "Slang" },
-  { id: "proverbs", label: "Proverbs" },
-  { id: "sayings", label: "Sayings" }
+  { id: "proverbs", label: "Proverbs" }
 ];
 function srcFilterValid(id) {
   return SRC_FILTERS.some(function (f) { return f.id === id; }) ? id : "all";
@@ -81,21 +80,48 @@ function gradeStrike(g) {
    you learn whole, so they share one deck. Each source keeps its own file and
    its own 1..N numbering; merging shifts each by a fixed offset, which makes
    the old rank -> new rank migration pure arithmetic (see migrateExpressions). */
+/* `kind` is what an entry is; `id` is only which file it came from. "Sayings"
+   was never a real category — white as a sheet and go in one ear and out the
+   other are idioms by any normal definition, and the two lists are separate
+   only because IdiomKB shipped them separately. So sayings are shown as idioms.
+   The file and its id stay put, because ranks are derived from them. */
 var EXPRESSION_PARTS = [
-  { id: "idioms",   data: window.IDIOMS   || [] },
-  { id: "phrasal",  data: window.PHRASAL  || [] },
-  { id: "slang",    data: window.SLANG    || [] },
-  { id: "proverbs", data: window.PROVERBS || [] },
-  { id: "sayings",  data: window.SAYINGS  || [] }
+  { id: "idioms",   kind: "idioms",   data: window.IDIOMS   || [] },
+  { id: "phrasal",  kind: "phrasal",  data: window.PHRASAL  || [] },
+  { id: "slang",    kind: "slang",    data: window.SLANG    || [] },
+  { id: "proverbs", kind: "proverbs", data: window.PROVERBS || [] },
+  { id: "sayings",  kind: "idioms",   data: window.SAYINGS  || [] }
 ];
 var EXPRESSION_OFFSET = {};   // old deck id -> rank offset in the merged deck
 
+/* The same expression can sit in several source lists — "ask out" is in both
+   idioms and phrasal verbs, and it is genuinely both. Show it once, under the
+   most specific label: a verb+particle is a phrasal verb first, and a fixed
+   figurative phrase is an idiom before it is slang. */
+var DEDUPE_PRIORITY = ["phrasal", "idioms", "sayings", "proverbs", "slang"];
+
+function claimHeadwords() {
+  var owner = {};
+  DEDUPE_PRIORITY.forEach(function (id) {
+    var part = EXPRESSION_PARTS.filter(function (p) { return p.id === id; })[0];
+    if (!part) return;
+    part.data.forEach(function (e) {
+      var k = String(e.w || "").trim().toLowerCase();
+      if (k && owner[k] === undefined) owner[k] = id;
+    });
+  });
+  return owner;
+}
+
 function buildExpressions() {
-  var out = [], offset = 0;
+  var out = [], offset = 0, owner = claimHeadwords();
   EXPRESSION_PARTS.forEach(function (part) {
     EXPRESSION_OFFSET[part.id] = offset;
     part.data.forEach(function (e) {
-      out.push({ r: offset + e.r, w: e.w, c: e.c, e: e.e, src: part.id, nat: e.nat || "" });
+      // Skipping a duplicate must not shift anything: the offset still advances
+      // by the whole file, so every surviving rank keeps its value.
+      if (owner[String(e.w || "").trim().toLowerCase()] !== part.id) return;
+      out.push({ r: offset + e.r, w: e.w, c: e.c, e: e.e, src: part.kind, nat: e.nat || "" });
     });
     offset += part.data.length;
   });
@@ -111,7 +137,7 @@ var DECK_LABELS = { vocab: "Vocabulary", expressions: "Expressions" };
 var DECK_NOUN = { vocab: "words", expressions: "expressions" };
 var DECK_ITEM = { vocab: "word", expressions: "expression" };
 /* What each merged entry actually is, for the card's prompt. */
-var SRC_ITEM = { idioms: "idiom", phrasal: "phrasal verb", slang: "slang term", proverbs: "proverb", sayings: "saying" };
+var SRC_ITEM = { idioms: "idiom", phrasal: "phrasal verb", slang: "slang term", proverbs: "proverb" };
 
 /* `r` is identity — progress, cloud records and exported backups are all keyed
    on it, so it never moves. Frequency order lives in the array order instead,
