@@ -171,6 +171,7 @@ proverbs.js           proverbs (window.PROVERBS)
 sayings.js            sayings & expressions (window.SAYINGS)
 sentences.js          Chinese → English translation bank (window.SENTENCES)
 tools/build-ipa.py    Regenerates ipa.js from the CMU Pronouncing Dictionary
+tools/rerank-words.py Re-sorts words.js by wordfreq corpus frequency
 backend/              AWS SAM stack: Cognito + API Gateway + Lambda + DynamoDB
 ```
 
@@ -189,6 +190,10 @@ Lambda + DynamoDB, defined as one SAM template) for accounts and sync.
 
 - **Vocabulary** and **Phrasal Verbs** meanings come from [**ECDICT**](https://github.com/skywind3000/ECDICT),
   an open English→Chinese dictionary.
+- **Word order** is by [**wordfreq**](https://github.com/rspeer/wordfreq) Zipf score — a blend of
+  books, subtitles, news, web and Wikipedia. ECDICT's own ranking came from an early-2000s web
+  crawl, which placed page furniture and spam among the commonest English (`faq` at 693, `usr` at
+  1077, `phentermine` at 1575). Re-sort with `tools/rerank-words.py`.
 - **Idioms** and **Sayings** come from [**IdiomKB**](https://github.com/lishuang-w/IdiomKB),
   a verified idiom knowledge base (each entry with a Chinese and English meaning).
 - **Proverbs** come from [**LLMProverbMT**](https://github.com/yuriak/LLMProverbMT) (human-verified
