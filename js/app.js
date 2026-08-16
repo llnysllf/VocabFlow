@@ -1247,27 +1247,129 @@ function normEn(s) {
   s = s.replace(/[.,!?;:"“”()]/g, " ");
   return s.replace(/\s+/g, " ").trim();
 }
-function hasTok(norm, token, fuzzy) {
+/* A point that needs "tall" should be satisfied by "taller", one that needs
+   "graduate" by "graduated". Without this, valid paraphrases of the deck's own
+   sample answers get marked wrong. Applied only to the "needed" side. */
+var SUFFIXES = ["s", "es", "'s", "d", "ed", "r", "er", "st", "est", "ing", "ies", "ied"];
+function wordForms(token) {
+  var out = [], i, suf;
+  var doubles = token.length > 2 &&
+    "aeiouwxy".indexOf(token.charAt(token.length - 1)) < 0 &&
+    "aeiou".indexOf(token.charAt(token.length - 2)) >= 0 &&
+    "aeiou".indexOf(token.charAt(token.length - 3)) < 0;
+  for (i = 0; i < SUFFIXES.length; i++) {
+    suf = SUFFIXES[i];
+    out.push(token + suf);
+    if (token.slice(-1) === "e") out.push(token.slice(0, -1) + suf);
+    if (token.slice(-1) === "y") out.push(token.slice(0, -1) + "i" + suf);
+    if (doubles) out.push(token + token.slice(-1) + suf);   // stop -> stopped
+  }
+  return out;
+}
+
+function hasTok(norm, token, fuzzy, banned) {
   token = normEn(token);
   if (!token) return false;
   if (token.indexOf(" ") >= 0) return norm.indexOf(token) >= 0;          // phrase
   var pad = " " + norm + " ";
   if (pad.indexOf(" " + token + " ") >= 0) return true;                  // whole word
-  // simple-plural tolerance, only for the "needed" words (not the wrong-form list)
-  return !!fuzzy && (pad.indexOf(" " + token + "s ") >= 0 || pad.indexOf(" " + token + "es ") >= 0);
+  if (!fuzzy) return false;
+  // A form the point explicitly lists as wrong must not be rescued by fuzzing:
+  // those are the verb-form errors the sentence is there to teach.
+  var forms = wordForms(token);
+  for (var i = 0; i < forms.length; i++) {
+    if (banned && banned.indexOf(forms[i]) >= 0) continue;
+    if (pad.indexOf(" " + forms[i] + " ") >= 0) return true;
+  }
+  return false;
 }
-/* Accept several phrasings; otherwise diagnose each tested point. */
-function gradeSentence(sent, answer) {
+
+/* Forms that are everywhere in real speech but that a grammar book marks wrong.
+   The learner's answer is rewritten to the textbook form and re-graded; if that
+   passes, the answer is accepted and the note explains what was informal. */
+var SPOKEN_FORMS = [
+  { re: /\bgonna\b/gi,  to: "going to",
+    note: "“gonna” is how “going to” is said — normal in speech, but write “going to”." },
+  { re: /\bwanna\b/gi,  to: "want to",
+    note: "“wanna” is how “want to” is said — normal in speech, but write “want to”." },
+  { re: /\bgotta\b/gi,  to: "have got to",
+    note: "“gotta” is how “got to” is said — normal in speech, but write “have got to”." },
+  { re: /\bkinda\b/gi,  to: "kind of",
+    note: "“kinda” is how “kind of” is said — normal in speech, but write “kind of”." },
+  { re: /\bgimme\b/gi,  to: "give me",
+    note: "“gimme” is how “give me” is said — normal in speech, but write “give me”." },
+  { re: /\blemme\b/gi,  to: "let me",
+    note: "“lemme” is how “let me” is said — normal in speech, but write “let me”." },
+  { re: /\b(?:cuz|coz|'cause)\b/gi, to: "because",
+    note: "“cuz” for “because” — fine in speech and texting, not in writing." },
+  { re: /\b(could|would|should|must|might) of\b/gi, to: "$1 have",
+    note: "“$1 of” sounds exactly like “$1’ve”, which is why it is so common — but in writing it is “$1 have”." },
+  { re: /\bthere(?:'s| is)\b(?=[^,.;?!]*\b(?:two|three|four|five|six|seven|eight|nine|ten|many|several|some|lots|a lot|\w+s)\b)/gi,
+    to: "there are",
+    note: "“there’s” before a plural is what almost everyone says — the textbook form is “there are”." },
+  { re: /\bthere was\b(?=[^,.;?!]*\b(?:two|three|four|five|six|seven|eight|nine|ten|many|several|\w+s)\b)/gi,
+    to: "there were",
+    note: "“there was” before a plural is very common in speech — the textbook form is “there were”." },
+  { re: /\bless\b(?=\s+\w+s\b)/gi, to: "fewer",
+    note: "“less” with countable things is everywhere in speech — writing prefers “fewer”." },
+  { re: /\bif (i|he|she|it) was\b/gi, to: "if $1 were",
+    note: "“if $1 was” is normal in speech; the subjunctive “if $1 were” is the textbook form." },
+  { re: /\bthan me\b/gi,   to: "than I",   note: "“than me” is what people say; strict grammar wants “than I”." },
+  { re: /\bthan him\b/gi,  to: "than he",  note: "“than him” is what people say; strict grammar wants “than he”." },
+  { re: /\bthan her\b/gi,  to: "than she", note: "“than her” is what people say; strict grammar wants “than she”." },
+  { re: /\bthan them\b/gi, to: "than they",note: "“than them” is what people say; strict grammar wants “than they”." },
+  { re: /\bme and (\w+)\b/gi, to: "$1 and I",
+    note: "“me and …” as the subject is extremely common in speech — writing wants “… and I”." },
+  { re: /\b(doing|feeling) good\b/gi, to: "$1 well",
+    note: "“$1 good” is standard in American speech; the textbook form is “$1 well”." },
+  { re: /\bdifferent than\b/gi, to: "different from",
+    note: "“different than” is normal in American English; “different from” is the safer written form." }
+];
+
+/* Rewrite spoken forms to their textbook equivalents. */
+function toTextbook(answer) {
+  var text = String(answer || ""), notes = [];
+  SPOKEN_FORMS.forEach(function (rule) {
+    rule.re.lastIndex = 0;
+    if (!rule.re.test(text)) return;
+    rule.re.lastIndex = 0;
+    var note = rule.note;
+    text = text.replace(rule.re, function () {
+      var args = arguments;
+      note = note.replace(/\$(\d)/g, function (_, i) { return args[i] || ""; });
+      return rule.to.replace(/\$(\d)/g, function (_, i) { return args[i] || ""; });
+    });
+    notes.push(note);
+  });
+  return { text: text, notes: notes };
+}
+
+function gradePoints(sent, answer) {
   var n = normEn(answer);
   if (!n) return { empty: true };
   var exact = sent.en.map(normEn).indexOf(n) >= 0;
   var points = (sent.points || []).map(function (p) {
-    var ok = (p.need || []).some(function (t) { return hasTok(n, t, true); });
+    var banned = (p.wrong || []).map(normEn);
+    var ok = (p.need || []).some(function (t) { return hasTok(n, t, true, banned); });
     var wrong = !ok && (p.wrong || []).some(function (t) { return hasTok(n, t, false); });
     return { p: p, status: ok ? "ok" : (wrong ? "wrong" : "missing") };
   });
   var failed = points.filter(function (x) { return x.status !== "ok"; });
   return { correct: exact || failed.length === 0, exact: exact, points: points, failed: failed };
+}
+
+/* Accept several phrasings; accept natural spoken ones with a note; otherwise
+   diagnose each tested point. */
+function gradeSentence(sent, answer) {
+  var res = gradePoints(sent, answer);
+  if (res.empty || res.correct) return res;
+  var spoken = toTextbook(answer);
+  if (!spoken.notes.length) return res;
+  var alt = gradePoints(sent, spoken.text);
+  if (!alt.correct) return res;
+  alt.spoken = spoken.notes;      // right in real life, worth a word about why
+  alt.exact = false;
+  return alt;
 }
 
 function sProg() { return S.sentences; }
@@ -1378,7 +1480,13 @@ function checkSentence() {
   renderSentenceProgress();
   refreshStats();
   var html = "";
-  if (res.correct) {
+  if (res.correct && res.spoken) {
+    fb.className = "s-feedback ok spoken";
+    html += '<div class="s-head">✓ Accepted — that is how people really say it</div>';
+    html += '<ul class="s-issues">';
+    res.spoken.forEach(function (note) { html += "<li>" + escapeHtml(note) + "</li>"; });
+    html += "</ul>";
+  } else if (res.correct) {
     fb.className = "s-feedback ok";
     html += '<div class="s-head">✓ ' + (res.exact ? "Correct!" : "Looks right!") + "</div>";
   } else {
