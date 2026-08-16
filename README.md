@@ -75,8 +75,8 @@ adjustable under **Goal & Data**.
 
 ## Studying one part of speech
 
-**Nouns · Verbs · Adjectives · Adverbs · Other** sit indented under Vocabulary in the
-sidebar. They are views over that one deck, sharing its progress — grading a word under
+**Nouns · Verbs · Adjectives · Adverbs · Other** fold out of Vocabulary in the sidebar —
+click the deck to open its list, click again to shut it. They are views over that one deck, sharing its progress — grading a word under
 Nouns counts everywhere. Picking one scopes the Library list, the practice queue and the
 Statistics counts, and sticks until you change it, so you can spend a session on
 adjectives alone. A pill on the practice card shows when the deck is narrowed.
@@ -114,7 +114,8 @@ An expression that appears in several source lists is shown once, under the most
 label: *ask out* and *come on* are phrasal verbs before they are idioms, and *hit the road*
 is an idiom before it is slang. That removes 42 duplicates.
 
-The nations only unfold once Slang is selected. Words like `arvo` and `knackered` are
+The nations only unfold once Slang is selected, and each deck remembers whether its list
+was open, reopening on the group you were last studying. Words like `arvo` and `knackered` are
 missing from the CMU dictionary (it is American), so they show no phonetic — but Wiktionary
 has recordings by native speakers of the right accent, so the play button still gives you
 `En-au-arvo.ogg` rather than an American approximation.

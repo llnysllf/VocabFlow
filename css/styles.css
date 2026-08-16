@@ -1272,6 +1272,31 @@ body.settings-mode .deck-nav{display:none}
   .focusitem .fc{text-align:left}
 }
 
+/* ===== collapsible deck groups ===== */
+.tab .tabname{display:flex;align-items:center;gap:6px;min-width:0}
+.tab.parent .chev{
+  display:inline-grid;
+  place-items:center;
+  width:14px;
+  height:14px;
+  flex:none;
+  margin-left:-3px;
+  color:#7f8da3;
+  transition:transform .18s ease,color .16s ease;
+}
+.tab.parent .chev svg{
+  width:12px;
+  height:12px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2.4;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.tab.parent.open .chev{transform:rotate(90deg)}
+.tab.parent:hover .chev{color:#e6ecf6}
+.tab.parent.active .chev{color:#69edbd}
+
 /* ===== part-of-speech sub-decks ===== */
 /* Indented under Vocabulary and visually lighter, because they are views over
    that deck rather than decks of their own. */

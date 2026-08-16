@@ -1643,14 +1643,33 @@ function selectDeck(id, patch) {
   }
 }
 
-function tabButton(label, count, active, onClick, cls) {
+var CHEVRON = '<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>';
+
+function tabButton(label, count, active, onClick, cls, open) {
   var b = document.createElement("button");
-  b.className = "tab" + (cls ? " " + cls : "") + (active ? " active" : "");
-  b.innerHTML = '<span class="tabname">' + escapeHtml(label) + "</span>" +
+  b.className = "tab" + (cls ? " " + cls : "") + (active ? " active" : "") +
+    (open === undefined ? "" : " parent" + (open ? " open" : ""));
+  b.innerHTML = '<span class="tabname">' + (open === undefined ? "" : CHEVRON) +
+    escapeHtml(label) + "</span>" +
     '<span class="tabcount">' + count.toLocaleString() + "</span>";
+  if (open !== undefined) b.setAttribute("aria-expanded", open ? "true" : "false");
   b.addEventListener("click", onClick);
   return b;
 }
+
+/* Which deck's sub-list is unfolded. Runtime only — but it starts unfolded on
+   whichever deck the saved scope belongs to, so a narrowed deck shows you where
+   you are instead of looking like the whole thing. */
+var navOpen = null;
+function initNavOpen() {
+  if (navOpen) return;
+  navOpen = {
+    vocab: posFilterValid(S.cfg.pos) !== "all",
+    expressions: srcFilterValid(S.cfg.src) !== "all"
+  };
+}
+function toggleNav(id) { initNavOpen(); navOpen[id] = !navOpen[id]; }
+function navIsOpen(id) { initNavOpen(); return !!navOpen[id]; }
 
 /* How many entries the given part-of-speech filter would leave. Counting walks
    15,000 meanings, so cache it — the answer only depends on the data. */
@@ -1687,12 +1706,18 @@ function renderTabs() {
 
   DECK_IDS.forEach(function (id) {
     var narrowed = id === "vocab" ? posFilter() !== "all" : srcFilter() !== "all";
+    var splits = id === "vocab" ? deckHasPosFor("vocab") : deckHasSrcFor("expressions");
+    var open = splits && navIsOpen(id);
+    // A deck that splits gets a chevron: the click both selects the whole deck
+    // and folds its list open or shut.
     nav.appendChild(tabButton(DECK_LABELS[id], DECKS[id].length, id === sel && !narrowed, function () {
+      toggleNav(id);
       selectDeck(id, id === "vocab" ? { pos: "all" } : { src: "all", nat: "all" });
-    }));
+    }, "", splits ? open : undefined));
+    if (!open) return;
     // Sub-entries are views over the same deck and the same progress, not decks
     // of their own: word types on Vocabulary, kinds of expression on Expressions.
-    if (id === "vocab" && deckHasPosFor("vocab")) {
+    if (id === "vocab") {
       POS_FILTERS.forEach(function (f) {
         if (f.id === "all") return;
         nav.appendChild(tabButton(f.label, posCount("vocab", f.id),
@@ -1700,7 +1725,7 @@ function renderTabs() {
           function () { selectDeck("vocab", { pos: f.id }); }, "subtab"));
       });
     }
-    if (id === "expressions" && deckHasSrcFor("expressions")) {
+    if (id === "expressions") {
       SRC_FILTERS.forEach(function (f) {
         if (f.id === "all") return;
         var chosen = sel === "expressions" && srcFilter() === f.id;
