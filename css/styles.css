@@ -1273,8 +1273,12 @@ body.settings-mode .deck-nav{display:none}
 }
 
 /* ===== example sentences ===== */
-.examples{margin-top:14px}
+.examples{margin-top:14px;display:grid;gap:8px}
+.ex-stubs{grid-column:1/-1;display:grid;gap:6px;margin-top:4px}
 .ex-details summary{
+  display:flex;
+  align-items:center;
+  gap:8px;
   width:max-content;
   cursor:pointer;
   color:#b8c3d5;
@@ -1285,6 +1289,18 @@ body.settings-mode .deck-nav{display:none}
 }
 .ex-details summary::marker{color:#6c788c}
 .ex-details[open] summary{margin-bottom:10px}
+/* the word type this block is for — the thing that separates the sections */
+.ex-type{
+  padding:2px 8px;
+  border:1px solid rgba(69,214,163,.3);
+  border-radius:999px;
+  background:rgba(69,214,163,.12);
+  color:var(--accent);
+  font-size:11px;
+  font-weight:850;
+  letter-spacing:.2px;
+  text-transform:none;
+}
 .ex-body{display:grid;gap:8px}
 .ex-row{
   padding:10px 12px;

@@ -904,35 +904,56 @@ function examplesFor(word) {
   return (table && table[String(word || "").trim().toLowerCase()]) || [];
 }
 
+var EX_TYPE_ORDER = ["n.", "v.", "adj.", "adv.", "prep.", "conj.", "pron.", "art.",
+                     "num.", "interj.", "aux."];
+var EX_TYPE_NAME = { "n.": "Noun", "v.": "Verb", "adj.": "Adjective", "adv.": "Adverb",
+                     "prep.": "Preposition", "conj.": "Conjunction", "pron.": "Pronoun",
+                     "art.": "Article", "num.": "Numeral", "interj.": "Interjection",
+                     "aux.": "Auxiliary" };
+
+function exampleTypes(word) {
+  var groups = examplesFor(word), out = [];
+  EX_TYPE_ORDER.forEach(function (t) { if (groups[t] && groups[t].length) out.push(t); });
+  Object.keys(groups).forEach(function (t) {
+    if (out.indexOf(t) < 0 && groups[t] && groups[t].length) out.push(t);
+  });
+  return out;
+}
+
+/* One fold per word type. "break" as a noun and "break" as a verb are different
+   words to a learner, so they get separate sections rather than one mixed list. */
 function renderExamples(word, host) {
   if (!host) return;
   host.innerHTML = "";
-  var list = examplesFor(word);
-  if (!list.length) return;
+  var groups = examplesFor(word);
+  var types = exampleTypes(word);
+  if (!types.length) return;
 
-  var details = document.createElement("details");
-  details.className = "ex-details";
-  var summary = document.createElement("summary");
-  var senses = 0, seen = {};
-  list.forEach(function (x) { if (x.s && !seen[x.s]) { seen[x.s] = 1; senses++; } });
-  summary.textContent = "Examples (" + list.length + ")" +
-    (senses > 1 ? " · " + senses + " different meanings" : "");
-  details.appendChild(summary);
+  types.forEach(function (t) {
+    var list = groups[t];
+    var details = document.createElement("details");
+    details.className = "ex-details";
+    var summary = document.createElement("summary");
+    summary.innerHTML = '<span class="ex-type">' + escapeHtml(t) + "</span>" +
+      "<span>" + escapeHtml(EX_TYPE_NAME[t] || t) + " · " + list.length +
+      " example" + (list.length === 1 ? "" : "s") + "</span>";
+    details.appendChild(summary);
 
-  var body = document.createElement("div");
-  body.className = "ex-body";
-  list.forEach(function (x) {
-    var row = document.createElement("div");
-    row.className = "ex-row";
-    row.innerHTML =
-      (x.s ? '<span class="ex-sense">' + escapeHtml(x.s) + "</span>" : "") +
-      '<div class="ex-line"><span class="ex-en">' + escapeHtml(x.en) + "</span>" +
-      speakBtnHtml(x.en) + "</div>" +
-      '<div class="ex-zh">' + escapeHtml(x.zh) + "</div>";
-    body.appendChild(row);
+    var body = document.createElement("div");
+    body.className = "ex-body";
+    list.forEach(function (x) {
+      var row = document.createElement("div");
+      row.className = "ex-row";
+      row.innerHTML =
+        (x.s ? '<span class="ex-sense">' + escapeHtml(x.s) + "</span>" : "") +
+        '<div class="ex-line"><span class="ex-en">' + escapeHtml(x.en) + "</span>" +
+        speakBtnHtml(x.en) + "</div>" +
+        '<div class="ex-zh">' + escapeHtml(x.zh) + "</div>";
+      body.appendChild(row);
+    });
+    details.appendChild(body);
+    host.appendChild(details);
   });
-  details.appendChild(body);
-  host.appendChild(details);
 }
 
 function renderGloss(text) {
@@ -1968,15 +1989,19 @@ function speakBtnHtml(text) {
     escapeHtml(String(text)) + '">' + SPEAK_ICON + "</button>";
 }
 
-/* Collapsed placeholder; the sentences are built on first open. */
+/* Collapsed placeholders, one per word type; sentences built on first open. */
 function exampleStubHtml(word) {
-  var list = examplesFor(word);
-  if (!list.length) return "";
-  var senses = {}, n = 0;
-  list.forEach(function (x) { if (x.s && !senses[x.s]) { senses[x.s] = 1; n++; } });
-  return '<details class="ex-details row-ex" data-ex="' + escapeHtml(String(word)) + '">' +
-    "<summary>Examples (" + list.length + ")" +
-    (n > 1 ? " · " + n + " different meanings" : "") + "</summary></details>";
+  var groups = examplesFor(word);
+  var types = exampleTypes(word);
+  if (!types.length) return "";
+  return '<div class="ex-stubs">' + types.map(function (t) {
+    var n = groups[t].length;
+    return '<details class="ex-details" data-ex="' + escapeHtml(String(word)) +
+      '" data-type="' + escapeHtml(t) + '"><summary>' +
+      '<span class="ex-type">' + escapeHtml(t) + "</span><span>" +
+      escapeHtml(EX_TYPE_NAME[t] || t) + " · " + n + " example" + (n === 1 ? "" : "s") +
+      "</span></summary></details>";
+  }).join("") + "</div>";
 }
 
 function phoneticHtml(text) {
@@ -2395,8 +2420,15 @@ function wireEvents() {
         det.setAttribute("data-filled", "1");
         var host = document.createElement("div");
         renderExamples(det.getAttribute("data-ex"), host);
-        var inner = host.querySelector(".ex-body");
-        if (inner) det.appendChild(inner);
+        // Each stub owns one word type; take that type's sentences.
+        var want = det.getAttribute("data-type");
+        var all = host.querySelectorAll(".ex-details");
+        for (var i = 0; i < all.length; i++) {
+          if (all[i].querySelector(".ex-type").textContent === want) {
+            det.appendChild(all[i].querySelector(".ex-body"));
+            break;
+          }
+        }
       }
       return;
     }

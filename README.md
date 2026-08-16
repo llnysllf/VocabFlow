@@ -126,20 +126,23 @@ has recordings by native speakers of the right accent, so the play button still 
 Checking an answer, or opening a word in the Library, reveals an **Examples** panel:
 real sentences with Chinese translations, each with its own play button.
 
-Where a word has several meanings the examples are labelled with the one they show, so
-the senses separate visibly instead of sitting in a comma-separated list:
+Examples are split **by word type**, one fold each — "break" the noun and "break" the verb
+are different words to a learner:
 
 | | |
 |---|---|
-| **n. 休息** | The break is over. — 休息结束了！ |
-| **vt. 打断** | We didn't break in. — 我们没有打断。 |
-| **vt. 打破** | I sometimes break the rules. — 我有时候打破规矩。 |
-| **vt. 弄坏** | Did Tom break something again? — 汤姆又弄坏了什么东西吗？ |
+| **n.** Noun | Take a break. — 休息一下吧。 · The break is over. · I just need a break. |
+| **v.** Verb | *打断* We didn't break in. · *打破* I sometimes break the rules. · *弄坏* Did Tom break something again? |
 
-Tatoeba's sentences are not sense-tagged, so the label is inferred: if the Chinese
-translation contains one of the word's own listed meanings, the example is filed under it.
-That covers **3,605** words, of which **836** show two or more distinct senses. The rest
-still get examples, just unlabelled.
+Every sentence is part-of-speech tagged, and filed under the type the word actually has
+*in that sentence* — not under the dictionary's list, and not guessed from the translation.
+That covers **82%** of the word types the dictionary lists, and **5,266 words have an
+example for every type they list**.
+
+Within a type, a sentence is additionally labelled with the specific sense when the Chinese
+translation makes it unambiguous (打断 / 打破 / 弄坏 above). **39%** of type groups have at
+least one such sense-confirmed sentence; the other 61% rest on the tagger alone, which is
+occasionally wrong on adverbs it reads as nouns.
 
 Coverage follows frequency, which is the right shape — 99% of the top 1,000 words have
 examples, 92% of 1,000–3,000, falling to 9% by rank 15,000. In the Library the panel is a
