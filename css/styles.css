@@ -1286,6 +1286,9 @@ body.settings-mode .deck-nav{display:none}
 .tab.subtab .tabcount{font-size:10px;opacity:.75}
 .tab.subtab:hover{color:#e6ecf6}
 .tab.subtab.active{color:var(--accent);font-weight:750}
+/* Nations sit a level below Slang, and only appear once Slang is chosen. */
+.tab.subtab.deep{margin-left:28px;font-size:12px;color:#7c8899}
+.tab.subtab.deep:hover{color:#dbe3ee}
 /* Practice card: says why the queue is narrowed. */
 .posnote{
   position:absolute;

@@ -7,7 +7,7 @@ var INTERVALS = { 0: 0, 1: 1, 2: 2, 3: 4, 4: 10, 5: 30, 6: 90 }; // days to next
 var MAX_LEVEL = 6;                           // level 6 = very strong, still reviewed rarely
 var RETIRED_DUE = 999999;                    // "too easy" items stay out of review
 
-var DEFAULTS = { strikeLimit: 7, newPerDay: 50, partWeight: 0.5, autoSpeak: true, pos: "all", nat: "all" };
+var DEFAULTS = { strikeLimit: 7, newPerDay: 50, partWeight: 0.5, autoSpeak: true, pos: "all", src: "all", nat: "all" };
 
 /* Part-of-speech filter. "other" is everything the four main classes miss —
    prepositions, pronouns, abbreviations, and the ~8% of entries whose meaning
@@ -25,15 +25,31 @@ function posFilterValid(id) {
   return POS_FILTERS.some(function (f) { return f.id === id; }) ? id : "all";
 }
 
-/* Slang is the only part of Expressions tied to a country, so picking a nation
-   narrows the deck to that country's slang rather than filtering the idioms and
-   proverbs — which belong to no one in particular. */
+/* Expressions splits by what kind of thing an entry is. Nations sit a level
+   below that, under Slang, because slang is the only kind tied to a country —
+   an idiom or a proverb belongs to no one in particular. */
+var SRC_FILTERS = [
+  { id: "all", label: "All" },
+  { id: "idioms", label: "Idioms" },
+  { id: "phrasal", label: "Phrasal Verbs" },
+  { id: "slang", label: "Slang" },
+  { id: "proverbs", label: "Proverbs" }
+];
+function srcFilterValid(id) {
+  return SRC_FILTERS.some(function (f) { return f.id === id; }) ? id : "all";
+}
+
+/* Slang is vocabulary marked by where it is used. "General" was a mistake: its
+   entries — awesome, cool, cash, stuff, weird — are ordinary informal English,
+   and every one of them already sits in the Vocabulary deck with the same
+   meaning. What makes nick, bail and barbie worth a slang deck is that the
+   slang sense differs from the everyday word; awesome has no second sense. */
+var HIDDEN_NATIONS = ["General"];
 var NAT_FILTERS = [
   { id: "all", label: "All" },
   { id: "American", label: "American" },
   { id: "British", label: "British" },
-  { id: "Australian", label: "Australian" },
-  { id: "General", label: "General" }
+  { id: "Australian", label: "Australian" }
 ];
 function natFilterValid(id) {
   return NAT_FILTERS.some(function (f) { return f.id === id; }) ? id : "all";
@@ -69,21 +85,50 @@ function gradeStrike(g) {
    you learn whole, so they share one deck. Each source keeps its own file and
    its own 1..N numbering; merging shifts each by a fixed offset, which makes
    the old rank -> new rank migration pure arithmetic (see migrateExpressions). */
+/* `kind` is what an entry is; `id` is only which file it came from. "Sayings"
+   was never a real category — white as a sheet and go in one ear and out the
+   other are idioms by any normal definition, and the two lists are separate
+   only because IdiomKB shipped them separately. So sayings are shown as idioms.
+   The file and its id stay put, because ranks are derived from them. */
 var EXPRESSION_PARTS = [
-  { id: "idioms",   data: window.IDIOMS   || [] },
-  { id: "phrasal",  data: window.PHRASAL  || [] },
-  { id: "slang",    data: window.SLANG    || [] },
-  { id: "proverbs", data: window.PROVERBS || [] },
-  { id: "sayings",  data: window.SAYINGS  || [] }
+  { id: "idioms",   kind: "idioms",   data: window.IDIOMS   || [] },
+  { id: "phrasal",  kind: "phrasal",  data: window.PHRASAL  || [] },
+  { id: "slang",    kind: "slang",    data: window.SLANG    || [] },
+  { id: "proverbs", kind: "proverbs", data: window.PROVERBS || [] },
+  { id: "sayings",  kind: "idioms",   data: window.SAYINGS  || [] }
 ];
 var EXPRESSION_OFFSET = {};   // old deck id -> rank offset in the merged deck
 
+/* The same expression can sit in several source lists — "ask out" is in both
+   idioms and phrasal verbs, and it is genuinely both. Show it once, under the
+   most specific label: a verb+particle is a phrasal verb first, and a fixed
+   figurative phrase is an idiom before it is slang. */
+var DEDUPE_PRIORITY = ["phrasal", "idioms", "sayings", "proverbs", "slang"];
+
+function claimHeadwords() {
+  var owner = {};
+  DEDUPE_PRIORITY.forEach(function (id) {
+    var part = EXPRESSION_PARTS.filter(function (p) { return p.id === id; })[0];
+    if (!part) return;
+    part.data.forEach(function (e) {
+      var k = String(e.w || "").trim().toLowerCase();
+      if (k && owner[k] === undefined) owner[k] = id;
+    });
+  });
+  return owner;
+}
+
 function buildExpressions() {
-  var out = [], offset = 0;
+  var out = [], offset = 0, owner = claimHeadwords();
   EXPRESSION_PARTS.forEach(function (part) {
     EXPRESSION_OFFSET[part.id] = offset;
     part.data.forEach(function (e) {
-      out.push({ r: offset + e.r, w: e.w, c: e.c, e: e.e, src: part.id, nat: e.nat || "" });
+      // Skipping an entry must not shift anything: the offset still advances by
+      // the whole file, so every surviving rank keeps its value. That is why
+      // retired entries stay in their source file rather than being deleted.
+      if (e.nat && HIDDEN_NATIONS.indexOf(e.nat) >= 0) return;
+      if (owner[String(e.w || "").trim().toLowerCase()] !== part.id) return;
+      out.push({ r: offset + e.r, w: e.w, c: e.c, e: e.e, src: part.kind, nat: e.nat || "" });
     });
     offset += part.data.length;
   });
@@ -99,7 +144,7 @@ var DECK_LABELS = { vocab: "Vocabulary", expressions: "Expressions" };
 var DECK_NOUN = { vocab: "words", expressions: "expressions" };
 var DECK_ITEM = { vocab: "word", expressions: "expression" };
 /* What each merged entry actually is, for the card's prompt. */
-var SRC_ITEM = { idioms: "idiom", phrasal: "phrasal verb", slang: "slang term", proverbs: "proverb", sayings: "saying" };
+var SRC_ITEM = { idioms: "idiom", phrasal: "phrasal verb", slang: "slang term", proverbs: "proverb" };
 
 /* `r` is identity — progress, cloud records and exported backups are all keyed
    on it, so it never moves. Frequency order lives in the array order instead,
@@ -1203,7 +1248,8 @@ function syncAppChrome(view) {
    in play. Used by the practice pill, the list header and the stats heading. */
 function scopeLabel() {
   if (posFilter() !== "all") return posLabelFor(posFilter());
-  if (natFilter() !== "all") return natLabelFor(natFilter()) + " slang";
+  if (srcFilter() === "slang" && natFilter() !== "all") return natLabelFor(natFilter()) + " slang";
+  if (srcFilter() !== "all") return srcLabelFor(srcFilter());
   return "";
 }
 
@@ -1543,13 +1589,14 @@ function skipSentence() { nextSentence(); }   // move on without recording a res
 /* Selecting a deck keeps you in whatever view you were already in. `scope` is
    the sub-entry that was clicked: a word type on Vocabulary, a nation on
    Expressions, or undefined for the deck's own row. */
-function selectDeck(id, scope) {
+function selectDeck(id, patch) {
   var prevView = appView;
   var changed = false;
-  if (scope !== undefined) {
-    var key = id === "expressions" ? "nat" : "pos";
-    var next = id === "expressions" ? natFilterValid(scope) : posFilterValid(scope);
-    if (S.cfg[key] !== next) { S.cfg[key] = next; changed = true; save(); }
+  if (patch) {
+    Object.keys(patch).forEach(function (k) {
+      if (S.cfg[k] !== patch[k]) { S.cfg[k] = patch[k]; changed = true; }
+    });
+    if (changed) save();
   }
 
   if (prevView === "stats" || prevView === "settings") {
@@ -1599,12 +1646,15 @@ function posCount(deckId, id) {
   return (posCountCache[key] = n);
 }
 
-var natCountCache = {};
-function natCount(id) {
-  if (natCountCache[id] !== undefined) return natCountCache[id];
+var exprCountCache = {};
+function exprCount(srcId, natId) {
+  var key = srcId + "|" + (natId || "all");
+  if (exprCountCache[key] !== undefined) return exprCountCache[key];
   var data = DECKS.expressions || [], n = 0;
-  for (var i = 0; i < data.length; i++) { if (natMatchesWith(data[i], id)) n++; }
-  return (natCountCache[id] = n);
+  for (var i = 0; i < data.length; i++) {
+    if (srcMatchesWith(data[i], srcId) && natMatchesWith(data[i], natId || "all")) n++;
+  }
+  return (exprCountCache[key] = n);
 }
 
 function renderTabs() {
@@ -1614,26 +1664,36 @@ function renderTabs() {
   var sel = currentNavSelected();
 
   DECK_IDS.forEach(function (id) {
-    var narrowed = id === "vocab" ? posFilter() !== "all" : natFilter() !== "all";
+    var narrowed = id === "vocab" ? posFilter() !== "all" : srcFilter() !== "all";
     nav.appendChild(tabButton(DECK_LABELS[id], DECKS[id].length, id === sel && !narrowed, function () {
-      selectDeck(id, "all");
+      selectDeck(id, id === "vocab" ? { pos: "all" } : { src: "all", nat: "all" });
     }));
     // Sub-entries are views over the same deck and the same progress, not decks
-    // of their own: word types on Vocabulary, slang by nation on Expressions.
+    // of their own: word types on Vocabulary, kinds of expression on Expressions.
     if (id === "vocab" && deckHasPosFor("vocab")) {
       POS_FILTERS.forEach(function (f) {
         if (f.id === "all") return;
         nav.appendChild(tabButton(f.label, posCount("vocab", f.id),
           sel === "vocab" && posFilter() === f.id,
-          function () { selectDeck("vocab", f.id); }, "subtab"));
+          function () { selectDeck("vocab", { pos: f.id }); }, "subtab"));
       });
     }
-    if (id === "expressions" && deckHasNatFor("expressions")) {
-      NAT_FILTERS.forEach(function (f) {
+    if (id === "expressions" && deckHasSrcFor("expressions")) {
+      SRC_FILTERS.forEach(function (f) {
         if (f.id === "all") return;
-        nav.appendChild(tabButton(f.label, natCount(f.id),
-          sel === "expressions" && natFilter() === f.id,
-          function () { selectDeck("expressions", f.id); }, "subtab"));
+        var chosen = sel === "expressions" && srcFilter() === f.id;
+        nav.appendChild(tabButton(f.label, exprCount(f.id),
+          chosen && natFilter() === "all",
+          function () { selectDeck("expressions", { src: f.id, nat: "all" }); }, "subtab"));
+        // Nations belong to slang alone, and only unfold once slang is chosen.
+        if (f.id === "slang" && chosen) {
+          NAT_FILTERS.forEach(function (nf) {
+            if (nf.id === "all") return;
+            nav.appendChild(tabButton(nf.label, exprCount("slang", nf.id),
+              natFilter() === nf.id,
+              function () { selectDeck("expressions", { src: "slang", nat: nf.id }); }, "subtab deep"));
+          });
+        }
       });
     }
   });
@@ -1729,27 +1789,32 @@ function posFilter() {
 
 function posMatches(d) { return posMatchesWith(d, posFilter(), S.active); }
 
-/* Only meaningful on Expressions, and only slang carries a nation. */
-function deckHasNatFor(deckId) {
-  return (DECKS[deckId] || []).some(function (d) { return !!d.nat; });
+/* Kind-of-expression filter: only meaningful on the Expressions deck. */
+function deckHasSrcFor(deckId) {
+  return (DECKS[deckId] || []).some(function (d) { return !!d.src; });
 }
+function srcFilter() {
+  return (S.active === "expressions") ? srcFilterValid(S.cfg.src) : "all";
+}
+function srcMatchesWith(d, want) { return want === "all" || d.src === want; }
+function srcMatches(d) { return srcMatchesWith(d, srcFilter()); }
+
+/* Nations sit under Slang, so they only bite once Slang is the chosen kind. */
 function natFilter() {
-  return (S.active === "expressions" && deckHasNatFor("expressions")) ? natFilterValid(S.cfg.nat) : "all";
+  return srcFilter() === "slang" ? natFilterValid(S.cfg.nat) : "all";
 }
-function natMatchesWith(d, want) {
-  return want === "all" || d.nat === want;
-}
+function natMatchesWith(d, want) { return want === "all" || d.nat === want; }
 function natMatches(d) { return natMatchesWith(d, natFilter()); }
 
-function natLabelFor(id) {
-  for (var i = 0; i < NAT_FILTERS.length; i++) {
-    if (NAT_FILTERS[i].id === id) return NAT_FILTERS[i].label;
-  }
+function labelIn(list, id) {
+  for (var i = 0; i < list.length; i++) { if (list[i].id === id) return list[i].label; }
   return "All";
 }
+function natLabelFor(id) { return labelIn(NAT_FILTERS, id); }
+function srcLabelFor(id) { return labelIn(SRC_FILTERS, id); }
 
 /* The one predicate every list and queue goes through. */
-function inScope(d) { return posMatches(d) && natMatches(d); }
+function inScope(d) { return posMatches(d) && srcMatches(d) && natMatches(d); }
 
 function posMatchesRank(rank) {
   var d = curIndex()[rank];

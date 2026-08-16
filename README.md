@@ -21,8 +21,8 @@ repetition** engine schedules each word for the right day so it actually moves i
 long-term memory.
 
 It has **two decks you switch between in the sidebar** — **Vocabulary** (15,000 words,
-splittable by word type) and **Expressions** (3,172 idioms, phrasal verbs, slang,
-proverbs and sayings) — each with its own independent progress. There's also a separate
+splittable by word type) and **Expressions** (3,173 idioms, phrasal verbs, slang and
+proverbs) — each with its own independent progress. There's also a separate
 **Sentences** mode that drills full Chinese → English translation with an offline grader.
 
 It's a single static site — no framework, no build step. Open it and study. Optionally
@@ -31,7 +31,7 @@ without sign-in it works fully offline as a guest, saving progress in your brows
 
 ## Features
 
-- 🗂️ **Two decks plus Sentences** — Vocabulary and Expressions (idioms, phrasal verbs, slang, proverbs, sayings), each tracked separately. Vocabulary splits into Nouns / Verbs / Adjectives / Adverbs / Other in the sidebar.
+- 🗂️ **Two decks plus Sentences** — Vocabulary and Expressions, each tracked separately. Vocabulary splits by word type; Expressions splits by kind, and its Slang splits again by country.
 - ✍️ **Sentences mode** — translate Chinese sentences into English; a built-in grader accepts multiple phrasings and points out what's off (no AI, fully offline). Natural spoken forms like *"there's three books"* or *"gonna"* are accepted, with a note on what the written form would be.
 - 🔎 **Library view** — search a deck and filter by status: today, answered, upcoming, too easy, or all.
 - 🧠 **Spaced repetition** — expanding review intervals (same-day → 1 → 2 → 4 → 10 → 30 → 90 days).
@@ -85,11 +85,39 @@ Words carrying several senses (`in` is a preposition, adverb, adjective *and* no
 under each of their types. *Other* covers prepositions, pronouns, abbreviations and the
 ~2,000 entries whose meaning has no part-of-speech marker, so nothing is unreachable.
 Idioms, phrasal verbs, proverbs and sayings carry no markers, so they get no word-type
-sub-entries. **Expressions** has its own split instead: **American · British · Australian ·
-General**, which narrows the deck to that country's slang. Words like `arvo` and
-`knackered` are missing from the CMU dictionary (it is American), so they show no phonetic
-— but Wiktionary has recordings by native speakers of the right accent, so the play button
-still gives you `En-au-arvo.ogg` rather than an American approximation.
+sub-entries. **Expressions** splits by kind instead — **Idioms · Phrasal Verbs · Slang ·
+Proverbs** — and **Slang** splits again by country, since slang is the only kind tied to
+one:
+
+```
+Expressions        3,173
+   Idioms          1,568
+   Phrasal Verbs   1,000
+   Slang             114
+      American        39
+      British         40
+      Australian      35
+   Proverbs          491
+```
+
+The three kinds are told apart by grammar, not by feel:
+
+- a **phrasal verb** is a verb — you conjugate it (*give up → gave up*);
+- an **idiom** is a fragment you build a sentence around (*"we broke the ice"*);
+- a **proverb** is a whole sentence that stands alone (*"you get what you pay for"*).
+
+`sayings.js` is still a separate file, but its entries are shown as **idioms** — *white as
+a sheet* and *go in one ear and out the other* are idioms by any normal definition, and the
+two lists are separate only because IdiomKB shipped them that way.
+
+An expression that appears in several source lists is shown once, under the most specific
+label: *ask out* and *come on* are phrasal verbs before they are idioms, and *hit the road*
+is an idiom before it is slang. That removes 42 duplicates.
+
+The nations only unfold once Slang is selected. Words like `arvo` and `knackered` are
+missing from the CMU dictionary (it is American), so they show no phonetic — but Wiktionary
+has recordings by native speakers of the right accent, so the play button still gives you
+`En-au-arvo.ogg` rather than an American approximation.
 
 ## Spoken English in the sentence grader
 
@@ -225,7 +253,8 @@ Lambda + DynamoDB, defined as one SAM template) for accounts and sync.
 - **Proverbs** come from [**LLMProverbMT**](https://github.com/yuriak/LLMProverbMT) (human-verified
   English→Chinese proverbs) plus IdiomKB.
 - **Slang** is hand-curated for this project and tagged by where it is used —
-  American, British, Australian, or General. It replaced ECDICT's register-tagged (俚/口)
+  American, British or Australian, and kept only where the slang sense differs from the
+  everyday word (`nick` is a notch but also to steal). It replaced ECDICT's register-tagged (俚/口)
   entries, which were unreliable (`molly` glossed as "coward" but defined as an aquarium
   fish, `becky` as "上挂钩"). Vulgar terms, slurs, and words whose meaning flips between
   countries are deliberately excluded.
