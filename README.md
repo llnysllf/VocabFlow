@@ -163,6 +163,22 @@ and `star` are longer and keep theirs, because for them the definition is real.
 
 Both are display fixes; `words.js` is untouched.
 
+### Are the Chinese meanings right?
+
+Checked against a second, independent dictionary — [CC-CEDICT](https://www.mdbg.net/chinese/dictionary?page=cc-cedict)
+(CC BY-SA 4.0), whose lineage is unrelated to ECDICT's. `tools/verify-meanings.py` inverts
+it (CC-CEDICT is Chinese→English) and asks whether ECDICT's Chinese for a word is among the
+headwords CC-CEDICT glosses with that word.
+
+Of the **10,759 words both dictionaries cover, 8,486 (79%) are corroborated**; 2,273 are not
+matched, only 335 of them in the top 3,000. Spot-checking the unmatched shows they are
+overwhelmingly *not* errors — CC-CEDICT does not carry compositional phrases as headwords
+(`your` → 你的, `their` → 他们的) or simply prefers a more literary synonym (`why` → 为何
+against ECDICT's 为什么). Read that list as "worth a look", not "wrong".
+
+No systematic errors in the Chinese were found. What this does not establish is that all
+15,000 are right: 4,241 words have no CC-CEDICT entry at all and remain unchecked.
+
 ## Spoken English in the sentence grader
 
 Plenty of English is universal in speech but marked wrong in a grammar book. The grader
