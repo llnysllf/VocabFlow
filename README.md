@@ -126,8 +126,9 @@ has recordings by native speakers of the right accent, so the play button still 
 Checking an answer, or opening a word in the Library, reveals an **Examples** panel:
 real sentences with Chinese translations, each with its own play button.
 
-Examples are split **by word type**, one fold each — "break" the noun and "break" the verb
-are different words to a learner:
+Each word type is one block: its Chinese meanings, then a fold of its sentences. Reading
+"n. 执政者, 交情" and then hunting for the noun examples in a separate list below made you do
+the join by hand.
 
 | | |
 |---|---|

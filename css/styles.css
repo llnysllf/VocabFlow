@@ -384,10 +384,11 @@ button:focus-visible{
   border-radius:var(--radius);
   background:linear-gradient(180deg,rgba(69,214,163,.07),rgba(69,214,163,.025));
 }
+/* one column: each block is a word type's meaning followed by its sentences,
+   and a two-column layout would squeeze the sentences to half width */
 .ans-cn{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:9px;
+  gap:10px;
 }
 .meaning-row{
   display:grid;
@@ -1292,13 +1293,18 @@ body.settings-mode .deck-nav{display:none}
 .meaning-row.domain .meaning-term{color:#a7b2c5}
 
 /* ===== example sentences ===== */
-.examples{margin-top:14px;display:grid;gap:8px}
+/* meaning + its sentences as one unit */
+.sense-block{display:grid;gap:6px}
+.sense-block .ex-details{margin:0 0 2px 6px}
 .ex-stubs{grid-column:1/-1;display:grid;gap:6px;margin-top:4px}
 .ex-details summary{
   display:flex;
   align-items:center;
   gap:8px;
   width:max-content;
+  text-transform:none;
+  letter-spacing:.2px;
+  font-size:11.5px;
   cursor:pointer;
   color:#b8c3d5;
   font-size:12px;

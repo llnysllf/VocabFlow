@@ -773,8 +773,7 @@ function reveal() {
   var d = curIndex()[current];
   var typed = elAns.value.trim();
   elYour.innerHTML = typed ? ("You typed: <b>" + escapeHtml(typed) + "</b>") : "<i>(no answer typed)</i>";
-  renderMeaning(d.c);
-  renderExamples(d.w, el("examples"));
+  renderMeaning(d.c, d.w);
   renderGloss(d.e, d.w);
   elReveal.classList.add("show");
   requestAnimationFrame(function () {
@@ -838,8 +837,12 @@ function splitMeaningTerms(text) {
   }).filter(Boolean);
 }
 
-function renderMeaning(text) {
+/* Meanings and their examples belong together: reading "n. 执政者, 交情" and
+   then hunting for the noun examples in a separate list below makes you do the
+   join by hand. Each word type is one block — its Chinese, then its sentences. */
+function renderMeaning(text, word) {
   elCn.innerHTML = "";
+  var groups = examplesFor(word), used = {};
   splitMeaning(text).forEach(function (part) {
     var termList = splitMeaningTerms(part.text);
     var row = document.createElement("div");
@@ -870,7 +873,25 @@ function renderMeaning(text) {
       terms.appendChild(chip);
     });
     row.appendChild(terms);
-    elCn.appendChild(row);
+
+    // Wrap the row with this type's sentences, so the two read as one thing.
+    var block = document.createElement("div");
+    block.className = "sense-block";
+    block.appendChild(row);
+    if (part.label && !used[part.label] && groups[part.label]) {
+      used[part.label] = 1;
+      block.appendChild(exampleFold(part.label, groups[part.label]));
+    }
+    elCn.appendChild(block);
+  });
+
+  // Types the sentences show that the dictionary did not list.
+  exampleTypes(word).forEach(function (t) {
+    if (used[t]) return;
+    var block = document.createElement("div");
+    block.className = "sense-block";
+    block.appendChild(exampleFold(t, groups[t]));
+    elCn.appendChild(block);
   });
 }
 
@@ -955,40 +976,25 @@ function exampleTypes(word) {
   return out;
 }
 
-/* One fold per word type. "break" as a noun and "break" as a verb are different
-   words to a learner, so they get separate sections rather than one mixed list. */
-function renderExamples(word, host) {
-  if (!host) return;
-  host.innerHTML = "";
-  var groups = examplesFor(word);
-  var types = exampleTypes(word);
-  if (!types.length) return;
+function exampleBodyHtml(list) {
+  return list.map(function (x) {
+    return '<div class="ex-row">' +
+      (x.s ? '<span class="ex-sense">' + escapeHtml(x.s) + "</span>" : "") +
+      '<div class="ex-line"><span class="ex-en">' + escapeHtml(x.en) + "</span>" +
+      speakBtnHtml(x.en) + "</div>" +
+      '<div class="ex-zh">' + escapeHtml(x.zh) + "</div></div>";
+  }).join("");
+}
 
-  types.forEach(function (t) {
-    var list = groups[t];
-    var details = document.createElement("details");
-    details.className = "ex-details";
-    var summary = document.createElement("summary");
-    summary.innerHTML = '<span class="ex-type">' + escapeHtml(t) + "</span>" +
-      "<span>" + escapeHtml(EX_TYPE_NAME[t] || t) + " · " + list.length +
-      " example" + (list.length === 1 ? "" : "s") + "</span>";
-    details.appendChild(summary);
-
-    var body = document.createElement("div");
-    body.className = "ex-body";
-    list.forEach(function (x) {
-      var row = document.createElement("div");
-      row.className = "ex-row";
-      row.innerHTML =
-        (x.s ? '<span class="ex-sense">' + escapeHtml(x.s) + "</span>" : "") +
-        '<div class="ex-line"><span class="ex-en">' + escapeHtml(x.en) + "</span>" +
-        speakBtnHtml(x.en) + "</div>" +
-        '<div class="ex-zh">' + escapeHtml(x.zh) + "</div>";
-      body.appendChild(row);
-    });
-    details.appendChild(body);
-    host.appendChild(details);
-  });
+/* One collapsed fold of sentences, belonging to the word type above it. */
+function exampleFold(type, list) {
+  var details = document.createElement("details");
+  details.className = "ex-details";
+  details.innerHTML = "<summary>" + list.length + " example" +
+    (list.length === 1 ? "" : "s") + " as " +
+    escapeHtml((EX_TYPE_NAME[type] || type).toLowerCase()) + "</summary>" +
+    '<div class="ex-body">' + exampleBodyHtml(list) + "</div>";
+  return details;
 }
 
 function renderGloss(text, word) {
@@ -2043,10 +2049,9 @@ function exampleStubHtml(word) {
   return '<div class="ex-stubs">' + types.map(function (t) {
     var n = groups[t].length;
     return '<details class="ex-details" data-ex="' + escapeHtml(String(word)) +
-      '" data-type="' + escapeHtml(t) + '"><summary>' +
-      '<span class="ex-type">' + escapeHtml(t) + "</span><span>" +
-      escapeHtml(EX_TYPE_NAME[t] || t) + " · " + n + " example" + (n === 1 ? "" : "s") +
-      "</span></summary></details>";
+      '" data-type="' + escapeHtml(t) + '"><summary>' + n + " example" +
+      (n === 1 ? "" : "s") + " as " +
+      escapeHtml((EX_TYPE_NAME[t] || t).toLowerCase()) + "</summary></details>";
   }).join("") + "</div>";
 }
 
@@ -2464,16 +2469,12 @@ function wireEvents() {
       var det = sum.parentNode;
       if (!det.getAttribute("data-filled")) {
         det.setAttribute("data-filled", "1");
-        var host = document.createElement("div");
-        renderExamples(det.getAttribute("data-ex"), host);
-        // Each stub owns one word type; take that type's sentences.
-        var want = det.getAttribute("data-type");
-        var all = host.querySelectorAll(".ex-details");
-        for (var i = 0; i < all.length; i++) {
-          if (all[i].querySelector(".ex-type").textContent === want) {
-            det.appendChild(all[i].querySelector(".ex-body"));
-            break;
-          }
+        var list = examplesFor(det.getAttribute("data-ex"))[det.getAttribute("data-type")];
+        if (list) {
+          var body = document.createElement("div");
+          body.className = "ex-body";
+          body.innerHTML = exampleBodyHtml(list);
+          det.appendChild(body);
         }
       }
       return;
