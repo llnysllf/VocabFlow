@@ -16,7 +16,7 @@ example is showing that meaning. That is a heuristic and only fires when the
 translation says so.
 
 Usage:
-    pip install nltk
+    pip install spacy && python3 -m spacy download en_core_web_sm
     curl -sO https://downloads.tatoeba.org/exports/per_language/eng/eng_sentences.tsv.bz2
     curl -sO https://downloads.tatoeba.org/exports/per_language/cmn/cmn_sentences.tsv.bz2
     curl -sO https://downloads.tatoeba.org/exports/per_language/cmn/cmn-eng_links.tsv.bz2
@@ -35,14 +35,11 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PER_TYPE = 3            # at most this many examples per word type
 MIN_LEN, MAX_LEN = 12, 100
 
-# Penn Treebank tags -> the labels the dictionary uses.
-TAG_TO_TYPE = {
-    "NN": "n.", "NNS": "n.", "NNP": "n.", "NNPS": "n.",
-    "VB": "v.", "VBD": "v.", "VBG": "v.", "VBN": "v.", "VBP": "v.", "VBZ": "v.",
-    "JJ": "adj.", "JJR": "adj.", "JJS": "adj.",
-    "RB": "adv.", "RBR": "adv.", "RBS": "adv.",
-    "IN": "prep.", "PRP": "pron.", "PRP$": "pron.", "DT": "art.",
-    "CC": "conj.", "CD": "num.", "UH": "interj.", "MD": "aux.",
+# spaCy's coarse tags -> the labels the dictionary uses.
+POS_TO_TYPE = {
+    "NOUN": "n.", "PROPN": "n.", "VERB": "v.", "ADJ": "adj.", "ADV": "adv.",
+    "ADP": "prep.", "PRON": "pron.", "DET": "art.", "CCONJ": "conj.",
+    "SCONJ": "conj.", "NUM": "num.", "INTJ": "interj.", "AUX": "aux.",
 }
 # ECDICT's abbreviations -> the same labels.
 ECDICT_TO_TYPE = {
@@ -106,35 +103,44 @@ def main():
     if not os.path.exists(os.path.join(folder, "eng_sentences.tsv")):
         sys.exit("Tatoeba .tsv exports not found in %s — see this file's docstring" % folder)
     try:
-        from nltk import pos_tag
-        from nltk.tokenize import TreebankWordTokenizer
+        import spacy
     except ImportError:
-        sys.exit("needs nltk: pip install nltk  (then it downloads its tagger on first run)")
-    import nltk
-    for pkg in ("averaged_perceptron_tagger_eng", "averaged_perceptron_tagger"):
-        nltk.download(pkg, quiet=True)
-    tokenizer = TreebankWordTokenizer()
+        sys.exit("needs spacy: pip install spacy && python3 -m spacy download en_core_web_sm")
+    try:
+        # The parser, NER and lemmatiser are not needed for tagging, and dropping
+        # them roughly triples throughput over 70k sentences.
+        nlp = spacy.load("en_core_web_sm", disable=["parser", "ner", "lemmatizer"])
+    except OSError:
+        sys.exit("spacy model missing: python3 -m spacy download en_core_web_sm")
 
     pairs = [p for p in load_pairs(folder) if MIN_LEN <= len(p[0]) <= MAX_LEN]
     print("tagging %d sentences..." % len(pairs))
 
     # word -> type -> [(en, zh)], from what the word actually is in that sentence
     index = collections.defaultdict(lambda: collections.defaultdict(list))
-    for n, (en, zh) in enumerate(pairs):
+    docs = nlp.pipe((en for en, _ in pairs), batch_size=200)
+    for n, (doc, (en, zh)) in enumerate(zip(docs, pairs)):
         if n and n % 20000 == 0:
             print("  %d/%d" % (n, len(pairs)))
-        tagged = pos_tag(tokenizer.tokenize(en))
-        for pos, (token, tag) in enumerate(tagged):
-            label = TAG_TO_TYPE.get(tag)
-            key = token.lower()
+        for i, token in enumerate(doc):
+            label = POS_TO_TYPE.get(token.pos_)
+            key = token.text.lower()
             if not label or not key.isalpha():
                 continue
-            # The tagger reads a sentence-opening imperative as a noun — "Run off
-            # now!" comes back NN. Skip the first word when it is tagged as one,
-            # rather than filing a verb under the noun examples.
-            if pos == 0 and label == "n.":
-                continue
-            index[key][label].append((en, zh))
+            # A tagger still calls "the bus run?" and "much less run" nouns.
+            # A real singular noun almost always has a determiner, possessive or
+            # number just before it, so prefer those and keep the rest as
+            # fallback — a preference costs no coverage, a filter would.
+            strong = True
+            if label == "n." and token.tag_ == "NN":
+                # Look at the word immediately before, stepping back over one
+                # adjective ("a fast run"). Anything else — a noun, a verb, an
+                # adverb — and this is probably not really a noun here.
+                j = i - 1
+                if j >= 0 and doc[j].pos_ == "ADJ":
+                    j -= 1
+                strong = j >= 0 and doc[j].pos_ in ("DET", "NUM", "PRON")
+            index[key][label].append((en, zh, strong))
 
     table, with_type, full = {}, 0, 0
     types_wanted = types_got = 0
@@ -153,24 +159,31 @@ def main():
         for label in labels:
             terms = wanted.get(label, [])
             picked, seen = [], set()
+            # Confidently-tagged first, then shortest — a short sentence is
+            # easier to read and usually shows the word more plainly.
+            ordered = sorted(found[label], key=lambda p: (not p[2], len(p[0])))
+
+            def take(en, zh, sense=None):
+                key = (en.lower(), zh)
+                if key in seen or en.lower() in {e for e, _ in seen}:
+                    return False
+                seen.add(key)
+                picked.append({"en": en, "zh": zh, "s": sense} if sense
+                              else {"en": en, "zh": zh})
+                return True
+
             # A sentence whose translation names a specific sense goes first —
             # that is what makes two examples of the same type differ.
-            for en, zh in sorted(found[label], key=lambda p: len(p[0])):
-                if zh in seen:
-                    continue
+            for en, zh, _strong in ordered:
+                if len(picked) >= PER_TYPE:
+                    break
                 hit = next((t for t in terms if len(t) >= 2 and t in zh), None)
-                if hit and not any(p.get("s", "").endswith(hit) for p in picked):
-                    seen.add(zh)
-                    picked.append({"en": en, "zh": zh, "s": hit})
+                if hit and not any(p.get("s") == hit for p in picked):
+                    take(en, zh, hit)
+            for en, zh, _strong in ordered:
                 if len(picked) >= PER_TYPE:
                     break
-            for en, zh in sorted(found[label], key=lambda p: len(p[0])):
-                if len(picked) >= PER_TYPE:
-                    break
-                if zh in seen:
-                    continue
-                seen.add(zh)
-                picked.append({"en": en, "zh": zh})
+                take(en, zh)
             if picked:
                 groups[label] = picked
         if groups:
