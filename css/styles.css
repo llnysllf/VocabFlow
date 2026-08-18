@@ -1494,15 +1494,56 @@ body.settings-mode .deck-nav{display:none}
 .sense-gloss{color:#94a1b6;font-size:12.5px;line-height:1.4}
 
 /* a term whose meaning Wiktionary names: the label rides with the word */
-.meaning-term.has-gloss{
-  display:inline-flex;
-  align-items:baseline;
-  gap:7px;
-  flex-wrap:wrap;
-}
+/* Chinese keeps its chip; the English sits outside it, clearly a note */
+.term-pair{display:inline-flex;align-items:baseline;gap:8px;min-width:0}
 .term-gloss{
   color:#8d9bae;
   font-size:11.5px;
   font-weight:600;
+  font-style:italic;
   line-height:1.35;
+}
+
+/* The meaning row is the dropdown: a count and chevron on the row itself,
+   rather than a separate "3 EXAMPLES AS NOUN" heading underneath it. */
+.sense-block.foldable > summary{
+  cursor:pointer;
+  list-style:none;
+  grid-template-columns:46px minmax(0,1fr) auto;
+}
+.sense-block.foldable > summary.plain{grid-template-columns:minmax(0,1fr) auto}
+.sense-block.foldable > summary::-webkit-details-marker{display:none}
+.sense-block.foldable > summary:hover{border-color:rgba(255,255,255,.16)}
+.ex-count{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  align-self:center;
+  justify-self:end;
+  padding:2px 7px 2px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.06);
+  color:#8d9bae;
+  font-size:11px;
+  font-weight:800;
+}
+.ex-count .chev{width:12px;height:12px;display:inline-grid;place-items:center;transition:transform .18s ease}
+.ex-count .chev svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.sense-block.foldable[open] > summary .chev{transform:rotate(90deg)}
+.sense-block.foldable > .ex-body{margin:8px 0 2px 6px}
+
+/* Narrow screens: keep the Chinese on one line and drop the English note
+   underneath it. Must come after the base rules to win the cascade. */
+@media (max-width:520px){
+  /* The base mobile rule collapses .meaning-row to one column, which fights a
+     grid column for the count — flow the row instead. */
+  .sense-block.foldable > summary{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+  }
+  .sense-block.foldable > summary .meaning-terms{flex:1 1 100%}
+  .ex-count{margin-left:auto}
+  .term-pair{flex-direction:column;align-items:flex-start;gap:3px}
 }

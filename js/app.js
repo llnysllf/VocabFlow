@@ -913,25 +913,44 @@ function renderMeaning(text, word) {
       var chip = document.createElement("span");
       chip.className = "meaning-term";
       chip.textContent = term;
-      if (glosses[term]) {
-        chip.className += " has-gloss";
-        var g = document.createElement("small");
-        g.className = "term-gloss";
-        g.textContent = glosses[term];
-        chip.appendChild(g);
-        shown[term] = 1;
-      }
-      terms.appendChild(chip);
+      if (!glosses[term]) { terms.appendChild(chip); return; }
+      // The English sits beside the chip, not inside it — the Chinese is the
+      // answer being tested and should keep its own box.
+      var pair = document.createElement("span");
+      pair.className = "term-pair";
+      pair.appendChild(chip);
+      var g = document.createElement("span");
+      g.className = "term-gloss";
+      g.textContent = glosses[term];
+      pair.appendChild(g);
+      terms.appendChild(pair);
+      shown[term] = 1;
     });
     row.appendChild(terms);
 
-    // Wrap the row with this type's sentences, so the two read as one thing.
-    var block = document.createElement("div");
-    block.className = "sense-block";
-    block.appendChild(row);
+    // The row itself opens the sentences — no separate header, just a count on
+    // the row you already read. Types with no sentences stay a plain row.
+    var first = part.label && !used[part.label];
+    var list = first ? groups[part.label] : null;
+    var block, host;
+    if (list) {
+      block = document.createElement("details");
+      block.className = "sense-block foldable";
+      host = document.createElement("summary");
+      host.className = "meaning-row " + row.className.replace("meaning-row", "").trim();
+      while (row.firstChild) host.appendChild(row.firstChild);
+      var count = document.createElement("span");
+      count.className = "ex-count";
+      count.innerHTML = list.length + CHEVRON;
+      host.appendChild(count);
+      block.appendChild(host);
+    } else {
+      block = document.createElement("div");
+      block.className = "sense-block";
+      block.appendChild(row);
+    }
     // ECDICT can list a type twice (vt. and vi. both become "v."), so the
     // labelled senses and the sentences attach to the first block only.
-    var first = part.label && !used[part.label];
     if (first) {
       var labelled = sensesFor(word, part.label);
       if (labelled.length) {
@@ -940,9 +959,12 @@ function renderMeaning(text, word) {
         if (extraSenses) block.appendChild(extraSenses);
       }
     }
-    if (first && groups[part.label]) {
+    if (list) {
       used[part.label] = 1;
-      block.appendChild(exampleFold(part.label, groups[part.label]));
+      var body = document.createElement("div");
+      body.className = "ex-body";
+      body.innerHTML = exampleBodyHtml(list);
+      block.appendChild(body);
     }
     elCn.appendChild(block);
   });

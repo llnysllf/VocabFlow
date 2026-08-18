@@ -170,9 +170,13 @@ meaning. Wiktionary's translation tables do carry that label, so `senses.js` lay
 where they exist — as a label on the term itself, not a second copy of it:
 
 ```
-can   v.  装罐
-      n.  罐头 a more or less cylindrical vessel for liquids   容器
+v.    装罐
+n.    罐头  a more or less cylindrical vessel for liquids   容器      3 ›
 ```
+
+The Chinese keeps its own chip and the English sits beside it as a note — the Chinese is
+the answer being tested. The count on the right opens that type's sentences; there is no
+separate heading for them.
 
 A sense whose Chinese the dictionary did not already list is added as its own line; one it
 did list just gains the label. Wiktionary writes a word as `罐頭 /罐头`, traditional then
