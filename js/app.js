@@ -884,159 +884,149 @@ function glossMap(word, type) {
   return map;
 }
 
-/* Only the senses whose Chinese the dictionary did not already list — the rest
-   are shown as a label on the term itself rather than repeated underneath. */
-function senseList(rows, alreadyShown) {
-  var lines = rows.filter(function (s) {
-    return !s.z.every(function (t) { return alreadyShown[t]; });
+/* One block per word type: the Chinese, an English caption under it where a
+   sense is named, and the row itself opening that type's sentences. Every type
+   goes through here — the ones ECDICT lists and the ones only Wiktionary or the
+   sentences know about — so an auxiliary "do" looks like a noun "can" rather
+   than arriving in a different shape. */
+function senseBlock(spec) {
+  var termList = spec.terms || [], captions = spec.captions || [], list = spec.examples;
+
+  var row = document.createElement("div");
+  row.className = "meaning-row" + (spec.label ? "" : " plain") +
+    (spec.domain ? " domain" : "") + (termList.length > 4 ? " wide" : "");
+  if (spec.label) {
+    var label = document.createElement("span");
+    label.className = "meaning-pos";
+    label.textContent = spec.label;
+    row.appendChild(label);
+  }
+  var terms = document.createElement("span");
+  terms.className = "meaning-terms";
+  // Sits with the terms, not as its own grid cell — the row is a 2-column grid.
+  if (spec.domain) {
+    var dom = document.createElement("span");
+    dom.className = "meaning-domain";
+    dom.textContent = spec.domain;
+    terms.appendChild(dom);
+  }
+  termList.forEach(function (term) {
+    var chip = document.createElement("span");
+    chip.className = "meaning-term";
+    chip.textContent = term;
+    terms.appendChild(chip);
   });
-  if (!lines.length) return null;
-  var list = document.createElement("div");
-  list.className = "sense-list";
-  lines.forEach(function (s) {
-    var line = document.createElement("div");
-    line.className = "sense-line";
-    line.innerHTML = '<span class="sense-zh">' +
-      s.z.filter(function (t) { return !alreadyShown[t]; })
-        .map(function (t) { return '<span class="meaning-term">' + escapeHtml(t) + "</span>"; }).join("") +
-      '</span><span class="sense-gloss">' + escapeHtml(s.g) + "</span>";
-    list.appendChild(line);
+  row.appendChild(terms);
+
+  var captionEl = null;
+  if (captions.length) {
+    captionEl = document.createElement("div");
+    captionEl.className = "term-captions";
+    captions.forEach(function (c) {
+      var line = document.createElement("div");
+      line.className = "term-caption";
+      // Say which Chinese the caption is glossing, unless it covers the whole
+      // row and there is nothing to pick out — "喜欢 to enjoy" over a row whose
+      // only term is 喜欢 just says it twice. A caption over some of the terms
+      // is named ("得到 获得 — to obtain", among eight), and so is one whose
+      // Chinese is not in the row at all ("do" meaning 吗), which would
+      // otherwise read "in questions" against nothing.
+      var named = c.terms.length !== termList.length ||
+        c.terms.some(function (t) { return termList.indexOf(t) < 0; });
+      line.innerHTML = (named
+        ? '<span class="caption-term">' + escapeHtml(c.terms.join(" ")) + "</span>" : "") +
+        "<span>" + escapeHtml(c.gloss) + "</span>";
+      captionEl.appendChild(line);
+    });
+  }
+
+  var block;
+  if (list && list.length) {
+    block = document.createElement("details");
+    block.className = "sense-block foldable";
+    var host = document.createElement("summary");
+    host.className = row.className;
+    while (row.firstChild) host.appendChild(row.firstChild);
+    var count = document.createElement("span");
+    count.className = "ex-count";
+    count.innerHTML = list.length + CHEVRON;
+    host.appendChild(count);
+    // The caption belongs to the row, so it goes inside the summary — anything
+    // appended after it would be part of the collapsed body and stay hidden.
+    if (captionEl) host.appendChild(captionEl);
+    block.appendChild(host);
+    var body = document.createElement("div");
+    body.className = "ex-body";
+    body.innerHTML = exampleBodyHtml(list);
+    block.appendChild(body);
+  } else {
+    block = document.createElement("div");
+    block.className = "sense-block";
+    if (captionEl) row.appendChild(captionEl);
+    block.appendChild(row);
+  }
+  return block;
+}
+
+/* 得到 and 获得 are both "to obtain" — one caption, not the same line twice. */
+function groupCaptions(pairs) {
+  var out = [];
+  pairs.forEach(function (c) {
+    var hit = out.filter(function (g) { return g.gloss === c.gloss; })[0];
+    if (hit) { if (hit.terms.indexOf(c.term) < 0) hit.terms.push(c.term); }
+    else out.push({ gloss: c.gloss, terms: [c.term] });
   });
-  return list;
+  return out;
 }
 
 function renderMeaning(text, word) {
   elCn.innerHTML = "";
   var groups = examplesFor(word), used = {};
+
   splitMeaning(text).forEach(function (part) {
-    var termList = part.terms;
-    var row = document.createElement("div");
-    row.className = "meaning-row" +
-      (part.label ? "" : " plain") +
-      (part.domain ? " domain" : "") +
-      (termList.length > 4 ? " wide" : "");
-
-    if (part.label) {
-      var label = document.createElement("span");
-      label.className = "meaning-pos";
-      label.textContent = part.label;
-      row.appendChild(label);
-    }
-    var terms = document.createElement("span");
-    terms.className = "meaning-terms";
-    // Sits with the terms, not as its own grid cell — the row is a 2-column grid.
-    if (part.domain) {
-      var dom = document.createElement("span");
-      dom.className = "meaning-domain";
-      dom.textContent = part.domain;
-      terms.appendChild(dom);
-    }
-    // Where Wiktionary names what a term means, hang the label on the term
-    // itself rather than repeating the Chinese in a second list below.
     var glosses = part.label ? glossMap(word, part.label) : {};
-    var shown = {};
-    // The Chinese stays one unbroken run — it is the answer being tested — and
-    // the English drops to a caption underneath rather than splitting the chips.
-    var captions = [];
-    termList.forEach(function (term) {
-      var chip = document.createElement("span");
-      chip.className = "meaning-term";
-      chip.textContent = term;
-      terms.appendChild(chip);
-      if (glosses[term]) { captions.push({ term: term, gloss: glosses[term] }); shown[term] = 1; }
+    var pairs = [], shown = {};
+    part.terms.forEach(function (t) {
+      if (glosses[t]) { pairs.push({ term: t, gloss: glosses[t] }); shown[t] = 1; }
     });
-    // 得到 and 获得 are both "to obtain" — one caption, not the same line twice.
-    var byGloss = [];
-    captions.forEach(function (c) {
-      var hit = byGloss.filter(function (g) { return g.gloss === c.gloss; })[0];
-      if (hit) hit.terms.push(c.term);
-      else byGloss.push({ gloss: c.gloss, terms: [c.term] });
-    });
-    captions = byGloss;
-    row.appendChild(terms);
-
-    // The row itself opens the sentences — no separate header, just a count on
-    // the row you already read. Types with no sentences stay a plain row.
+    // ECDICT can list a type twice (vt. and vi. both become "v."), so the
+    // sentences and any unlisted sense attach to the first block only.
     var first = part.label && !used[part.label];
-    var list = first ? groups[part.label] : null;
-    var block, host;
-    // Name the term only when more than one on this row carries a caption;
-    // with a single caption it would just repeat the chip above it.
-    var captionEl = null;
-    if (captions.length) {
-      captionEl = document.createElement("div");
-      captionEl.className = "term-captions";
-      captions.forEach(function (c) {
-        var line = document.createElement("div");
-        line.className = "term-caption";
-        line.innerHTML = (captions.length > 1
-          ? '<span class="caption-term">' + escapeHtml(c.terms.join(" ")) + "</span>" : "") +
-          "<span>" + escapeHtml(c.gloss) + "</span>";
-        captionEl.appendChild(line);
+    if (first) used[part.label] = 1;
+    var captions = groupCaptions(pairs);
+    if (first) {
+      sensesFor(word, part.label).forEach(function (s) {
+        if (s.z.every(function (t) { return !shown[t]; })) {
+          captions.push({ gloss: s.g, terms: s.z });
+        }
       });
     }
-
-    if (list) {
-      block = document.createElement("details");
-      block.className = "sense-block foldable";
-      host = document.createElement("summary");
-      host.className = "meaning-row " + row.className.replace("meaning-row", "").trim();
-      while (row.firstChild) host.appendChild(row.firstChild);
-      var count = document.createElement("span");
-      count.className = "ex-count";
-      count.innerHTML = list.length + CHEVRON;
-      host.appendChild(count);
-      // The caption belongs to the row, so it goes inside the summary — anything
-      // appended after it would be part of the collapsed body and stay hidden.
-      if (captionEl) host.appendChild(captionEl);
-      block.appendChild(host);
-    } else {
-      block = document.createElement("div");
-      block.className = "sense-block";
-      if (captionEl) row.appendChild(captionEl);
-      block.appendChild(row);
-    }
-    // ECDICT can list a type twice (vt. and vi. both become "v."), so the
-    // labelled senses and the sentences attach to the first block only.
-    if (first) {
-      var labelled = sensesFor(word, part.label);
-      if (labelled.length) {
-        used[part.label] = 1;
-        var extraSenses = senseList(labelled, shown);
-        if (extraSenses) block.appendChild(extraSenses);
-      }
-    }
-    if (list) {
-      used[part.label] = 1;
-      var body = document.createElement("div");
-      body.className = "ex-body";
-      body.innerHTML = exampleBodyHtml(list);
-      block.appendChild(body);
-    }
-    elCn.appendChild(block);
+    elCn.appendChild(senseBlock({
+      label: part.label, domain: part.domain, terms: part.terms,
+      captions: captions, examples: first ? groups[part.label] : null
+    }));
   });
 
-  // Types the sentences or the labelled senses cover but the dictionary did not
-  // list — "the" is only an article in ECDICT, but has an adverb sense in
-  // "the more ... the more".
+  // Types the sentences or the labelled senses cover but the dictionary does
+  // not list — "do" is only a verb in ECDICT, but is an auxiliary in "do you".
   var extra = exampleTypes(word).slice();
   (window.SENSES && window.SENSES[String(word || "").trim().toLowerCase()] || [])
     .forEach(function (s) { if (extra.indexOf(s.p) < 0) extra.push(s.p); });
   extra.forEach(function (t) {
     if (used[t]) return;
     used[t] = 1;
-    var block = document.createElement("div");
-    block.className = "sense-block";
-    var head = document.createElement("div");
-    head.className = "meaning-row";
-    head.innerHTML = '<span class="meaning-pos">' + escapeHtml(t) + '</span><span class="meaning-terms"></span>';
-    var labelled = sensesFor(word, t);
-    if (labelled.length) {
-      var listEl = senseList(labelled, {});
-      if (listEl) { block.appendChild(head); block.appendChild(listEl); }
+    var terms = [], captions = [];
+    sensesFor(word, t).forEach(function (s) {
+      s.z.forEach(function (z) { if (terms.indexOf(z) < 0) terms.push(z); });
+      captions.push({ gloss: s.g, terms: s.z });
+    });
+    if (!terms.length && !groups[t]) return;
+    // No dictionary Chinese for this type at all — spell the type out so the
+    // row says something. "AUX." on its own is a chip with nothing beside it.
+    if (!terms.length && !captions.length) {
+      captions.push({ gloss: "used as " + article(EX_TYPE_NAME[t] || t), terms: [] });
     }
-    if (groups[t]) block.appendChild(exampleFold(t, groups[t]));
-    if (block.childNodes.length) elCn.appendChild(block);
+    elCn.appendChild(senseBlock({ label: t, terms: terms, captions: captions, examples: groups[t] }));
   });
 }
 
@@ -1112,6 +1102,13 @@ var EX_TYPE_NAME = { "n.": "Noun", "v.": "Verb", "adj.": "Adjective", "adv.": "A
                      "art.": "Article", "num.": "Numeral", "interj.": "Interjection",
                      "aux.": "Auxiliary" };
 
+/* "an adverb", "a verb" — the type names are a closed set, so the vowel test
+   is enough; none of them is a "european"-style exception. */
+function article(name) {
+  name = String(name || "").toLowerCase();
+  return ("aeiou".indexOf(name.charAt(0)) < 0 ? "a " : "an ") + name;
+}
+
 function exampleTypes(word) {
   var groups = examplesFor(word), out = [];
   EX_TYPE_ORDER.forEach(function (t) { if (groups[t] && groups[t].length) out.push(t); });
@@ -1128,17 +1125,6 @@ function exampleBodyHtml(list) {
       speakBtnHtml(x.en) + "</div>" +
       '<div class="ex-zh">' + escapeHtml(x.zh) + "</div></div>";
   }).join("");
-}
-
-/* One collapsed fold of sentences, belonging to the word type above it. */
-function exampleFold(type, list) {
-  var details = document.createElement("details");
-  details.className = "ex-details";
-  details.innerHTML = "<summary>" + list.length + " example" +
-    (list.length === 1 ? "" : "s") + " as " +
-    escapeHtml((EX_TYPE_NAME[type] || type).toLowerCase()) + "</summary>" +
-    '<div class="ex-body">' + exampleBodyHtml(list) + "</div>";
-  return details;
 }
 
 function renderGloss(text, word) {

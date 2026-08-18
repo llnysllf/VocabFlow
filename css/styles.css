@@ -1465,25 +1465,9 @@ body.settings-mode .deck-nav{display:none}
 .bc-sep{color:#5d6879;padding:0 1px}
 .browseitem .meaning-domain{margin-right:2px}
 
-/* Wiktionary's labelled senses, sitting under the flat ECDICT list for a type:
-   the Chinese, then in plain English which meaning it is. */
-.sense-list{display:grid;gap:4px;margin:2px 0 2px 6px}
-.sense-line{
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr);
-  gap:10px;
-  align-items:baseline;
-  padding:5px 9px;
-  border-left:2px solid rgba(123,140,255,.35);
-  border-radius:0 8px 8px 0;
-  background:rgba(123,140,255,.05);
-}
-.sense-zh{display:flex;flex-wrap:wrap;gap:5px}
-.sense-gloss{color:#94a1b6;font-size:12.5px;line-height:1.4}
-
-/* a term whose meaning Wiktionary names: the label rides with the word */
-/* The English sits under the Chinese, not between the chips — the terms are the
-   answer and should read as one run. */
+/* Wiktionary names which sense a Chinese term is. The English sits under the
+   Chinese, not between the chips — the terms are the answer and should read as
+   one run. */
 .term-captions{display:grid;gap:3px;margin:5px 0 0;grid-column:1/-1}
 .term-caption{
   display:flex;
