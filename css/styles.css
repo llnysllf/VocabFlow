@@ -1333,18 +1333,6 @@ body.settings-mode .deck-nav{display:none}
   border-radius:var(--radius);
   background:rgba(255,255,255,.035);
 }
-/* the sense this sentence shows — what makes two examples of "run" differ */
-.ex-sense{
-  display:inline-block;
-  margin-bottom:6px;
-  padding:2px 8px;
-  border:1px solid rgba(123,140,255,.3);
-  border-radius:999px;
-  background:rgba(123,140,255,.12);
-  color:#aab7ff;
-  font-size:11px;
-  font-weight:800;
-}
 .ex-line{display:flex;align-items:flex-start;gap:8px}
 .ex-en{color:#eef3f8;font-size:15px;line-height:1.45;flex:1;min-width:0}
 .ex-line .speak-btn{margin-top:1px}

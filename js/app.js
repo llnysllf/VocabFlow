@@ -1077,7 +1077,6 @@ function exampleTypes(word) {
 function exampleBodyHtml(list) {
   return list.map(function (x) {
     return '<div class="ex-row">' +
-      (x.s ? '<span class="ex-sense">' + escapeHtml(x.s) + "</span>" : "") +
       '<div class="ex-line"><span class="ex-en">' + escapeHtml(x.en) + "</span>" +
       speakBtnHtml(x.en) + "</div>" +
       '<div class="ex-zh">' + escapeHtml(x.zh) + "</div></div>";

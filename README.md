@@ -133,16 +133,17 @@ the join by hand.
 | | |
 |---|---|
 | **n.** Noun | Take a break. — 休息一下吧。 · The break is over. · I just need a break. |
-| **v.** Verb | *打断* We didn't break in. · *打破* I sometimes break the rules. · *弄坏* Did Tom break something again? |
+| **v.** Verb | We didn't break in. · I sometimes break the rules. · Did Tom break something again? |
 
 Every sentence is part-of-speech tagged with [spaCy](https://spacy.io), and filed under the
 type the word actually has *in that sentence* — not under the dictionary's list, and not
 guessed from the translation. That covers **81%** of the word types the dictionary lists,
 and **5,436 words have an example for every type they list**.
 
-Within a type, a sentence is additionally labelled with the specific sense when the Chinese
-translation makes it unambiguous (打断 / 打破 / 弄坏 above). Around **39%** of type groups have at
-least one such sense-confirmed sentence; the rest rest on the tagger.
+Within a type, the picks are spread across senses where the Chinese translation identifies
+one — that is why `break`'s three verb examples show breaking a rule, breaking in and
+breaking an object rather than three of the same. The sense drives the choosing only and is
+not shown on the sentence.
 
 Coverage follows frequency, which is the right shape — 99% of the top 1,000 words have
 examples, 92% of 1,000–3,000, falling to 9% by rank 15,000. In the Library the panel is a
