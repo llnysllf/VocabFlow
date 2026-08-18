@@ -164,6 +164,13 @@ A side effect worth knowing: about 20 words whose only part-of-speech marker sat
 hidden field sense now count as *Other* rather than a noun or verb. Nothing becomes
 unreachable, since *Other* is the catch-all.
 
+ECDICT also repeats itself and occasionally carries no Chinese at all, so a term is shown
+once per part of speech — `like` listed 喜欢 under both `vt.` and `vi.`, which collapse to
+one `v.`, and `happen` listed 发生 twice in a single row — and a term with no Chinese
+characters is dropped, which removes acronym expansions (`facts`) and biographical dates
+(`roosevelt`). Two words are nothing but that, `word` and `pk`, and keep what they have
+rather than rendering blank.
+
 WordNet also resolves some short words to the **abbreviation** that shares their spelling,
 so `who` was glossed as a UN agency, `me` as the state of Maine, `am` as americium. Those
 English hints are dropped for words of three letters or fewer — `washington`, `california`

@@ -804,6 +804,7 @@ var POS_LEAD_RE = new RegExp("^((?:(?:" + POS_TOKENS + ")\\.\\s*&?\\s*){1,3})(.+
 /* ECDICT marks field-specific senses with a bracketed tag. Left raw they read
    as noise, and they crowd out the everyday meaning: "for" lists a DOS batch
    command beside "为, 因为". Name the field, and sort those senses last. */
+var HAS_HAN = /[\u4e00-\u9fff]/;
 var DOMAIN_LABEL = {
   "计": "computing", "医": "medicine", "化": "chemistry", "经": "economics",
   "法": "law", "机": "mechanics", "电": "electrical", "建": "construction",
@@ -830,7 +831,30 @@ function splitMeaning(text) {
   // "can" means the ASCII cancel character in computing, which is true and
   // useless next to 罐头; but "online" has nothing else, so 联机 must stay.
   var plain = parts.filter(function (p) { return !p.domain; });
-  return plain.length ? plain : parts;
+  var kept = plain.length ? plain : parts;
+
+  // ECDICT repeats itself: "like" lists 喜欢 under both vt. and vi., which
+  // become one "v." row each, and "happen" lists 发生 twice in the same row.
+  // Drop a term once it has been shown for this part of speech.
+  var seen = {};
+  kept.forEach(function (p) {
+    var key = p.label || "-";
+    seen[key] = seen[key] || {};
+    p.terms = splitMeaningTerms(p.text).filter(function (t) {
+      if (seen[key][t]) return false;
+      seen[key][t] = 1;
+      return true;
+    });
+  });
+
+  // A few entries carry no Chinese at all — "facts" is glossed with the
+  // expansion of an acronym, "roosevelt" with his dates. Drop those, unless
+  // they are the only thing the word has ("word", "pk").
+  var withHan = kept.map(function (p) {
+    return { label: p.label, text: p.text, domain: p.domain,
+             terms: p.terms.filter(function (t) { return HAS_HAN.test(t); }) };
+  }).filter(function (p) { return p.terms.length; });
+  return withHan.length ? withHan : kept.filter(function (p) { return p.terms.length; });
 }
 
 function splitMeaningTerms(text) {
@@ -885,7 +909,7 @@ function renderMeaning(text, word) {
   elCn.innerHTML = "";
   var groups = examplesFor(word), used = {};
   splitMeaning(text).forEach(function (part) {
-    var termList = splitMeaningTerms(part.text);
+    var termList = part.terms;
     var row = document.createElement("div");
     row.className = "meaning-row" +
       (part.label ? "" : " plain") +
@@ -2157,7 +2181,7 @@ function meaningSummaryHtml(text) {
   return splitMeaning(text).map(function (p) {
     return (p.label ? '<span class="bc-pos">' + escapeHtml(p.label) + "</span> " : "") +
       (p.domain ? '<span class="meaning-domain">' + escapeHtml(p.domain) + "</span> " : "") +
-      escapeHtml(p.text);
+      escapeHtml(p.terms.join(", "));
   }).join(' <span class="bc-sep">/</span> ');
 }
 
