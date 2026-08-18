@@ -75,8 +75,8 @@ adjustable under **Goal & Data**.
 
 ## Studying one part of speech
 
-**Nouns · Verbs · Adjectives · Adverbs · Other** sit indented under Vocabulary in the
-sidebar. They are views over that one deck, sharing its progress — grading a word under
+**Nouns · Verbs · Adjectives · Adverbs · Other** fold out of Vocabulary in the sidebar —
+click the deck to open its list, click again to shut it. They are views over that one deck, sharing its progress — grading a word under
 Nouns counts everywhere. Picking one scopes the Library list, the practice queue and the
 Statistics counts, and sticks until you change it, so you can spend a session on
 adjectives alone. A pill on the practice card shows when the deck is narrowed.
@@ -114,10 +114,96 @@ An expression that appears in several source lists is shown once, under the most
 label: *ask out* and *come on* are phrasal verbs before they are idioms, and *hit the road*
 is an idiom before it is slang. That removes 42 duplicates.
 
-The nations only unfold once Slang is selected. Words like `arvo` and `knackered` are
+Every group with children folds — Vocabulary, Expressions and Slang each carry a chevron,
+and click to open or shut. The app reopens on the group you were last studying rather than
+collapsing everything. Words like `arvo` and `knackered` are
 missing from the CMU dictionary (it is American), so they show no phonetic — but Wiktionary
 has recordings by native speakers of the right accent, so the play button still gives you
 `En-au-arvo.ogg` rather than an American approximation.
+
+## Example sentences
+
+Checking an answer, or opening a word in the Library, reveals an **Examples** panel:
+real sentences with Chinese translations, each with its own play button.
+
+Each word type is one block: its Chinese meanings, then a fold of its sentences. Reading
+"n. 执政者, 交情" and then hunting for the noun examples in a separate list below made you do
+the join by hand.
+
+| | |
+|---|---|
+| **n.** Noun | Take a break. — 休息一下吧。 · The break is over. · I just need a break. |
+| **v.** Verb | *打断* We didn't break in. · *打破* I sometimes break the rules. · *弄坏* Did Tom break something again? |
+
+Every sentence is part-of-speech tagged with [spaCy](https://spacy.io), and filed under the
+type the word actually has *in that sentence* — not under the dictionary's list, and not
+guessed from the translation. That covers **81%** of the word types the dictionary lists,
+and **5,436 words have an example for every type they list**.
+
+Within a type, a sentence is additionally labelled with the specific sense when the Chinese
+translation makes it unambiguous (打断 / 打破 / 弄坏 above). Around **39%** of type groups have at
+least one such sense-confirmed sentence; the rest rest on the tagger.
+
+Coverage follows frequency, which is the right shape — 99% of the top 1,000 words have
+examples, 92% of 1,000–3,000, falling to 9% by rank 15,000. In the Library the panel is a
+stub until opened, so 2,000 rows do not each build four sentences up front.
+
+## Meanings
+
+ECDICT marks field-specific senses with a bracketed tag — `[计]` computing, `[医]` medicine,
+`[化]` chemistry, `[经]` economics, `[法]` law. Left as-is they crowd out the everyday
+meaning: `for` led with a DOS batch command, and 819 words showed nothing else at all.
+Those senses are now **named and sorted last**, so `for` reads
+*prep. 为, 因为, 至于 / conj. 因为 / <sub>computing</sub> DOS批处理命令…*
+
+WordNet also resolves some short words to the **abbreviation** that shares their spelling,
+so `who` was glossed as a UN agency, `me` as the state of Maine, `am` as americium. Those
+English hints are dropped for words of three letters or fewer — `washington`, `california`
+and `star` are longer and keep theirs, because for them the definition is real.
+
+Both are display fixes; `words.js` is untouched.
+
+### Labelled senses
+
+ECDICT gives a flat list per word type and says nothing about which Chinese goes with which
+meaning. Wiktionary's translation tables do carry that label, so `senses.js` layers them on
+where they exist:
+
+```
+break   v.  打破          to separate into two or more pieces
+        v.  折, 骨折       of a bone: to crack
+        v.  破戒, 犯戒     to do that which is forbidden
+        n.  休息          rest or pause, usually from work
+```
+
+Built by `tools/build-senses.py` from [kaikki.org](https://kaikki.org)'s machine-readable
+Wiktionary extract (CC BY-SA 4.0), streamed and filtered rather than stored — the extract is
+3 GB and the result is 118 KB.
+
+**Coverage is thin**: 1,243 of 15,000 words, and only 189 of those get two or more labelled
+senses, which is the case where the labels actually disambiguate anything. 28% of the top
+1,000 words, falling to 3% by rank 15,000. It supplements `words.js` and never replaces it,
+so a word without labelled senses looks exactly as it did before.
+
+Oxford and Cambridge were considered and rejected: Cambridge publishes no API, and Oxford's
+forbids redistributing the data, which rules it out for a public repository regardless of
+whether you hold a key.
+
+### Are the Chinese meanings right?
+
+Checked against a second, independent dictionary — [CC-CEDICT](https://www.mdbg.net/chinese/dictionary?page=cc-cedict)
+(CC BY-SA 4.0), whose lineage is unrelated to ECDICT's. `tools/verify-meanings.py` inverts
+it (CC-CEDICT is Chinese→English) and asks whether ECDICT's Chinese for a word is among the
+headwords CC-CEDICT glosses with that word.
+
+Of the **10,759 words both dictionaries cover, 8,486 (79%) are corroborated**; 2,273 are not
+matched, only 335 of them in the top 3,000. Spot-checking the unmatched shows they are
+overwhelmingly *not* errors — CC-CEDICT does not carry compositional phrases as headwords
+(`your` → 你的, `their` → 他们的) or simply prefers a more literary synonym (`why` → 为何
+against ECDICT's 为什么). Read that list as "worth a look", not "wrong".
+
+No systematic errors in the Chinese were found. What this does not establish is that all
+15,000 are right: 4,241 words have no CC-CEDICT entry at all and remain unchecked.
 
 ## Spoken English in the sentence grader
 
@@ -224,7 +310,9 @@ slang.js              slang & colloquialisms (window.SLANG) │ into the one
 proverbs.js           491 proverbs (window.PROVERBS)        │ Expressions deck
 sayings.js            600 sayings (window.SAYINGS)          ┘
 sentences.js          Chinese → English translation bank (window.SENTENCES)
+examples.js           Example sentences per headword (window.EXAMPLES)
 tools/build-ipa.py    Regenerates ipa.js from the CMU Pronouncing Dictionary
+tools/build-examples.py  Regenerates examples.js from Tatoeba
 tools/rerank-words.py Re-sorts words.js by wordfreq corpus frequency
 backend/              AWS SAM stack: Cognito + API Gateway + Lambda + DynamoDB
 ```
@@ -258,6 +346,8 @@ Lambda + DynamoDB, defined as one SAM template) for accounts and sync.
   entries, which were unreliable (`molly` glossed as "coward" but defined as an aquarium
   fish, `becky` as "上挂钩"). Vulgar terms, slurs, and words whose meaning flips between
   countries are deliberately excluded.
+- **Example sentences** (`examples.js`) come from [**Tatoeba**](https://tatoeba.org) —
+  aligned English–Chinese pairs, CC BY 2.0 FR. Regenerate with `tools/build-examples.py`.
 - **Sentences** are hand-built to cover everyday English grammar: 575 sentences across tenses,
   articles, quantifiers, prepositions, modals, conditionals, passives, reported speech,
   relative clauses, question forms, verb patterns and comparison, plus everyday functions

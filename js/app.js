@@ -773,8 +773,8 @@ function reveal() {
   var d = curIndex()[current];
   var typed = elAns.value.trim();
   elYour.innerHTML = typed ? ("You typed: <b>" + escapeHtml(typed) + "</b>") : "<i>(no answer typed)</i>";
-  renderMeaning(d.c);
-  renderGloss(d.e);
+  renderMeaning(d.c, d.w);
+  renderGloss(d.e, d.w);
   elReveal.classList.add("show");
   requestAnimationFrame(function () {
     var grades = document.querySelector(".grades");
@@ -801,15 +801,34 @@ function posLabel(token) {
 var POS_TOKENS = "n|vt|vi|v|adj|adv|ad|a|s|r|prep|conj|pron|art|num|interj|int|aux|pl|abbr|imp|p";
 var POS_LEAD_RE = new RegExp("^((?:(?:" + POS_TOKENS + ")\\.\\s*&?\\s*){1,3})(.+)$", "i");
 
+/* ECDICT marks field-specific senses with a bracketed tag. Left raw they read
+   as noise, and they crowd out the everyday meaning: "for" lists a DOS batch
+   command beside "为, 因为". Name the field, and sort those senses last. */
+var DOMAIN_LABEL = {
+  "计": "computing", "医": "medicine", "化": "chemistry", "经": "economics",
+  "法": "law", "机": "mechanics", "电": "electrical", "建": "construction",
+  "俚": "slang", "物": "physics", "口": "colloquial", "古": "archaic",
+  "体": "sport", "地名": "place name", "军": "military", "农": "agriculture"
+};
+
 function splitMeaning(text) {
-  return String(text || "").split(/\s*\/\s*/).filter(Boolean).map(function (part) {
+  var parts = String(text || "").split(/\s*\/\s*/).filter(Boolean).map(function (part) {
+    var domain = "";
+    part = part.replace(/\[([^\]]{1,4})\]\s*/, function (_, tag) {
+      domain = DOMAIN_LABEL[tag] || tag;
+      return "";
+    }).trim();
     var m = part.match(POS_LEAD_RE);
     if (m) {
       var label = posLabel(m[1].split(/\s+/)[0]); // normalise just the first token
-      if (label) return { label: label, text: m[2] };
+      if (label) return { label: label, text: m[2], domain: domain };
     }
-    return { label: "", text: part };
-  });
+    return { label: "", text: part, domain: domain };
+  }).filter(function (p) { return p.text; });
+
+  // Everyday senses first; a stable sort keeps each group's original order.
+  var plain = parts.filter(function (p) { return !p.domain; });
+  return plain.concat(parts.filter(function (p) { return p.domain; }));
 }
 
 function splitMeaningTerms(text) {
@@ -818,13 +837,41 @@ function splitMeaningTerms(text) {
   }).filter(Boolean);
 }
 
-function renderMeaning(text) {
+/* Meanings and their examples belong together: reading "n. 执政者, 交情" and
+   then hunting for the noun examples in a separate list below makes you do the
+   join by hand. Each word type is one block — its Chinese, then its sentences. */
+/* ECDICT gives a flat list of Chinese per word type and says nothing about
+   which meaning each belongs to. Wiktionary's translation tables do, so where
+   they overlap the meanings get an English label saying what they are. */
+function sensesFor(word, type) {
+  var all = window.SENSES && window.SENSES[String(word || "").trim().toLowerCase()];
+  if (!all) return [];
+  return all.filter(function (s) { return s.p === type; });
+}
+
+function senseList(rows) {
+  var list = document.createElement("div");
+  list.className = "sense-list";
+  rows.forEach(function (s) {
+    var line = document.createElement("div");
+    line.className = "sense-line";
+    line.innerHTML = '<span class="sense-zh">' +
+      s.z.map(function (t) { return '<span class="meaning-term">' + escapeHtml(t) + "</span>"; }).join("") +
+      '</span><span class="sense-gloss">' + escapeHtml(s.g) + "</span>";
+    list.appendChild(line);
+  });
+  return list;
+}
+
+function renderMeaning(text, word) {
   elCn.innerHTML = "";
+  var groups = examplesFor(word), used = {};
   splitMeaning(text).forEach(function (part) {
     var termList = splitMeaningTerms(part.text);
     var row = document.createElement("div");
     row.className = "meaning-row" +
       (part.label ? "" : " plain") +
+      (part.domain ? " domain" : "") +
       (termList.length > 4 ? " wide" : "");
 
     if (part.label) {
@@ -833,9 +880,15 @@ function renderMeaning(text) {
       label.textContent = part.label;
       row.appendChild(label);
     }
-
     var terms = document.createElement("span");
     terms.className = "meaning-terms";
+    // Sits with the terms, not as its own grid cell — the row is a 2-column grid.
+    if (part.domain) {
+      var dom = document.createElement("span");
+      dom.className = "meaning-domain";
+      dom.textContent = part.domain;
+      terms.appendChild(dom);
+    }
     termList.forEach(function (term) {
       var chip = document.createElement("span");
       chip.className = "meaning-term";
@@ -843,7 +896,46 @@ function renderMeaning(text) {
       terms.appendChild(chip);
     });
     row.appendChild(terms);
-    elCn.appendChild(row);
+
+    // Wrap the row with this type's sentences, so the two read as one thing.
+    var block = document.createElement("div");
+    block.className = "sense-block";
+    block.appendChild(row);
+    // ECDICT can list a type twice (vt. and vi. both become "v."), so the
+    // labelled senses and the sentences attach to the first block only.
+    var first = part.label && !used[part.label];
+    if (first) {
+      var labelled = sensesFor(word, part.label);
+      if (labelled.length) { used[part.label] = 1; block.appendChild(senseList(labelled)); }
+    }
+    if (first && groups[part.label]) {
+      used[part.label] = 1;
+      block.appendChild(exampleFold(part.label, groups[part.label]));
+    }
+    elCn.appendChild(block);
+  });
+
+  // Types the sentences or the labelled senses cover but the dictionary did not
+  // list — "the" is only an article in ECDICT, but has an adverb sense in
+  // "the more ... the more".
+  var extra = exampleTypes(word).slice();
+  (window.SENSES && window.SENSES[String(word || "").trim().toLowerCase()] || [])
+    .forEach(function (s) { if (extra.indexOf(s.p) < 0) extra.push(s.p); });
+  extra.forEach(function (t) {
+    if (used[t]) return;
+    used[t] = 1;
+    var block = document.createElement("div");
+    block.className = "sense-block";
+    var head = document.createElement("div");
+    head.className = "meaning-row";
+    head.innerHTML = '<span class="meaning-pos">' + escapeHtml(t) + '</span><span class="meaning-terms"></span>';
+    var labelled = sensesFor(word, t);
+    if (labelled.length) {
+      block.appendChild(head);
+      block.appendChild(senseList(labelled));
+    }
+    if (groups[t]) block.appendChild(exampleFold(t, groups[t]));
+    if (block.childNodes.length) elCn.appendChild(block);
   });
 }
 
@@ -874,6 +966,15 @@ function isCrossRef(text) {
          /^Alt\.\s+of\s+/i.test(t);
 }
 
+/* WordNet resolves a short word to the ABBREVIATION that shares its spelling,
+   so "who" is glossed as a UN agency, "me" as the state of Maine, "am" as
+   americium. Only ever a problem for two- and three-letter words: "washington"
+   really is a state and "star" really is a celestial body. */
+var ABBREV_GLOSS = /a state in\b|United Nations agency|an associate degree|unit of surface area|radioactive transuranic|a airport|international airport/i;
+function isAbbrevGloss(word, text) {
+  return String(word || "").length <= 3 && ABBREV_GLOSS.test(String(text || ""));
+}
+
 /* The data uses " / " both to separate senses AND to mark mid-sentence line
    wraps from the original dictionary. Rejoin wrapped continuation lines (a
    lowercase start that isn't a new sense, following an unfinished line) so a
@@ -895,12 +996,58 @@ function joinGlossLines(text) {
   return out;
 }
 
-function renderGloss(text) {
+/* Example sentences, grouped by the sense each one shows. For a word like
+   "run" this is where the meanings separate visibly — 奔跑 in one sentence,
+   运行 in another — which a list of comma-separated glosses cannot convey. */
+function examplesFor(word) {
+  var table = window.EXAMPLES;
+  return (table && table[String(word || "").trim().toLowerCase()]) || [];
+}
+
+var EX_TYPE_ORDER = ["n.", "v.", "adj.", "adv.", "prep.", "conj.", "pron.", "art.",
+                     "num.", "interj.", "aux."];
+var EX_TYPE_NAME = { "n.": "Noun", "v.": "Verb", "adj.": "Adjective", "adv.": "Adverb",
+                     "prep.": "Preposition", "conj.": "Conjunction", "pron.": "Pronoun",
+                     "art.": "Article", "num.": "Numeral", "interj.": "Interjection",
+                     "aux.": "Auxiliary" };
+
+function exampleTypes(word) {
+  var groups = examplesFor(word), out = [];
+  EX_TYPE_ORDER.forEach(function (t) { if (groups[t] && groups[t].length) out.push(t); });
+  Object.keys(groups).forEach(function (t) {
+    if (out.indexOf(t) < 0 && groups[t] && groups[t].length) out.push(t);
+  });
+  return out;
+}
+
+function exampleBodyHtml(list) {
+  return list.map(function (x) {
+    return '<div class="ex-row">' +
+      (x.s ? '<span class="ex-sense">' + escapeHtml(x.s) + "</span>" : "") +
+      '<div class="ex-line"><span class="ex-en">' + escapeHtml(x.en) + "</span>" +
+      speakBtnHtml(x.en) + "</div>" +
+      '<div class="ex-zh">' + escapeHtml(x.zh) + "</div></div>";
+  }).join("");
+}
+
+/* One collapsed fold of sentences, belonging to the word type above it. */
+function exampleFold(type, list) {
+  var details = document.createElement("details");
+  details.className = "ex-details";
+  details.innerHTML = "<summary>" + list.length + " example" +
+    (list.length === 1 ? "" : "s") + " as " +
+    escapeHtml((EX_TYPE_NAME[type] || type).toLowerCase()) + "</summary>" +
+    '<div class="ex-body">' + exampleBodyHtml(list) + "</div>";
+  return details;
+}
+
+function renderGloss(text, word) {
   elEn.innerHTML = "";
   var lines = [];
   joinGlossLines(text).forEach(function (raw) {
     var g = parseGloss(raw);
     if (isCrossRef(g.text)) return;                 // skip useless cross-references
+    if (isAbbrevGloss(word, g.text)) return;        // ...and the abbreviation mix-ups
     lines.push(g);
   });
   if (!lines.length) return;
@@ -1643,14 +1790,36 @@ function selectDeck(id, patch) {
   }
 }
 
-function tabButton(label, count, active, onClick, cls) {
+var CHEVRON = '<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>';
+
+function tabButton(label, count, active, onClick, cls, open) {
   var b = document.createElement("button");
-  b.className = "tab" + (cls ? " " + cls : "") + (active ? " active" : "");
-  b.innerHTML = '<span class="tabname">' + escapeHtml(label) + "</span>" +
+  b.className = "tab" + (cls ? " " + cls : "") + (active ? " active" : "") +
+    (open === undefined ? "" : " parent" + (open ? " open" : ""));
+  b.innerHTML = '<span class="tabname">' + (open === undefined ? "" : CHEVRON) +
+    escapeHtml(label) + "</span>" +
     '<span class="tabcount">' + count.toLocaleString() + "</span>";
+  if (open !== undefined) b.setAttribute("aria-expanded", open ? "true" : "false");
   b.addEventListener("click", onClick);
   return b;
 }
+
+/* Which deck's sub-list is unfolded. Runtime only — but it starts unfolded on
+   whichever deck the saved scope belongs to, so a narrowed deck shows you where
+   you are instead of looking like the whole thing. */
+var navOpen = null;
+function initNavOpen() {
+  if (navOpen) return;
+  var src = srcFilterValid(S.cfg.src);
+  navOpen = {
+    vocab: posFilterValid(S.cfg.pos) !== "all",
+    expressions: src !== "all",
+    // Slang folds on its own; a saved nation means it was open.
+    slang: src === "slang" && natFilterValid(S.cfg.nat) !== "all"
+  };
+}
+function toggleNav(id) { initNavOpen(); navOpen[id] = !navOpen[id]; }
+function navIsOpen(id) { initNavOpen(); return !!navOpen[id]; }
 
 /* How many entries the given part-of-speech filter would leave. Counting walks
    15,000 meanings, so cache it — the answer only depends on the data. */
@@ -1687,12 +1856,18 @@ function renderTabs() {
 
   DECK_IDS.forEach(function (id) {
     var narrowed = id === "vocab" ? posFilter() !== "all" : srcFilter() !== "all";
+    var splits = id === "vocab" ? deckHasPosFor("vocab") : deckHasSrcFor("expressions");
+    var open = splits && navIsOpen(id);
+    // A deck that splits gets a chevron: the click both selects the whole deck
+    // and folds its list open or shut.
     nav.appendChild(tabButton(DECK_LABELS[id], DECKS[id].length, id === sel && !narrowed, function () {
+      toggleNav(id);
       selectDeck(id, id === "vocab" ? { pos: "all" } : { src: "all", nat: "all" });
-    }));
+    }, "", splits ? open : undefined));
+    if (!open) return;
     // Sub-entries are views over the same deck and the same progress, not decks
     // of their own: word types on Vocabulary, kinds of expression on Expressions.
-    if (id === "vocab" && deckHasPosFor("vocab")) {
+    if (id === "vocab") {
       POS_FILTERS.forEach(function (f) {
         if (f.id === "all") return;
         nav.appendChild(tabButton(f.label, posCount("vocab", f.id),
@@ -1700,15 +1875,20 @@ function renderTabs() {
           function () { selectDeck("vocab", { pos: f.id }); }, "subtab"));
       });
     }
-    if (id === "expressions" && deckHasSrcFor("expressions")) {
+    if (id === "expressions") {
       SRC_FILTERS.forEach(function (f) {
         if (f.id === "all") return;
         var chosen = sel === "expressions" && srcFilter() === f.id;
+        // Slang folds too — nations belong to it alone.
+        var splits = f.id === "slang" && exprCount("slang") > 0;
+        var open = splits && navIsOpen("slang");
         nav.appendChild(tabButton(f.label, exprCount(f.id),
           chosen && natFilter() === "all",
-          function () { selectDeck("expressions", { src: f.id, nat: "all" }); }, "subtab"));
-        // Nations belong to slang alone, and only unfold once slang is chosen.
-        if (f.id === "slang" && chosen) {
+          function () {
+            if (splits) toggleNav("slang");
+            selectDeck("expressions", { src: f.id, nat: "all" });
+          }, "subtab", splits ? open : undefined));
+        if (open) {
           NAT_FILTERS.forEach(function (nf) {
             if (nf.id === "all") return;
             nav.appendChild(tabButton(nf.label, exprCount("slang", nf.id),
@@ -1895,6 +2075,30 @@ function speakBtnHtml(text) {
     escapeHtml(String(text)) + '">' + SPEAK_ICON + "</button>";
 }
 
+/* One-line meaning for a list row: same ordering and domain naming the card
+   uses, so "for" leads with 为, 因为 rather than a DOS batch command. */
+function meaningSummaryHtml(text) {
+  return splitMeaning(text).map(function (p) {
+    return (p.label ? '<span class="bc-pos">' + escapeHtml(p.label) + "</span> " : "") +
+      (p.domain ? '<span class="meaning-domain">' + escapeHtml(p.domain) + "</span> " : "") +
+      escapeHtml(p.text);
+  }).join(' <span class="bc-sep">/</span> ');
+}
+
+/* Collapsed placeholders, one per word type; sentences built on first open. */
+function exampleStubHtml(word) {
+  var groups = examplesFor(word);
+  var types = exampleTypes(word);
+  if (!types.length) return "";
+  return '<div class="ex-stubs">' + types.map(function (t) {
+    var n = groups[t].length;
+    return '<details class="ex-details" data-ex="' + escapeHtml(String(word)) +
+      '" data-type="' + escapeHtml(t) + '"><summary>' + n + " example" +
+      (n === 1 ? "" : "s") + " as " +
+      escapeHtml((EX_TYPE_NAME[t] || t).toLowerCase()) + "</summary></details>";
+  }).join("") + "</div>";
+}
+
 function phoneticHtml(text) {
   var ipa = window.Pron ? Pron.phonetic(text) : "";
   return ipa ? '<span class="phonetic mini">/' + escapeHtml(ipa) + "/</span>" : "";
@@ -1907,7 +2111,8 @@ function browseItemHtml(d, opts) {
   return '<div class="browseitem rich" data-rank="' + d.r + '">' +
     '<div class="bmain"><div class="bline"><span class="bw">' + escapeHtml(d.w) + "</span>" +
     speakBtnHtml(d.w) + phoneticHtml(d.w) + "</div>" +
-    '<span class="bc">' + escapeHtml(String(d.c || "").replace(/\n/g, " / ")) + "</span></div>" +
+    '<span class="bc">' + meaningSummaryHtml(d.c) + "</span></div>" +
+    exampleStubHtml(d.w) +
     '<div class="bmeta">' + browseStat(d.r) + '<span class="bdue">' + escapeHtml(due) + "</span></div>" +
     (opts.edit ? gradePickerHtml(d.r) : "") +
     (opts.restore ? '<button type="button" class="mini-action" data-action="restore" data-rank="' + d.r + '">Restore</button>' : "") +
@@ -2293,7 +2498,31 @@ function wireEvents() {
   document.querySelectorAll(".browseview").forEach(function (b) {
     b.addEventListener("click", function () { setBrowseView(b.getAttribute("data-view")); });
   });
+  // Example sentences sit inside the reveal too, and their play buttons need
+  // the same handler the list rows get.
+  elReveal.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest('[data-action="speak"]') : null;
+    if (b && window.Pron) Pron.speak(b.getAttribute("data-text"));
+  });
+
   el("browseList").addEventListener("click", function (e) {
+    // Library rows carry only a stub; fill it the first time it is opened,
+    // so 2,000 rows do not each build four example sentences up front.
+    var sum = e.target.closest ? e.target.closest(".ex-details > summary") : null;
+    if (sum) {
+      var det = sum.parentNode;
+      if (!det.getAttribute("data-filled")) {
+        det.setAttribute("data-filled", "1");
+        var list = examplesFor(det.getAttribute("data-ex"))[det.getAttribute("data-type")];
+        if (list) {
+          var body = document.createElement("div");
+          body.className = "ex-body";
+          body.innerHTML = exampleBodyHtml(list);
+          det.appendChild(body);
+        }
+      }
+      return;
+    }
     var scale = e.target.closest ? e.target.closest(".scalebtn") : null;
     if (scale) {
       var holder = scale.closest(".scaleedit");

@@ -384,10 +384,11 @@ button:focus-visible{
   border-radius:var(--radius);
   background:linear-gradient(180deg,rgba(69,214,163,.07),rgba(69,214,163,.025));
 }
+/* one column: each block is a word type's meaning followed by its sentences,
+   and a two-column layout would squeeze the sentences to half width */
 .ans-cn{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:9px;
+  gap:10px;
 }
 .meaning-row{
   display:grid;
@@ -1272,6 +1273,113 @@ body.settings-mode .deck-nav{display:none}
   .focusitem .fc{text-align:left}
 }
 
+/* ===== field-specific meanings ===== */
+/* Named rather than left as a bare [计], and dimmed, because a DOS command is
+   not what someone looking up "for" needs first. */
+.meaning-domain{
+  flex:none;
+  align-self:flex-start;
+  padding:1px 7px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:999px;
+  background:rgba(255,255,255,.05);
+  color:#8d9bae;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.3px;
+  white-space:nowrap;
+}
+.meaning-row.domain{opacity:.72}
+.meaning-row.domain .meaning-term{color:#a7b2c5}
+
+/* ===== example sentences ===== */
+/* meaning + its sentences as one unit */
+.sense-block{display:grid;gap:6px}
+.sense-block .ex-details{margin:0 0 2px 6px}
+.ex-stubs{grid-column:1/-1;display:grid;gap:6px;margin-top:4px}
+.ex-details summary{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:max-content;
+  text-transform:none;
+  letter-spacing:.2px;
+  font-size:11.5px;
+  cursor:pointer;
+  color:#b8c3d5;
+  font-size:12px;
+  font-weight:850;
+  letter-spacing:.55px;
+  text-transform:uppercase;
+}
+.ex-details summary::marker{color:#6c788c}
+.ex-details[open] summary{margin-bottom:10px}
+/* the word type this block is for — the thing that separates the sections */
+.ex-type{
+  padding:2px 8px;
+  border:1px solid rgba(69,214,163,.3);
+  border-radius:999px;
+  background:rgba(69,214,163,.12);
+  color:var(--accent);
+  font-size:11px;
+  font-weight:850;
+  letter-spacing:.2px;
+  text-transform:none;
+}
+.ex-body{display:grid;gap:8px}
+.ex-row{
+  padding:10px 12px;
+  border:1px solid var(--line-soft);
+  border-radius:var(--radius);
+  background:rgba(255,255,255,.035);
+}
+/* the sense this sentence shows — what makes two examples of "run" differ */
+.ex-sense{
+  display:inline-block;
+  margin-bottom:6px;
+  padding:2px 8px;
+  border:1px solid rgba(123,140,255,.3);
+  border-radius:999px;
+  background:rgba(123,140,255,.12);
+  color:#aab7ff;
+  font-size:11px;
+  font-weight:800;
+}
+.ex-line{display:flex;align-items:flex-start;gap:8px}
+.ex-en{color:#eef3f8;font-size:15px;line-height:1.45;flex:1;min-width:0}
+.ex-line .speak-btn{margin-top:1px}
+.ex-zh{margin-top:5px;color:#a7b2c5;font-size:13.5px;line-height:1.5}
+/* inside a Library row the block is secondary to the word itself */
+.browseitem .ex-details{grid-column:1/-1;margin-top:2px}
+.browseitem .ex-details summary{font-size:11px;letter-spacing:.4px;color:#8d9bae}
+.browseitem .ex-en{font-size:14px}
+.browseitem .ex-zh{font-size:13px}
+
+/* ===== collapsible deck groups ===== */
+.tab .tabname{display:flex;align-items:center;gap:6px;min-width:0}
+.tab.parent .chev{
+  display:inline-grid;
+  place-items:center;
+  width:14px;
+  height:14px;
+  flex:none;
+  margin-left:-3px;
+  color:#7f8da3;
+  transition:transform .18s ease,color .16s ease;
+}
+.tab.parent .chev svg{
+  width:12px;
+  height:12px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2.4;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.tab.parent.open .chev{transform:rotate(90deg)}
+.tab.parent:hover .chev{color:#e6ecf6}
+.tab.parent.active .chev{color:#69edbd}
+
 /* ===== part-of-speech sub-decks ===== */
 /* Indented under Vocabulary and visually lighter, because they are views over
    that deck rather than decks of their own. */
@@ -1363,3 +1471,24 @@ body.settings-mode .deck-nav{display:none}
   .meaning-pos{width:max-content}
   .scaleedit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* list-row meaning: part of speech and separators kept quieter than the words */
+.bc-pos{color:#8d9bae;font-weight:800}
+.bc-sep{color:#5d6879;padding:0 1px}
+.browseitem .meaning-domain{margin-right:2px}
+
+/* Wiktionary's labelled senses, sitting under the flat ECDICT list for a type:
+   the Chinese, then in plain English which meaning it is. */
+.sense-list{display:grid;gap:4px;margin:2px 0 2px 6px}
+.sense-line{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:10px;
+  align-items:baseline;
+  padding:5px 9px;
+  border-left:2px solid rgba(123,140,255,.35);
+  border-radius:0 8px 8px 0;
+  background:rgba(123,140,255,.05);
+}
+.sense-zh{display:flex;flex-wrap:wrap;gap:5px}
+.sense-gloss{color:#94a1b6;font-size:12.5px;line-height:1.4}

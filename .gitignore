@@ -12,3 +12,7 @@ node_modules/
 
 # Personal backups exported from the app
 vocabflow-backup-*.json
+
+# python bytecode from tools/
+__pycache__/
+*.pyc
