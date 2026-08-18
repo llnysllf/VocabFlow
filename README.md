@@ -163,6 +163,32 @@ and `star` are longer and keep theirs, because for them the definition is real.
 
 Both are display fixes; `words.js` is untouched.
 
+### Labelled senses
+
+ECDICT gives a flat list per word type and says nothing about which Chinese goes with which
+meaning. Wiktionary's translation tables do carry that label, so `senses.js` layers them on
+where they exist:
+
+```
+break   v.  打破          to separate into two or more pieces
+        v.  折, 骨折       of a bone: to crack
+        v.  破戒, 犯戒     to do that which is forbidden
+        n.  休息          rest or pause, usually from work
+```
+
+Built by `tools/build-senses.py` from [kaikki.org](https://kaikki.org)'s machine-readable
+Wiktionary extract (CC BY-SA 4.0), streamed and filtered rather than stored — the extract is
+3 GB and the result is 118 KB.
+
+**Coverage is thin**: 1,243 of 15,000 words, and only 189 of those get two or more labelled
+senses, which is the case where the labels actually disambiguate anything. 28% of the top
+1,000 words, falling to 3% by rank 15,000. It supplements `words.js` and never replaces it,
+so a word without labelled senses looks exactly as it did before.
+
+Oxford and Cambridge were considered and rejected: Cambridge publishes no API, and Oxford's
+forbids redistributing the data, which rules it out for a public repository regardless of
+whether you hold a key.
+
 ### Are the Chinese meanings right?
 
 Checked against a second, independent dictionary — [CC-CEDICT](https://www.mdbg.net/chinese/dictionary?page=cc-cedict)

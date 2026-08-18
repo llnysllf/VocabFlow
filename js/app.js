@@ -840,6 +840,29 @@ function splitMeaningTerms(text) {
 /* Meanings and their examples belong together: reading "n. 执政者, 交情" and
    then hunting for the noun examples in a separate list below makes you do the
    join by hand. Each word type is one block — its Chinese, then its sentences. */
+/* ECDICT gives a flat list of Chinese per word type and says nothing about
+   which meaning each belongs to. Wiktionary's translation tables do, so where
+   they overlap the meanings get an English label saying what they are. */
+function sensesFor(word, type) {
+  var all = window.SENSES && window.SENSES[String(word || "").trim().toLowerCase()];
+  if (!all) return [];
+  return all.filter(function (s) { return s.p === type; });
+}
+
+function senseList(rows) {
+  var list = document.createElement("div");
+  list.className = "sense-list";
+  rows.forEach(function (s) {
+    var line = document.createElement("div");
+    line.className = "sense-line";
+    line.innerHTML = '<span class="sense-zh">' +
+      s.z.map(function (t) { return '<span class="meaning-term">' + escapeHtml(t) + "</span>"; }).join("") +
+      '</span><span class="sense-gloss">' + escapeHtml(s.g) + "</span>";
+    list.appendChild(line);
+  });
+  return list;
+}
+
 function renderMeaning(text, word) {
   elCn.innerHTML = "";
   var groups = examplesFor(word), used = {};
@@ -878,20 +901,41 @@ function renderMeaning(text, word) {
     var block = document.createElement("div");
     block.className = "sense-block";
     block.appendChild(row);
-    if (part.label && !used[part.label] && groups[part.label]) {
+    // ECDICT can list a type twice (vt. and vi. both become "v."), so the
+    // labelled senses and the sentences attach to the first block only.
+    var first = part.label && !used[part.label];
+    if (first) {
+      var labelled = sensesFor(word, part.label);
+      if (labelled.length) { used[part.label] = 1; block.appendChild(senseList(labelled)); }
+    }
+    if (first && groups[part.label]) {
       used[part.label] = 1;
       block.appendChild(exampleFold(part.label, groups[part.label]));
     }
     elCn.appendChild(block);
   });
 
-  // Types the sentences show that the dictionary did not list.
-  exampleTypes(word).forEach(function (t) {
+  // Types the sentences or the labelled senses cover but the dictionary did not
+  // list — "the" is only an article in ECDICT, but has an adverb sense in
+  // "the more ... the more".
+  var extra = exampleTypes(word).slice();
+  (window.SENSES && window.SENSES[String(word || "").trim().toLowerCase()] || [])
+    .forEach(function (s) { if (extra.indexOf(s.p) < 0) extra.push(s.p); });
+  extra.forEach(function (t) {
     if (used[t]) return;
+    used[t] = 1;
     var block = document.createElement("div");
     block.className = "sense-block";
-    block.appendChild(exampleFold(t, groups[t]));
-    elCn.appendChild(block);
+    var head = document.createElement("div");
+    head.className = "meaning-row";
+    head.innerHTML = '<span class="meaning-pos">' + escapeHtml(t) + '</span><span class="meaning-terms"></span>';
+    var labelled = sensesFor(word, t);
+    if (labelled.length) {
+      block.appendChild(head);
+      block.appendChild(senseList(labelled));
+    }
+    if (groups[t]) block.appendChild(exampleFold(t, groups[t]));
+    if (block.childNodes.length) elCn.appendChild(block);
   });
 }
 
