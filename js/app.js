@@ -826,9 +826,11 @@ function splitMeaning(text) {
     return { label: "", text: part, domain: domain };
   }).filter(function (p) { return p.text; });
 
-  // Everyday senses first; a stable sort keeps each group's original order.
+  // A field-specific sense is worth showing only when it is all the word has.
+  // "can" means the ASCII cancel character in computing, which is true and
+  // useless next to 罐头; but "online" has nothing else, so 联机 must stay.
   var plain = parts.filter(function (p) { return !p.domain; });
-  return plain.concat(parts.filter(function (p) { return p.domain; }));
+  return plain.length ? plain : parts;
 }
 
 function splitMeaningTerms(text) {

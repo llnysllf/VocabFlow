@@ -152,10 +152,17 @@ stub until opened, so 2,000 rows do not each build four sentences up front.
 ## Meanings
 
 ECDICT marks field-specific senses with a bracketed tag — `[计]` computing, `[医]` medicine,
-`[化]` chemistry, `[经]` economics, `[法]` law. Left as-is they crowd out the everyday
-meaning: `for` led with a DOS batch command, and 819 words showed nothing else at all.
-Those senses are now **named and sorted last**, so `for` reads
-*prep. 为, 因为, 至于 / conj. 因为 / <sub>computing</sub> DOS批处理命令…*
+`[化]` chemistry, `[经]` economics, `[法]` law. `can` means the ASCII cancel character in
+computing and `for` is a DOS batch command; both are true and neither helps.
+
+A field sense is shown **only when it is all the word has**. `for` now reads
+*prep. 为, 因为, 至于 / conj. 因为* with the DOS command dropped, while `online` keeps
+<sub>computing</sub> 联机 because there is nothing else — 819 words are in that position and
+would otherwise render blank. 3,854 words that mix the two just lose the tail.
+
+A side effect worth knowing: about 20 words whose only part-of-speech marker sat inside a
+hidden field sense now count as *Other* rather than a noun or verb. Nothing becomes
+unreachable, since *Other* is the catch-all.
 
 WordNet also resolves some short words to the **abbreviation** that shares their spelling,
 so `who` was glossed as a UN agency, `me` as the state of Maine, `am` as americium. Those
