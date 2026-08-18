@@ -57,11 +57,14 @@ def clean_gloss(text):
 
 
 def chinese_terms(word):
-    """Wiktionary writes Han variants as "壞 /坏"; keep them as separate terms."""
+    """Wiktionary writes a word as "traditional /simplified" — 罐頭 /罐头 is one
+    word in two scripts, not two words. The rest of the app is simplified, so
+    keep the simplified form only. Genuinely different words are comma-separated.
+    """
     out = []
-    for part in re.split(r"[/,、]", str(word or "")):
-        part = part.strip()
-        if part and HAN.search(part) and len(part) <= 12:
+    for part in re.split(r"[,、;]", str(word or "")):
+        part = part.split("/")[-1].strip()          # trailing side is simplified
+        if part and HAN.search(part) and len(part) <= 12 and part not in out:
             out.append(part)
     return out
 

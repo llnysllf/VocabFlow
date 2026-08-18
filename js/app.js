@@ -849,14 +849,30 @@ function sensesFor(word, type) {
   return all.filter(function (s) { return s.p === type; });
 }
 
-function senseList(rows) {
+/* chinese term -> the English label for it, for one word type. */
+function glossMap(word, type) {
+  var map = {};
+  sensesFor(word, type).forEach(function (s) {
+    s.z.forEach(function (t) { if (!map[t]) map[t] = s.g; });
+  });
+  return map;
+}
+
+/* Only the senses whose Chinese the dictionary did not already list — the rest
+   are shown as a label on the term itself rather than repeated underneath. */
+function senseList(rows, alreadyShown) {
+  var lines = rows.filter(function (s) {
+    return !s.z.every(function (t) { return alreadyShown[t]; });
+  });
+  if (!lines.length) return null;
   var list = document.createElement("div");
   list.className = "sense-list";
-  rows.forEach(function (s) {
+  lines.forEach(function (s) {
     var line = document.createElement("div");
     line.className = "sense-line";
     line.innerHTML = '<span class="sense-zh">' +
-      s.z.map(function (t) { return '<span class="meaning-term">' + escapeHtml(t) + "</span>"; }).join("") +
+      s.z.filter(function (t) { return !alreadyShown[t]; })
+        .map(function (t) { return '<span class="meaning-term">' + escapeHtml(t) + "</span>"; }).join("") +
       '</span><span class="sense-gloss">' + escapeHtml(s.g) + "</span>";
     list.appendChild(line);
   });
@@ -889,10 +905,22 @@ function renderMeaning(text, word) {
       dom.textContent = part.domain;
       terms.appendChild(dom);
     }
+    // Where Wiktionary names what a term means, hang the label on the term
+    // itself rather than repeating the Chinese in a second list below.
+    var glosses = part.label ? glossMap(word, part.label) : {};
+    var shown = {};
     termList.forEach(function (term) {
       var chip = document.createElement("span");
       chip.className = "meaning-term";
       chip.textContent = term;
+      if (glosses[term]) {
+        chip.className += " has-gloss";
+        var g = document.createElement("small");
+        g.className = "term-gloss";
+        g.textContent = glosses[term];
+        chip.appendChild(g);
+        shown[term] = 1;
+      }
       terms.appendChild(chip);
     });
     row.appendChild(terms);
@@ -906,7 +934,11 @@ function renderMeaning(text, word) {
     var first = part.label && !used[part.label];
     if (first) {
       var labelled = sensesFor(word, part.label);
-      if (labelled.length) { used[part.label] = 1; block.appendChild(senseList(labelled)); }
+      if (labelled.length) {
+        used[part.label] = 1;
+        var extraSenses = senseList(labelled, shown);
+        if (extraSenses) block.appendChild(extraSenses);
+      }
     }
     if (first && groups[part.label]) {
       used[part.label] = 1;
@@ -931,8 +963,8 @@ function renderMeaning(text, word) {
     head.innerHTML = '<span class="meaning-pos">' + escapeHtml(t) + '</span><span class="meaning-terms"></span>';
     var labelled = sensesFor(word, t);
     if (labelled.length) {
-      block.appendChild(head);
-      block.appendChild(senseList(labelled));
+      var listEl = senseList(labelled, {});
+      if (listEl) { block.appendChild(head); block.appendChild(listEl); }
     }
     if (groups[t]) block.appendChild(exampleFold(t, groups[t]));
     if (block.childNodes.length) elCn.appendChild(block);

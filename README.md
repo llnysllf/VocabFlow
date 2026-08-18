@@ -167,14 +167,16 @@ Both are display fixes; `words.js` is untouched.
 
 ECDICT gives a flat list per word type and says nothing about which Chinese goes with which
 meaning. Wiktionary's translation tables do carry that label, so `senses.js` layers them on
-where they exist:
+where they exist — as a label on the term itself, not a second copy of it:
 
 ```
-break   v.  打破          to separate into two or more pieces
-        v.  折, 骨折       of a bone: to crack
-        v.  破戒, 犯戒     to do that which is forbidden
-        n.  休息          rest or pause, usually from work
+can   v.  装罐
+      n.  罐头 a more or less cylindrical vessel for liquids   容器
 ```
+
+A sense whose Chinese the dictionary did not already list is added as its own line; one it
+did list just gains the label. Wiktionary writes a word as `罐頭 /罐头`, traditional then
+simplified — only the simplified form is kept, since the rest of the app is simplified.
 
 Built by `tools/build-senses.py` from [kaikki.org](https://kaikki.org)'s machine-readable
 Wiktionary extract (CC BY-SA 4.0), streamed and filtered rather than stored — the extract is
