@@ -911,23 +911,24 @@ function renderMeaning(text, word) {
     // itself rather than repeating the Chinese in a second list below.
     var glosses = part.label ? glossMap(word, part.label) : {};
     var shown = {};
+    // The Chinese stays one unbroken run — it is the answer being tested — and
+    // the English drops to a caption underneath rather than splitting the chips.
+    var captions = [];
     termList.forEach(function (term) {
       var chip = document.createElement("span");
       chip.className = "meaning-term";
       chip.textContent = term;
-      if (!glosses[term]) { terms.appendChild(chip); return; }
-      // The English sits beside the chip, not inside it — the Chinese is the
-      // answer being tested and should keep its own box.
-      var pair = document.createElement("span");
-      pair.className = "term-pair";
-      pair.appendChild(chip);
-      var g = document.createElement("span");
-      g.className = "term-gloss";
-      g.textContent = glosses[term];
-      pair.appendChild(g);
-      terms.appendChild(pair);
-      shown[term] = 1;
+      terms.appendChild(chip);
+      if (glosses[term]) { captions.push({ term: term, gloss: glosses[term] }); shown[term] = 1; }
     });
+    // 得到 and 获得 are both "to obtain" — one caption, not the same line twice.
+    var byGloss = [];
+    captions.forEach(function (c) {
+      var hit = byGloss.filter(function (g) { return g.gloss === c.gloss; })[0];
+      if (hit) hit.terms.push(c.term);
+      else byGloss.push({ gloss: c.gloss, terms: [c.term] });
+    });
+    captions = byGloss;
     row.appendChild(terms);
 
     // The row itself opens the sentences — no separate header, just a count on
@@ -935,6 +936,22 @@ function renderMeaning(text, word) {
     var first = part.label && !used[part.label];
     var list = first ? groups[part.label] : null;
     var block, host;
+    // Name the term only when more than one on this row carries a caption;
+    // with a single caption it would just repeat the chip above it.
+    var captionEl = null;
+    if (captions.length) {
+      captionEl = document.createElement("div");
+      captionEl.className = "term-captions";
+      captions.forEach(function (c) {
+        var line = document.createElement("div");
+        line.className = "term-caption";
+        line.innerHTML = (captions.length > 1
+          ? '<span class="caption-term">' + escapeHtml(c.terms.join(" ")) + "</span>" : "") +
+          "<span>" + escapeHtml(c.gloss) + "</span>";
+        captionEl.appendChild(line);
+      });
+    }
+
     if (list) {
       block = document.createElement("details");
       block.className = "sense-block foldable";
@@ -945,10 +962,14 @@ function renderMeaning(text, word) {
       count.className = "ex-count";
       count.innerHTML = list.length + CHEVRON;
       host.appendChild(count);
+      // The caption belongs to the row, so it goes inside the summary — anything
+      // appended after it would be part of the collapsed body and stay hidden.
+      if (captionEl) host.appendChild(captionEl);
       block.appendChild(host);
     } else {
       block = document.createElement("div");
       block.className = "sense-block";
+      if (captionEl) row.appendChild(captionEl);
       block.appendChild(row);
     }
     // ECDICT can list a type twice (vt. and vi. both become "v."), so the

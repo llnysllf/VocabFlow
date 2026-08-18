@@ -179,12 +179,21 @@ where they exist — as a label on the term itself, not a second copy of it:
 
 ```
 v.    装罐
-n.    罐头  a more or less cylindrical vessel for liquids   容器      3 ›
+n.    罐头   容器                                              3 ›
+      a more or less cylindrical vessel for liquids
 ```
 
-The Chinese keeps its own chip and the English sits beside it as a note — the Chinese is
-the answer being tested. The count on the right opens that type's sentences; there is no
-separate heading for them.
+The Chinese stays one unbroken run — it is the answer being tested — and the English drops
+to a caption underneath rather than splitting the terms apart. Where a row carries two
+different senses the caption names its terms, and terms sharing a sense share one line:
+
+```
+n.    男人   人类   人                                          3 ›
+      男人 · adult male human
+      人类 人 · a human being
+```
+
+The count on the right opens that type's sentences; there is no separate heading for them.
 
 A sense whose Chinese the dictionary did not already list is added as its own line; one it
 did list just gains the label. Wiktionary writes a word as `罐頭 /罐头`, traditional then

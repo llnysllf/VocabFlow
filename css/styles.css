@@ -1482,15 +1482,26 @@ body.settings-mode .deck-nav{display:none}
 .sense-gloss{color:#94a1b6;font-size:12.5px;line-height:1.4}
 
 /* a term whose meaning Wiktionary names: the label rides with the word */
-/* Chinese keeps its chip; the English sits outside it, clearly a note */
-.term-pair{display:inline-flex;align-items:baseline;gap:8px;min-width:0}
-.term-gloss{
+/* The English sits under the Chinese, not between the chips — the terms are the
+   answer and should read as one run. */
+.term-captions{display:grid;gap:3px;margin:5px 0 0;grid-column:1/-1}
+.term-caption{
+  display:flex;
+  gap:8px;
+  align-items:baseline;
   color:#8d9bae;
-  font-size:11.5px;
+  font-size:12px;
   font-weight:600;
   font-style:italic;
-  line-height:1.35;
+  line-height:1.4;
 }
+.caption-term{
+  flex:none;
+  color:#b8c3d5;
+  font-style:normal;
+  font-weight:750;
+}
+.caption-term::after{content:" ·";color:#5d6879}
 
 /* The meaning row is the dropdown: a count and chevron on the row itself,
    rather than a separate "3 EXAMPLES AS NOUN" heading underneath it. */
@@ -1531,7 +1542,10 @@ body.settings-mode .deck-nav{display:none}
     align-items:center;
     gap:8px;
   }
-  .sense-block.foldable > summary .meaning-terms{flex:1 1 100%}
-  .ex-count{margin-left:auto}
-  .term-pair{flex-direction:column;align-items:flex-start;gap:3px}
+  /* part of speech and the count share the first line; terms and captions each
+     take a full line below it */
+  .sense-block.foldable > summary .meaning-pos{order:0}
+  .sense-block.foldable > summary .ex-count{order:1;margin-left:auto}
+  .sense-block.foldable > summary .meaning-terms{order:2;flex:1 1 100%}
+  .sense-block.foldable > summary .term-captions{order:3;flex:1 1 100%}
 }
