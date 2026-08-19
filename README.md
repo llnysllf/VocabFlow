@@ -137,17 +137,34 @@ the join by hand.
 
 Every sentence is part-of-speech tagged with [spaCy](https://spacy.io), and filed under the
 type the word actually has *in that sentence* — not under the dictionary's list, and not
-guessed from the translation. That covers **81%** of the word types the dictionary lists,
-and **5,436 words have an example for every type they list**.
+guessed from the translation. Two things are relaxed in stages so a good match always beats
+a merely acceptable one. A word is illustrated by its own form where possible and by a
+sentence sharing its lemma otherwise, so "I won an award" can serve `awards` and `said` is
+shown by a sentence that says. And because spaCy tags by Universal Dependencies while the
+dictionary labels by traditional grammar, each tag names one label it means outright and any
+it can also stand for: `this` and `every` are determiners to the tagger and adjectives to
+the dictionary, `not` is a particle and an adverb, an auxiliary is a verb. The parser is
+what keeps that honest — "This book is mine" and "What's this?" are both `DT`, and only the
+dependency says which is the adjective and which the pronoun.
 
 Within a type, the picks are spread across senses where the Chinese translation identifies
 one — that is why `break`'s three verb examples show breaking a rule, breaking in and
 breaking an object rather than three of the same. The sense drives the choosing only and is
 not shown on the sentence.
 
-Coverage follows frequency, which is the right shape — 99% of the top 1,000 words have
-examples, 92% of 1,000–3,000, falling to 9% by rank 15,000. In the Library the panel is a
-stub until opened, so 2,000 rows do not each build four sentences up front.
+**Coverage: 58% of the word types the dictionary lists, and 6,827 words have an example for
+every type they list.** It follows frequency, which is the right shape — every word in the
+top 1,000 has an example, 97% of 1,000–3,000, falling to 20% by rank 15,000.
+
+The ceiling is the corpus, not the matching: only 8,763 of the 15,000 headwords appear
+anywhere in Tatoeba's aligned English–Chinese pairs at all, so roughly 6,000 words have no
+sentence to find. Larger parallel corpora exist — WikiMatrix would reach 97% of the gap —
+but they are mined by similarity rather than written by people, and enough of their pairs
+are mistranslations or about a different sense of the word that they would cost more in
+trust than they return in coverage. Run `tools/check-examples.py` for the current numbers.
+
+In the Library the panel is a stub until opened, so 2,000 rows do not each build four
+sentences up front.
 
 ## Meanings
 
@@ -343,6 +360,7 @@ sentences.js          Chinese → English translation bank (window.SENTENCES)
 examples.js           Example sentences per headword (window.EXAMPLES)
 tools/build-ipa.py    Regenerates ipa.js from the CMU Pronouncing Dictionary
 tools/build-examples.py  Regenerates examples.js from Tatoeba
+tools/check-examples.py  Reports example coverage of the shipped files
 tools/rerank-words.py Re-sorts words.js by wordfreq corpus frequency
 backend/              AWS SAM stack: Cognito + API Gateway + Lambda + DynamoDB
 ```
