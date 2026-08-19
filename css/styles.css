@@ -1333,18 +1333,6 @@ body.settings-mode .deck-nav{display:none}
   border-radius:var(--radius);
   background:rgba(255,255,255,.035);
 }
-/* the sense this sentence shows — what makes two examples of "run" differ */
-.ex-sense{
-  display:inline-block;
-  margin-bottom:6px;
-  padding:2px 8px;
-  border:1px solid rgba(123,140,255,.3);
-  border-radius:999px;
-  background:rgba(123,140,255,.12);
-  color:#aab7ff;
-  font-size:11px;
-  font-weight:800;
-}
 .ex-line{display:flex;align-items:flex-start;gap:8px}
 .ex-en{color:#eef3f8;font-size:15px;line-height:1.45;flex:1;min-width:0}
 .ex-line .speak-btn{margin-top:1px}
@@ -1477,18 +1465,71 @@ body.settings-mode .deck-nav{display:none}
 .bc-sep{color:#5d6879;padding:0 1px}
 .browseitem .meaning-domain{margin-right:2px}
 
-/* Wiktionary's labelled senses, sitting under the flat ECDICT list for a type:
-   the Chinese, then in plain English which meaning it is. */
-.sense-list{display:grid;gap:4px;margin:2px 0 2px 6px}
-.sense-line{
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr);
-  gap:10px;
+/* Wiktionary names which sense a Chinese term is. The English sits under the
+   Chinese, not between the chips — the terms are the answer and should read as
+   one run. */
+.term-captions{display:grid;gap:3px;margin:5px 0 0;grid-column:1/-1}
+.term-caption{
+  display:flex;
+  gap:8px;
   align-items:baseline;
-  padding:5px 9px;
-  border-left:2px solid rgba(123,140,255,.35);
-  border-radius:0 8px 8px 0;
-  background:rgba(123,140,255,.05);
+  color:#8d9bae;
+  font-size:12px;
+  font-weight:600;
+  font-style:italic;
+  line-height:1.4;
 }
-.sense-zh{display:flex;flex-wrap:wrap;gap:5px}
-.sense-gloss{color:#94a1b6;font-size:12.5px;line-height:1.4}
+.caption-term{
+  flex:none;
+  color:#b8c3d5;
+  font-style:normal;
+  font-weight:750;
+}
+.caption-term::after{content:" ·";color:#5d6879}
+
+/* The meaning row is the dropdown: a count and chevron on the row itself,
+   rather than a separate "3 EXAMPLES AS NOUN" heading underneath it. */
+.sense-block.foldable > summary{
+  cursor:pointer;
+  list-style:none;
+  grid-template-columns:46px minmax(0,1fr) auto;
+}
+.sense-block.foldable > summary.plain{grid-template-columns:minmax(0,1fr) auto}
+.sense-block.foldable > summary::-webkit-details-marker{display:none}
+.sense-block.foldable > summary:hover{border-color:rgba(255,255,255,.16)}
+.ex-count{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  align-self:center;
+  justify-self:end;
+  padding:2px 7px 2px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.06);
+  color:#8d9bae;
+  font-size:11px;
+  font-weight:800;
+}
+.ex-count .chev{width:12px;height:12px;display:inline-grid;place-items:center;transition:transform .18s ease}
+.ex-count .chev svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.sense-block.foldable[open] > summary .chev{transform:rotate(90deg)}
+.sense-block.foldable > .ex-body{margin:8px 0 2px 6px}
+
+/* Narrow screens: keep the Chinese on one line and drop the English note
+   underneath it. Must come after the base rules to win the cascade. */
+@media (max-width:520px){
+  /* The base mobile rule collapses .meaning-row to one column, which fights a
+     grid column for the count — flow the row instead. */
+  .sense-block.foldable > summary{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+  }
+  /* part of speech and the count share the first line; terms and captions each
+     take a full line below it */
+  .sense-block.foldable > summary .meaning-pos{order:0}
+  .sense-block.foldable > summary .ex-count{order:1;margin-left:auto}
+  .sense-block.foldable > summary .meaning-terms{order:2;flex:1 1 100%}
+  .sense-block.foldable > summary .term-captions{order:3;flex:1 1 100%}
+}

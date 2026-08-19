@@ -133,28 +133,60 @@ the join by hand.
 | | |
 |---|---|
 | **n.** Noun | Take a break. — 休息一下吧。 · The break is over. · I just need a break. |
-| **v.** Verb | *打断* We didn't break in. · *打破* I sometimes break the rules. · *弄坏* Did Tom break something again? |
+| **v.** Verb | We didn't break in. · I sometimes break the rules. · Did Tom break something again? |
 
 Every sentence is part-of-speech tagged with [spaCy](https://spacy.io), and filed under the
 type the word actually has *in that sentence* — not under the dictionary's list, and not
-guessed from the translation. That covers **81%** of the word types the dictionary lists,
-and **5,436 words have an example for every type they list**.
+guessed from the translation. Two things are relaxed in stages so a good match always beats
+a merely acceptable one. A word is illustrated by its own form where possible and by a
+sentence sharing its lemma otherwise, so "I won an award" can serve `awards` and `said` is
+shown by a sentence that says. And because spaCy tags by Universal Dependencies while the
+dictionary labels by traditional grammar, each tag names one label it means outright and any
+it can also stand for: `this` and `every` are determiners to the tagger and adjectives to
+the dictionary, `not` is a particle and an adverb, an auxiliary is a verb. The parser is
+what keeps that honest — "This book is mine" and "What's this?" are both `DT`, and only the
+dependency says which is the adjective and which the pronoun.
 
-Within a type, a sentence is additionally labelled with the specific sense when the Chinese
-translation makes it unambiguous (打断 / 打破 / 弄坏 above). Around **39%** of type groups have at
-least one such sense-confirmed sentence; the rest rest on the tagger.
+Within a type, the picks are spread across senses where the Chinese translation identifies
+one — that is why `break`'s three verb examples show breaking a rule, breaking in and
+breaking an object rather than three of the same. The sense drives the choosing only and is
+not shown on the sentence.
 
-Coverage follows frequency, which is the right shape — 99% of the top 1,000 words have
-examples, 92% of 1,000–3,000, falling to 9% by rank 15,000. In the Library the panel is a
-stub until opened, so 2,000 rows do not each build four sentences up front.
+**Coverage: 58% of the word types the dictionary lists, and 6,827 words have an example for
+every type they list.** It follows frequency, which is the right shape — every word in the
+top 1,000 has an example, 97% of 1,000–3,000, falling to 20% by rank 15,000.
+
+The ceiling is the corpus, not the matching: only 8,763 of the 15,000 headwords appear
+anywhere in Tatoeba's aligned English–Chinese pairs at all, so roughly 6,000 words have no
+sentence to find. Larger parallel corpora exist — WikiMatrix would reach 97% of the gap —
+but they are mined by similarity rather than written by people, and enough of their pairs
+are mistranslations or about a different sense of the word that they would cost more in
+trust than they return in coverage. Run `tools/check-examples.py` for the current numbers.
+
+In the Library the panel is a stub until opened, so 2,000 rows do not each build four
+sentences up front.
 
 ## Meanings
 
 ECDICT marks field-specific senses with a bracketed tag — `[计]` computing, `[医]` medicine,
-`[化]` chemistry, `[经]` economics, `[法]` law. Left as-is they crowd out the everyday
-meaning: `for` led with a DOS batch command, and 819 words showed nothing else at all.
-Those senses are now **named and sorted last**, so `for` reads
-*prep. 为, 因为, 至于 / conj. 因为 / <sub>computing</sub> DOS批处理命令…*
+`[化]` chemistry, `[经]` economics, `[法]` law. `can` means the ASCII cancel character in
+computing and `for` is a DOS batch command; both are true and neither helps.
+
+A field sense is shown **only when it is all the word has**. `for` now reads
+*prep. 为, 因为, 至于 / conj. 因为* with the DOS command dropped, while `online` keeps
+<sub>computing</sub> 联机 because there is nothing else — 819 words are in that position and
+would otherwise render blank. 3,854 words that mix the two just lose the tail.
+
+A side effect worth knowing: about 20 words whose only part-of-speech marker sat inside a
+hidden field sense now count as *Other* rather than a noun or verb. Nothing becomes
+unreachable, since *Other* is the catch-all.
+
+ECDICT also repeats itself and occasionally carries no Chinese at all, so a term is shown
+once per part of speech — `like` listed 喜欢 under both `vt.` and `vi.`, which collapse to
+one `v.`, and `happen` listed 发生 twice in a single row — and a term with no Chinese
+characters is dropped, which removes acronym expansions (`facts`) and biographical dates
+(`roosevelt`). Two words are nothing but that, `word` and `pk`, and keep what they have
+rather than rendering blank.
 
 WordNet also resolves some short words to the **abbreviation** that shares their spelling,
 so `who` was glossed as a UN agency, `me` as the state of Maine, `am` as americium. Those
@@ -167,14 +199,29 @@ Both are display fixes; `words.js` is untouched.
 
 ECDICT gives a flat list per word type and says nothing about which Chinese goes with which
 meaning. Wiktionary's translation tables do carry that label, so `senses.js` layers them on
-where they exist:
+where they exist — as a label on the term itself, not a second copy of it:
 
 ```
-break   v.  打破          to separate into two or more pieces
-        v.  折, 骨折       of a bone: to crack
-        v.  破戒, 犯戒     to do that which is forbidden
-        n.  休息          rest or pause, usually from work
+v.    装罐
+n.    罐头   容器                                              3 ›
+      a more or less cylindrical vessel for liquids
 ```
+
+The Chinese stays one unbroken run — it is the answer being tested — and the English drops
+to a caption underneath rather than splitting the terms apart. Where a row carries two
+different senses the caption names its terms, and terms sharing a sense share one line:
+
+```
+n.    男人   人类   人                                          3 ›
+      男人 · adult male human
+      人类 人 · a human being
+```
+
+The count on the right opens that type's sentences; there is no separate heading for them.
+
+A sense whose Chinese the dictionary did not already list is added as its own line; one it
+did list just gains the label. Wiktionary writes a word as `罐頭 /罐头`, traditional then
+simplified — only the simplified form is kept, since the rest of the app is simplified.
 
 Built by `tools/build-senses.py` from [kaikki.org](https://kaikki.org)'s machine-readable
 Wiktionary extract (CC BY-SA 4.0), streamed and filtered rather than stored — the extract is
@@ -313,6 +360,7 @@ sentences.js          Chinese → English translation bank (window.SENTENCES)
 examples.js           Example sentences per headword (window.EXAMPLES)
 tools/build-ipa.py    Regenerates ipa.js from the CMU Pronouncing Dictionary
 tools/build-examples.py  Regenerates examples.js from Tatoeba
+tools/check-examples.py  Reports example coverage of the shipped files
 tools/rerank-words.py Re-sorts words.js by wordfreq corpus frequency
 backend/              AWS SAM stack: Cognito + API Gateway + Lambda + DynamoDB
 ```
